@@ -46,6 +46,8 @@ public class KubeApi {
 // --disable-admission-plugins ServiceAccount
 
 
+        // system:masters for client group
+
     }
 
     private void stopApiServer() {
