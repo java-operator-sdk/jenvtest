@@ -46,8 +46,8 @@ public class KubeApi {
 // --disable-admission-plugins ServiceAccount
 
 
-        // system:masters for client group
-
+   // system:masters for client group
+   // https://stackoverflow.com/questions/21297139/how-do-you-sign-a-certificate-signing-request-with-your-certification-authority
     }
 
     private void stopApiServer() {
