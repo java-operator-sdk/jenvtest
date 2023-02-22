@@ -5,19 +5,19 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-public class KubeApi {
+public class APIServer {
 
-    private static final Logger log = LoggerFactory.getLogger(KubeApi.class);
+    private static final Logger log = LoggerFactory.getLogger(APIServer.class);
 
-    private final KubeApiConfig config;
+    private final APIServerConfig config;
     private BinaryHandler binaryHandler;
     private Process etcdProcess;
 
-    public KubeApi() {
-        this(new KubeApiConfig());
+    public APIServer() {
+        this(new APIServerConfig());
     }
 
-    public KubeApi(KubeApiConfig config) {
+    public APIServer(APIServerConfig config) {
         this.config = config;
         this.binaryHandler = new BinaryHandler(config.getBinaryDirectory());
     }
