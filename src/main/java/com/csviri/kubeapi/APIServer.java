@@ -3,6 +3,7 @@ package com.csviri.kubeapi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 
 public class APIServer {
@@ -27,27 +28,12 @@ public class APIServer {
         startApiServer();
     }
 
-
-
     public void stop() {
         stopApiServer();
         stopEtcd();
     }
 
     private void startApiServer() {
-
-// ./kube-apiserver --cert-dir .
-// --etcd-servers http://0.0.0.0:2379
-// --authorization-mode RBAC
-// --service-account-issuer https://localhost
-// --service-account-signing-key-file /home/csviri/Downloads/kubeapi/tempcerts/apiserver.key
-// --service-account-key-file /home/csviri/Downloads/kubeapi/tempcerts/apiserver.key
-// --service-account-issuer /home/csviri/Downloads/kubeapi/tempcerts/apiserver.cert
-// --disable-admission-plugins ServiceAccount
-
-
-   // system:masters for client group
-   // https://stackoverflow.com/questions/21297139/how-do-you-sign-a-certificate-signing-request-with-your-certification-authority
     }
 
     private void stopApiServer() {
@@ -64,6 +50,9 @@ public class APIServer {
     private void startEtcd() {
         var etcdBinary = binaryHandler.binaries().getEtcd();
         try {
+            if (!etcdBinary.exists()) {
+                throw new KubeApiException("Missing binary from etcd on path: " + etcdBinary.getAbsolutePath());
+            }
             // todo config ports
             etcdProcess = new ProcessBuilder(etcdBinary.getAbsolutePath(),
                     "--listen-client-urls=http://0.0.0.0:2379",
