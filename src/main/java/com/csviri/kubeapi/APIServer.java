@@ -14,6 +14,7 @@ public class APIServer {
     private final APIServerConfig config;
     private BinaryManager binaryManager;
     private CertManager certManager;
+    private KubeConfigManager kubeConfigManager;
     private Process etcdProcess;
     private Process apiServerProcess;
 
@@ -25,6 +26,7 @@ public class APIServer {
         this.config = config;
         this.binaryManager = new BinaryManager(config.getJenvtestDirectory());
         this.certManager = new CertManager(config.getJenvtestDirectory());
+        this.kubeConfigManager = new KubeConfigManager(certManager);
     }
 
     public void start() {
@@ -33,6 +35,7 @@ public class APIServer {
         cleanPreviousState();
         startEtcd();
         startApiServer();
+        kubeConfigManager.updateKubeConfig();
     }
 
     private void prepareLogDirectory() {
