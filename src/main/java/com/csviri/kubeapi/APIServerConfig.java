@@ -4,20 +4,24 @@ import java.io.File;
 
 public class APIServerConfig {
 
-    public static final String KUBE_API_DEFAULT_DIRECTORY_NAME = ".jenvtest";
+    public static final String DIRECTORY_NAME = ".jenvtest";
 
-    private String binaryDirectory;
+    private String jenvtestDir;
 
     public APIServerConfig() {
-        this.binaryDirectory = System.getProperty("user.home") + File.separator + KUBE_API_DEFAULT_DIRECTORY_NAME;
+        this.jenvtestDir = System.getProperty("user.home") + File.separator + DIRECTORY_NAME;
     }
 
-    public String getBinaryDirectory() {
-        return binaryDirectory;
+    public String getJenvtestDirectory() {
+        return jenvtestDir;
     }
 
-    public APIServerConfig setBinaryDirectory(String binaryDirectory) {
-        this.binaryDirectory = binaryDirectory;
+    public APIServerConfig setJenvtestDir(String jenvtestDir) {
+        this.jenvtestDir = jenvtestDir;
         return this;
+    }
+
+    public String logDirectory() {
+        return new File(jenvtestDir,"logs").getPath();
     }
 }

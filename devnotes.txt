@@ -14,7 +14,8 @@ run etcd:
  ./etcd --listen-client-urls=http://0.0.0.0:2379 --advertise-client-urls=http://0.0.0.0:2379
 
 run self signed:
- ./kube-apiserver --cert-dir /home/csviri/Downloads/kubeapi/selfsignedclient/api  --etcd-servers http://0.0.0.0:2379 --authorization-mode RBAC --service-account-issuer https://localhost --service-account-signing-key-file /home/csviri/Downloads/kubeapi/tempcerts/apiserver.key --service-account-signing-key-file /home/csviri/Downloads/kubeapi/tempcerts/apiserver.key --service-account-key-file /home/csviri/Downloads/kubeapi/tempcerts/apiserver.key --service-account-issuer /home/csviri/Downloads/kubeapi/tempcerts/apiserver.cert --disable-admission-plugins ServiceAccount --client-ca-file /home/csviri/Downloads/kubeapi/selfsignedclient/client.crt
+
+ ./kube-apiserver --cert-dir /home/csviri/.jenvtest/  --etcd-servers http://0.0.0.0:2379 --authorization-mode RBAC --service-account-issuer https://localhost --service-account-signing-key-file /home/csviri/.jenvtest/apiserver.key --service-account-signing-key-file /home/csviri/.jenvtest/apiserver.key --service-account-key-file /home/csviri/Downloads/kubeapi/tempcerts/apiserver.key --service-account-issuer /home/csviri/.jenvtest/apiserver.cert --disable-admission-plugins ServiceAccount --client-ca-file /home/csviri/.jenvtest/client.crt
 
 // ./kube-apiserver --cert-dir .
 // --etcd-servers http://0.0.0.0:2379

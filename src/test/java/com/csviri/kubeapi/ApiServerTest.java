@@ -6,9 +6,8 @@ class ApiServerTest {
 
     @Test
     void testStartup() {
-        var kubeApi = new APIServer(new APIServerConfig().setBinaryDirectory("/home/csviri/Downloads/kubeapi"));
+        var kubeApi = new APIServer();
         kubeApi.start();
-
         kubeApi.stop();
     }
 
