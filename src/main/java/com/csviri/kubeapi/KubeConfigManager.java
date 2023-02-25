@@ -25,9 +25,15 @@ public class KubeConfigManager {
         execAndWait("kubectl", "config", "use-context", "jenvtest");
     }
 
-    // todo
-    public void removeFromKubeConfig() {
+    public void cleanupFromKubeConfig() {
         log.debug("Cleanig up kubeconfig");
+        unset("contexts.jenvtest");
+        unset("clusters.jenvtest");
+        unset("users.jenvtest");
+    }
+
+    private void unset(String target) {
+        execAndWait("kubectl","config","unset", target);
     }
 
     private void execAndWait(String... arguments) {

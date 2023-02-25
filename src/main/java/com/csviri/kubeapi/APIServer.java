@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 public class APIServer {
 
@@ -36,6 +35,7 @@ public class APIServer {
         startEtcd();
         startApiServer();
         kubeConfigManager.updateKubeConfig();
+        waitUntilDefaultNamespaceCreated();
     }
 
     private void prepareLogDirectory() {
@@ -51,30 +51,7 @@ public class APIServer {
     public void stop() {
         stopApiServer();
         stopEtcd();
-    }
-
-    private void startApiServer() {
-        certManager.ensureAPIServerCertificates();
-        var apiServerBinary = binaryManager.binaries().getApiServer();
-        try {
-            if (!apiServerBinary.exists()) {
-                throw new KubeApiException("Missing binary for API Server on path: " + apiServerBinary.getAbsolutePath());
-            }
-            apiServerProcess = new ProcessBuilder(apiServerBinary.getAbsolutePath(),
-                    "--cert-dir", config.getJenvtestDirectory(), "--etcd-servers",
-                    "http://0.0.0.0:2379", "--authorization-mode", "RBAC", "--service-account-issuer",
-                    "https://localhost", "--service-account-signing-key-file", certManager.getAPIServerKeyPath(),
-                    "--service-account-signing-key-file", certManager.getAPIServerKeyPath(),
-                    "--service-account-key-file", certManager.getAPIServerKeyPath(), "--service-account-issuer",
-                    certManager.getAPIServerCertPath(),
-                    "--disable-admission-plugins", "ServiceAccount", "--client-ca-file", certManager.getClientCertPath())
-                    .redirectOutput(new File(config.logDirectory(), "apiserver.logs"))
-                    .redirectError(new File(config.logDirectory(), "apiserver.logs"))
-                    .start();
-            log.debug("API Server started");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        kubeConfigManager.cleanupFromKubeConfig();
     }
 
     private void stopApiServer() {
@@ -96,6 +73,11 @@ public class APIServer {
         log.debug("etcd stopped");
     }
 
+    private void waitUntilDefaultNamespaceCreated() {
+
+    }
+
+    // todo detect if process not started up correctly
     private void startEtcd() {
         var etcdBinary = binaryManager.binaries().getEtcd();
         try {
@@ -111,10 +93,37 @@ public class APIServer {
                     .redirectOutput(logsFile)
                     .redirectError(logsFile)
                     .start();
-//            etcdProcess.waitFor(5, TimeUnit.SECONDS);
             log.debug("etcd started");
         } catch (IOException e) {
             throw new KubeApiException(e);
+        }
+    }
+
+    private void startApiServer() {
+        certManager.ensureAPIServerCertificates();
+        var apiServerBinary = binaryManager.binaries().getApiServer();
+        try {
+            if (!apiServerBinary.exists()) {
+                throw new KubeApiException("Missing binary for API Server on path: " + apiServerBinary.getAbsolutePath());
+            }
+            var logsFile = new File(config.logDirectory(), "apiserver.logs");
+            apiServerProcess = new ProcessBuilder(apiServerBinary.getAbsolutePath(),
+                    "--cert-dir", config.getJenvtestDirectory(), "--etcd-servers",
+                    "http://0.0.0.0:2379", "--authorization-mode", "RBAC", "--service-account-issuer",
+                    "https://localhost", "--service-account-signing-key-file", certManager.getAPIServerKeyPath(),
+                    "--service-account-signing-key-file", certManager.getAPIServerKeyPath(),
+                    "--service-account-key-file", certManager.getAPIServerKeyPath(), "--service-account-issuer",
+                    certManager.getAPIServerCertPath(),
+                    "--disable-admission-plugins", "ServiceAccount", "--client-ca-file", certManager.getClientCertPath()
+//                    "--service-cluster-ip-range", "10.0.0.0/24",
+//                    "--allow-privileged", "true"
+                    )
+                    .redirectOutput(logsFile)
+                    .redirectError(logsFile)
+                    .start();
+            log.debug("API Server started");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }
