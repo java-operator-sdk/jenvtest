@@ -11,7 +11,7 @@ client cert (no CA) :
 openssl req -nodes -x509 -sha256 -newkey rsa:4096   -keyout client.key   -out client.crt   -days 356   -subj "/C=NL/ST=Zuid Holland/L=Rotterdam/O=system:masters/OU=IT Dept/CN=attila"
 
 run etcd:
- ./etcd --listen-client-urls=http://0.0.0.0:2379 --advertise-client-urls=http://0.0.0.0:2379
+ ./etcd --listen-client-urls=http://0.0.0.0:2379 --advertise-client-urls=http://0.0.0.0:2379 --wal-dir=/home/csviri/.jenvtest/etcddata/ --unsafe-no-fsync=true
 
 run self signed:
 

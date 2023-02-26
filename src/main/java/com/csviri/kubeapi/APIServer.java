@@ -1,5 +1,6 @@
 package com.csviri.kubeapi;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +32,7 @@ public class APIServer {
     public void start() {
         log.debug("Stating. Using jenvtest dir: {}", config.getJenvtestDirectory());
         prepareLogDirectory();
-        cleanPreviousState();
+        cleanEtcdData();
         startEtcd();
         startApiServer();
         kubeConfigManager.updateKubeConfig();
@@ -52,6 +53,7 @@ public class APIServer {
         stopApiServer();
         stopEtcd();
         kubeConfigManager.cleanupFromKubeConfig();
+        cleanEtcdData();
     }
 
     private void stopApiServer() {
@@ -61,8 +63,12 @@ public class APIServer {
         log.debug("API Server stopped");
     }
 
-    private void cleanPreviousState() {
-        // todo
+    private void cleanEtcdData() {
+        try {
+            FileUtils.deleteDirectory(new File("default.etcd"));
+        } catch (IOException e) {
+            throw new KubeApiException(e);
+        }
     }
 
 
@@ -74,7 +80,7 @@ public class APIServer {
     }
 
     private void waitUntilDefaultNamespaceCreated() {
-
+       // todo
     }
 
     // todo detect if process not started up correctly
@@ -108,19 +114,24 @@ public class APIServer {
             }
             var logsFile = new File(config.logDirectory(), "apiserver.logs");
             apiServerProcess = new ProcessBuilder(apiServerBinary.getAbsolutePath(),
-                    "--cert-dir", config.getJenvtestDirectory(), "--etcd-servers",
-                    "http://0.0.0.0:2379", "--authorization-mode", "RBAC", "--service-account-issuer",
-                    "https://localhost", "--service-account-signing-key-file", certManager.getAPIServerKeyPath(),
+                    "--cert-dir", config.getJenvtestDirectory(),
+                    "--etcd-servers", "http://0.0.0.0:2379",
+                    "--authorization-mode", "RBAC",
+                    "--service-account-issuer", "https://localhost",
                     "--service-account-signing-key-file", certManager.getAPIServerKeyPath(),
-                    "--service-account-key-file", certManager.getAPIServerKeyPath(), "--service-account-issuer",
-                    certManager.getAPIServerCertPath(),
-                    "--disable-admission-plugins", "ServiceAccount", "--client-ca-file", certManager.getClientCertPath()
-//                    "--service-cluster-ip-range", "10.0.0.0/24",
-//                    "--allow-privileged", "true"
+                    "--service-account-signing-key-file", certManager.getAPIServerKeyPath(),
+                    "--service-account-key-file", certManager.getAPIServerKeyPath(),
+                    "--service-account-issuer", certManager.getAPIServerCertPath(),
+                    "--disable-admission-plugins", "ServiceAccount",
+                    "--client-ca-file", certManager.getClientCertPath(),
+                    "--service-cluster-ip-range", "10.0.0.0/24",
+                    "--allow-privileged"
                     )
                     .redirectOutput(logsFile)
                     .redirectError(logsFile)
                     .start();
+              // todo detect premature termination
+//            apiServerProcess.onExit()
             log.debug("API Server started");
         } catch (IOException e) {
             throw new RuntimeException(e);
