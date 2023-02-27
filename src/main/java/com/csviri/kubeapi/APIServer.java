@@ -4,19 +4,22 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.util.Scanner;
 
 public class APIServer {
 
     private static final Logger log = LoggerFactory.getLogger(APIServer.class);
+    public static final int STARTUP_TIMEOUT = 10_000;
 
     private final APIServerConfig config;
     private BinaryManager binaryManager;
     private CertManager certManager;
     private KubeConfigManager kubeConfigManager;
     private Process etcdProcess;
-    private Process apiServerProcess;
+    private volatile Process apiServerProcess;
+    private Thread startupWaiter;
+    private volatile boolean startedUpProperly;
 
     public APIServer() {
         this(new APIServerConfig());
@@ -30,13 +33,14 @@ public class APIServer {
     }
 
     public void start() {
-        log.debug("Stating. Using jenvtest dir: {}", config.getJenvtestDirectory());
+        log.debug("Stating API Server. Using jenvtest dir: {}", config.getJenvtestDirectory());
         prepareLogDirectory();
         cleanEtcdData();
         startEtcd();
         startApiServer();
         kubeConfigManager.updateKubeConfig();
         waitUntilDefaultNamespaceCreated();
+        log.info("API Server ready to use");
     }
 
     private void prepareLogDirectory() {
@@ -58,7 +62,7 @@ public class APIServer {
 
     private void stopApiServer() {
         if (apiServerProcess != null) {
-            apiServerProcess.destroy();
+            apiServerProcess.destroyForcibly();
         }
         log.debug("API Server stopped");
     }
@@ -71,7 +75,6 @@ public class APIServer {
         }
     }
 
-
     private void stopEtcd() {
         if (etcdProcess != null) {
             etcdProcess.destroy();
@@ -80,7 +83,14 @@ public class APIServer {
     }
 
     private void waitUntilDefaultNamespaceCreated() {
-       // todo
+        try {
+            startupWaiter.join(STARTUP_TIMEOUT);
+            if (!startedUpProperly) {
+                throw new KubeApiException("Something went wrong starting up KubeApi server. Check the logs");
+            }
+        } catch (InterruptedException e) {
+            throw new KubeApiException(e);
+        }
     }
 
     // todo detect if process not started up correctly
@@ -96,6 +106,7 @@ public class APIServer {
             etcdProcess = new ProcessBuilder(etcdBinary.getAbsolutePath(),
                     "--listen-client-urls=http://0.0.0.0:2379",
                     "--advertise-client-urls=http://0.0.0.0:2379")
+                    // todo log to a different logger on debug level
                     .redirectOutput(logsFile)
                     .redirectError(logsFile)
                     .start();
@@ -126,15 +137,34 @@ public class APIServer {
                     "--client-ca-file", certManager.getClientCertPath(),
                     "--service-cluster-ip-range", "10.0.0.0/24",
                     "--allow-privileged"
-                    )
-                    .redirectOutput(logsFile)
-                    .redirectError(logsFile)
+            )
                     .start();
-              // todo detect premature termination
+
+            addStartupReadyHandler();
+            // todo detect premature termination
 //            apiServerProcess.onExit()
             log.debug("API Server started");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
+
+    private void addStartupReadyHandler() {
+        // alternative would be to use health checks? https://kubernetes.io/docs/reference/using-api/health-checks/
+        // waits until fully started, otherwise default namespace might be missing
+        this.startupWaiter = new Thread(() -> {
+            // todo the scanner is not closed
+            Scanner sc = new Scanner(apiServerProcess.getErrorStream());
+                while (sc.hasNextLine()) {
+                    String line = sc.nextLine();
+//                    if (line.contains("Caches are synced")) {
+                    if (line.contains("all system priority classes are created successfully or already exist")) {
+                        startedUpProperly = true;
+                        return;
+                    }
+                }
+            });
+        this.startupWaiter.start();
+    }
+
 }
