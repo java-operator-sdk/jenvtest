@@ -3,7 +3,9 @@ package com.csviri.kubeapi;
 import java.io.File;
 
 public class BinaryManager {
-    public static final String DEFAULT_VERSION_1_26_1 = "v1.26.1";
+    
+    public static final String DEFAULT_VERSION_1_26_1 = "v1.26.2";
+    public static final String DEFAULT_ETD_VERSION = "v3.4.24";
     public static final String ETCD_BINARY_NAME = "etcd";
     public static final String API_SERVER_BINARY_NAME = "kube-apiserver";
     public static final String KUBECTL_BINARY_NAME = "kubectl";
@@ -18,10 +20,8 @@ public class BinaryManager {
         this.jenvtestDir = jenvtestDir;
     }
 
-    public ApiBinaries downloadBinariesIfNotPresent() {
+    public void downloadBinariesIfNotPresent() {
 
-
-        return null;
     }
 
     public ApiBinaries binaries() {
