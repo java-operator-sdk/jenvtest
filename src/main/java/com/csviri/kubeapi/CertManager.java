@@ -66,6 +66,7 @@ public class CertManager {
     public String getClientCertPath() {
         return new File(jenvtestDir, CLIENT_CERT_NAME).getAbsolutePath();
     }
+
     public String getClientKeyPath() {
         return new File(jenvtestDir, CLIENT_KEY_NAME).getAbsolutePath();
     }

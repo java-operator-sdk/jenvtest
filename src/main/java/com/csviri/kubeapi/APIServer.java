@@ -19,6 +19,7 @@ public class APIServer {
     private final KubeConfigManager kubeConfigManager;
     private Process etcdProcess;
     private volatile Process apiServerProcess;
+    private volatile boolean stopped = false;
 
     public APIServer() {
         this(new APIServerConfig());
@@ -42,6 +43,15 @@ public class APIServer {
         log.info("API Server ready to use");
     }
 
+    public void stop() {
+        stopped = true;
+        stopApiServer();
+        stopEtcd();
+        kubeConfigManager.cleanupFromKubeConfig();
+        cleanEtcdData();
+        log.debug("Fully stopped.");
+    }
+
     private void prepareLogDirectory() {
         var logDir = new File(config.logDirectory());
         if (!logDir.exists()) {
@@ -52,13 +62,6 @@ public class APIServer {
         }
     }
 
-    public void stop() {
-        stopApiServer();
-        stopEtcd();
-        kubeConfigManager.cleanupFromKubeConfig();
-        cleanEtcdData();
-        log.debug("Fully stopped.");
-    }
 
     private void stopApiServer() {
         if (apiServerProcess != null) {
@@ -127,6 +130,12 @@ public class APIServer {
                     .redirectOutput(logsFile)
                     .redirectError(logsFile)
                     .start();
+            etcdProcess.onExit().thenApply(p-> {
+               if (!stopped) {
+                   throw new KubeApiException("Etcd stopped unexpectedly");
+               }
+               return null;
+            });
             log.debug("etcd started");
         } catch (IOException e) {
             throw new KubeApiException(e);
@@ -140,7 +149,7 @@ public class APIServer {
             if (!apiServerBinary.exists()) {
                 throw new KubeApiException("Missing binary for API Server on path: " + apiServerBinary.getAbsolutePath());
             }
-            var logsFile = new File(config.logDirectory(), "apiserver.logs");
+
             apiServerProcess = new ProcessBuilder(apiServerBinary.getAbsolutePath(),
                     "--cert-dir", config.getJenvtestDirectory(),
                     "--etcd-servers", "http://0.0.0.0:2379",
@@ -156,6 +165,12 @@ public class APIServer {
                     "--allow-privileged"
             )
                     .start();
+            apiServerProcess.onExit().thenApply(p-> {
+                if (!stopped) {
+                    throw new KubeApiException("APIServer stopped unexpectedly.");
+                }
+                return null;
+            });
             log.debug("API Server started");
         } catch (IOException e) {
             throw new RuntimeException(e);
