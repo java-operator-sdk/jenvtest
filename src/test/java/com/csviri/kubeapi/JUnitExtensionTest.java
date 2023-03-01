@@ -12,10 +12,10 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @EnableAPIServer
-public class JUnitExtensionTest {
+class JUnitExtensionTest {
 
     @Test
-    public void testCommunication() {
+    void testCommunication() {
         var client = new KubernetesClientBuilder().build();
         client.resource(configMap()).createOrReplace();
         var cm = client.resource(configMap()).get();

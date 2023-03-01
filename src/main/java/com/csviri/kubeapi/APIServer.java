@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class APIServer {
 
@@ -13,13 +14,11 @@ public class APIServer {
     public static final int STARTUP_TIMEOUT = 10_000;
 
     private final APIServerConfig config;
-    private BinaryManager binaryManager;
-    private CertManager certManager;
-    private KubeConfigManager kubeConfigManager;
+    private final BinaryManager binaryManager;
+    private final CertManager certManager;
+    private final KubeConfigManager kubeConfigManager;
     private Process etcdProcess;
     private volatile Process apiServerProcess;
-    private Thread startupWaiter;
-    private volatile boolean startedUpProperly;
 
     public APIServer() {
         this(new APIServerConfig());
@@ -39,7 +38,7 @@ public class APIServer {
         startEtcd();
         startApiServer();
         kubeConfigManager.updateKubeConfig();
-        waitUntilDefaultNamespaceCreated();
+        waitUntilDefaultNamespaceCreatedWithK();
         log.info("API Server ready to use");
     }
 
@@ -58,6 +57,7 @@ public class APIServer {
         stopEtcd();
         kubeConfigManager.cleanupFromKubeConfig();
         cleanEtcdData();
+        log.debug("Fully stopped.");
     }
 
     private void stopApiServer() {
@@ -82,13 +82,30 @@ public class APIServer {
         log.debug("etcd stopped");
     }
 
-    private void waitUntilDefaultNamespaceCreated() {
+    private void waitUntilDefaultNamespaceCreatedWithK() {
         try {
-            startupWaiter.join(STARTUP_TIMEOUT);
-            if (!startedUpProperly) {
-                throw new KubeApiException("Something went wrong starting up KubeApi server. Check the logs");
+        AtomicBoolean started = new AtomicBoolean(false);
+        var proc = new ProcessBuilder("kubectl","get","ns","--watch").start();
+        var procWaiter = new Thread(() -> {
+            try(Scanner sc = new Scanner(proc.getInputStream())){
+            while (sc.hasNextLine()) {
+                String line = sc.nextLine();
+                if (line.contains("default")) {
+                    started.set(true);
+                    return;
+                }
             }
+            }
+        });
+        procWaiter.start();
+        procWaiter.join(APIServer.STARTUP_TIMEOUT);
+        if (!started.get()) {
+            throw new KubeApiException("API Server did not start properly. Check the log files.");
+        }
+        } catch (IOException e) {
+            throw new KubeApiException(e);
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             throw new KubeApiException(e);
         }
     }
@@ -139,32 +156,9 @@ public class APIServer {
                     "--allow-privileged"
             )
                     .start();
-
-            addStartupReadyHandler();
-            // todo detect premature termination
-//            apiServerProcess.onExit()
             log.debug("API Server started");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
-
-    private void addStartupReadyHandler() {
-        // alternative would be to use health checks? https://kubernetes.io/docs/reference/using-api/health-checks/
-        // waits until fully started, otherwise default namespace might be missing
-        this.startupWaiter = new Thread(() -> {
-            // todo the scanner is not closed
-            Scanner sc = new Scanner(apiServerProcess.getErrorStream());
-                while (sc.hasNextLine()) {
-                    String line = sc.nextLine();
-//                    if (line.contains("Caches are synced")) {
-                    if (line.contains("all system priority classes are created successfully or already exist")) {
-                        startedUpProperly = true;
-                        return;
-                    }
-                }
-            });
-        this.startupWaiter.start();
-    }
-
 }
