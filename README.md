@@ -1,5 +1,7 @@
-# k8s-api-server-java-wrapper
+# jenvtest
 
-## links
+Jenvtest is similar to envtest in controller runtime to support unit testing with API Server:
+https://book.kubebuilder.io/reference/envtest.html
 
-https://kubernetes.io/docs/tasks/administer-cluster/configure-upgrade-etcd/#starting-etcd-clusters
+Project is in early phases, heading towards mvp release.
+
