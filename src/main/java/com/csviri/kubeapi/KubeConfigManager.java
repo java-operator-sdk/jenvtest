@@ -4,43 +4,56 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class KubeConfigManager {
 
     private static final Logger log = LoggerFactory.getLogger(KubeConfigManager.class);
-    private CertManager certManager;
+    public static final String JENVTEST = "jenvtest";
 
-    public KubeConfigManager(CertManager certManager) {
+    private CertManager certManager;
+    private BinaryManager binaryManager;
+
+    public KubeConfigManager(CertManager certManager, BinaryManager binaryManager) {
         this.certManager = certManager;
+        this.binaryManager = binaryManager;
     }
 
     public void updateKubeConfig() {
         log.debug("Updating kubeconfig");
-        execAndWait("kubectl", "config", "set-cluster", "jenvtest", "--server=https://127.0.0.1:6443",
+        execWithKubectlConfigAndWait("set-cluster", JENVTEST, "--server=https://127.0.0.1:6443",
                 "--certificate-authority=" + certManager.getAPIServerCertPath());
-        execAndWait("kubectl", "config", "set-credentials", "jenvtest",
+        execWithKubectlConfigAndWait( "set-credentials", JENVTEST,
                 "--client-certificate=" + certManager.getClientCertPath(), "--client-key=" + certManager.getClientKeyPath());
-        execAndWait("kubectl", "config", "set-context", "jenvtest", "--cluster=jenvtest",
+        execWithKubectlConfigAndWait("set-context", JENVTEST, "--cluster=jenvtest",
                 "--namespace=default", "--user=jenvtest");
-        execAndWait("kubectl", "config", "use-context", "jenvtest");
+        execWithKubectlConfigAndWait("use-context", JENVTEST);
     }
 
     public void cleanupFromKubeConfig() {
         log.debug("Cleanig up kubeconfig");
-        unset("contexts.jenvtest");
-        unset("clusters.jenvtest");
-        unset("users.jenvtest");
+        unset("contexts."+JENVTEST);
+        unset("clusters."+JENVTEST);
+        unset("users."+JENVTEST);
     }
 
     private void unset(String target) {
-        execAndWait("kubectl","config","unset", target);
+        execWithKubectlConfigAndWait("unset", target);
     }
 
-    private void execAndWait(String... arguments) {
+    private void execWithKubectlConfigAndWait(String... arguments) {
         try {
-            var process = new ProcessBuilder(arguments).start();
+            List<String> args = new ArrayList<>(arguments.length+2);
+            args.add(binaryManager.binaries().getKubectl().getPath());
+            args.add("config");
+            args.addAll(List.of(arguments));
+            var process = new ProcessBuilder(args).start();
             process.waitFor();
-        } catch (InterruptedException | IOException e) {
+        } catch (IOException e) {
+            throw new KubeApiException(e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             throw new KubeApiException(e);
         }
     }

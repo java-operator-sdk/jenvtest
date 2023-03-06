@@ -11,6 +11,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class APIServer {
 
     private static final Logger log = LoggerFactory.getLogger(APIServer.class);
+
     public static final int STARTUP_TIMEOUT = 10_000;
 
     private final APIServerConfig config;
@@ -27,9 +28,9 @@ public class APIServer {
 
     public APIServer(APIServerConfig config) {
         this.config = config;
-        this.binaryManager = new BinaryManager(config.getJenvtestDirectory());
+        this.binaryManager = new BinaryManager(config.getJenvtestDirectory(),config.getApiServerVersion());
         this.certManager = new CertManager(config.getJenvtestDirectory());
-        this.kubeConfigManager = new KubeConfigManager(certManager);
+        this.kubeConfigManager = new KubeConfigManager(certManager,binaryManager);
     }
 
     public void start() {
@@ -39,7 +40,7 @@ public class APIServer {
         startEtcd();
         startApiServer();
         kubeConfigManager.updateKubeConfig();
-        waitUntilDefaultNamespaceCreatedWithK();
+        waitUntilDefaultNamespaceCreated();
         log.info("API Server ready to use");
     }
 
@@ -85,10 +86,10 @@ public class APIServer {
         log.debug("etcd stopped");
     }
 
-    private void waitUntilDefaultNamespaceCreatedWithK() {
+    private void waitUntilDefaultNamespaceCreated() {
         try {
         AtomicBoolean started = new AtomicBoolean(false);
-        var proc = new ProcessBuilder("kubectl","get","ns","--watch").start();
+        var proc = new ProcessBuilder(binaryManager.binaries().getKubectl().getPath(),"get","ns","--watch").start();
         var procWaiter = new Thread(() -> {
             try(Scanner sc = new Scanner(proc.getInputStream())){
             while (sc.hasNextLine()) {
@@ -113,7 +114,6 @@ public class APIServer {
         }
     }
 
-    // todo detect if process not started up correctly
     private void startEtcd() {
         var etcdBinary = binaryManager.binaries().getEtcd();
         try {
@@ -122,7 +122,6 @@ public class APIServer {
             }
             var logsFile = new File(config.logDirectory(), "etcd.logs");
 
-            // todo config ports
             etcdProcess = new ProcessBuilder(etcdBinary.getAbsolutePath(),
                     "--listen-client-urls=http://0.0.0.0:2379",
                     "--advertise-client-urls=http://0.0.0.0:2379")
