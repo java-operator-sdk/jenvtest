@@ -6,15 +6,18 @@ public class APIServerConfig {
 
     public static final String DIRECTORY_NAME = ".jenvtest";
 
+    /**
+     * Set home directory of the project. Default is ~/.jenvtest
+     **/
     private String jenvtestDir;
-    // todo support wildcard 1.26.*
+
     /**
      * Sample: 1.26.1, 1.25.0
      */
     private String apiServerVersion;
 
     public APIServerConfig() {
-        this.jenvtestDir = System.getProperty("user.home") + File.separator + DIRECTORY_NAME;
+        this.jenvtestDir = new File(System.getProperty("user.home"), DIRECTORY_NAME).getPath();
     }
 
     public String getJenvtestDirectory() {
@@ -36,6 +39,6 @@ public class APIServerConfig {
     }
 
     public String logDirectory() {
-        return new File(jenvtestDir,"logs").getPath();
+        return new File(jenvtestDir, "logs").getPath();
     }
 }
