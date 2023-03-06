@@ -4,10 +4,11 @@ import java.io.File;
 
 public class APIServerConfig {
 
+    public static final String CONFIG_ROOT_ENV_VAR = "JENVTEST_DIR";
     public static final String DIRECTORY_NAME = ".jenvtest";
 
     /**
-     * Set home directory of the project. Default is ~/.jenvtest
+     * Set directory where binaries and other assets are present. Default is ~/.jenvtest.
      **/
     private String jenvtestDir;
 
@@ -17,7 +18,12 @@ public class APIServerConfig {
     private String apiServerVersion;
 
     public APIServerConfig() {
-        this.jenvtestDir = new File(System.getProperty("user.home"), DIRECTORY_NAME).getPath();
+        var jenvtestDirFromEnvVar = System.getenv(CONFIG_ROOT_ENV_VAR);
+        if (jenvtestDirFromEnvVar != null) {
+            this.jenvtestDir = jenvtestDirFromEnvVar;
+        } else {
+            this.jenvtestDir = new File(System.getProperty("user.home"), DIRECTORY_NAME).getPath();
+        }
     }
 
     public String getJenvtestDirectory() {
