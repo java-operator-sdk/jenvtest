@@ -44,5 +44,5 @@ class JUnitExtensionTest {
 [`setup-envtest`](https://pkg.go.dev/sigs.k8s.io/controller-runtime/tools/setup-envtest#section-readme) can be used
 to download binaries.
 
-by executing `setup-envtest use --bin-dir ~/.jenvtest` will download the latest binaries required to the default 
+by executing `setup-envtest use --bin-dir ~/.jenvtest` will download the latest required binaries to the default 
 directory.
