@@ -1,6 +1,6 @@
-package com.csviri.kubeapi.junit;
+package com.csviri.jenvtest.junit;
 
-import com.csviri.kubeapi.APIServer;
+import com.csviri.jenvtest.APIServer;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;

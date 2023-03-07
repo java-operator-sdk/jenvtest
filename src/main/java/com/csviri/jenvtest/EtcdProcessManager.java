@@ -1,5 +1,6 @@
-package com.csviri.kubeapi;
+package com.csviri.jenvtest;
 
+import com.csviri.jenvtest.binary.BinaryManager;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +26,7 @@ public class EtcdProcessManager {
         var etcdBinary = binaryManager.binaries().getEtcd();
         try {
             if (!etcdBinary.exists()) {
-                throw new KubeApiException("Missing binary for etcd on path: " + etcdBinary.getAbsolutePath());
+                throw new JenvtestException("Missing binary for etcd on path: " + etcdBinary.getAbsolutePath());
             }
             var logsFile = new File(config.logDirectory(), "etcd.logs");
 
@@ -36,15 +37,16 @@ public class EtcdProcessManager {
                     .redirectOutput(logsFile)
                     .redirectError(logsFile)
                     .start();
+            // todo better stop handling - we should stop the whole app this case
             etcdProcess.onExit().thenApply(p-> {
                 if (!stopped) {
-                    throw new KubeApiException("Etcd stopped unexpectedly");
+                    throw new JenvtestException("Etcd stopped unexpectedly");
                 }
                 return null;
             });
             log.debug("etcd started");
         } catch (IOException e) {
-            throw new KubeApiException(e);
+            throw new JenvtestException(e);
         }
     }
 
@@ -52,7 +54,7 @@ public class EtcdProcessManager {
         try {
             FileUtils.deleteDirectory(new File("default.etcd"));
         } catch (IOException e) {
-            throw new KubeApiException(e);
+            throw new JenvtestException(e);
         }
     }
 

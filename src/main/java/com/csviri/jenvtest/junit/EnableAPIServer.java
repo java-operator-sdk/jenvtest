@@ -1,4 +1,4 @@
-package com.csviri.kubeapi.junit;
+package com.csviri.jenvtest.junit;
 
 import org.junit.jupiter.api.extension.ExtendWith;
 

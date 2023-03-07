@@ -1,15 +1,27 @@
-package com.csviri.kubeapi;
+package com.csviri.jenvtest;
 
 import java.util.Comparator;
 import java.util.List;
 
-public class SemverUtil {
+public class VersioningUtils {
 
-    private static SemverComparator semverComparator = new SemverComparator();
+    public static final SemverComparator SEMVER_COMPARATOR = new SemverComparator();
 
+    public static String getOSName() {
+        String os = System.getProperty("os.name").toLowerCase();
+        if (os.contains("win")) {
+            return "windows";
+        } else {
+            return os;
+        }
+    }
 
-    public static final String getLatestVersion(List<String> versions) {
-        versions.sort(semverComparator);
+    public static String getOSArch() {
+        return System.getProperty("os.arch").toLowerCase();
+    }
+
+    public static String getLatestVersion(List<String> versions) {
+        versions.sort(SEMVER_COMPARATOR);
         return versions.get(versions.size()-1);
     }
 

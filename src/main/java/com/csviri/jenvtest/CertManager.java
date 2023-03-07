@@ -1,4 +1,4 @@
-package com.csviri.kubeapi;
+package com.csviri.jenvtest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +28,7 @@ public class CertManager {
             generateAPIServerCertificates();
             generateUserCertificates();
         } catch (IOException | InterruptedException e) {
-            throw new KubeApiException(e);
+            throw new JenvtestException(e);
         }
     }
 

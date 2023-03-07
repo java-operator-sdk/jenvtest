@@ -1,6 +1,7 @@
-package com.csviri.kubeapi;
+package com.csviri.jenvtest;
 
 import java.io.File;
+import java.util.Optional;
 
 public class APIServerConfig {
 
@@ -13,9 +14,17 @@ public class APIServerConfig {
     private String jenvtestDir;
 
     /**
-     * Sample: 1.26.1, 1.25.0
+     * If not set the latest binary will be selected automatically
+     * Sample: 1.26.1, 1.25.0.
      */
     private String apiServerVersion;
+
+    /**
+     * If true, tries to download binaries. If the apiServerVersion is not set and some local binaries found
+     * won't try to download them again.
+     * */
+    // todo config with env var
+    private boolean downloadBinaries = true;
 
     public APIServerConfig() {
         var jenvtestDirFromEnvVar = System.getenv(CONFIG_ROOT_ENV_VAR);
@@ -35,8 +44,8 @@ public class APIServerConfig {
         return this;
     }
 
-    public String getApiServerVersion() {
-        return apiServerVersion;
+    public Optional<String> getApiServerVersion() {
+        return Optional.ofNullable(apiServerVersion);
     }
 
     public APIServerConfig setApiServerVersion(String apiServerVersion) {
@@ -46,5 +55,14 @@ public class APIServerConfig {
 
     public String logDirectory() {
         return new File(jenvtestDir, "logs").getPath();
+    }
+
+    public boolean getDownloadBinaries() {
+        return downloadBinaries;
+    }
+
+    public APIServerConfig setDownloadBinaries(boolean downloadBinaries) {
+        this.downloadBinaries = downloadBinaries;
+        return this;
     }
 }
