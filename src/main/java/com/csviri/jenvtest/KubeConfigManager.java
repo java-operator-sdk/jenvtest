@@ -1,5 +1,6 @@
-package com.csviri.kubeapi;
+package com.csviri.jenvtest;
 
+import com.csviri.jenvtest.binary.BinaryManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,10 +52,10 @@ public class KubeConfigManager {
             var process = new ProcessBuilder(args).start();
             process.waitFor();
         } catch (IOException e) {
-            throw new KubeApiException(e);
+            throw new JenvtestException(e);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new KubeApiException(e);
+            throw new JenvtestException(e);
         }
     }
 }

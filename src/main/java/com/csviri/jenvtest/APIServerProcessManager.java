@@ -1,5 +1,6 @@
-package com.csviri.kubeapi;
+package com.csviri.jenvtest;
 
+import com.csviri.jenvtest.binary.BinaryManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +30,7 @@ public class APIServerProcessManager {
         var apiServerBinary = binaryManager.binaries().getApiServer();
         try {
             if (!apiServerBinary.exists()) {
-                throw new KubeApiException("Missing binary for API Server on path: " + apiServerBinary.getAbsolutePath());
+                throw new JenvtestException("Missing binary for API Server on path: " + apiServerBinary.getAbsolutePath());
             }
 
             apiServerProcess = new ProcessBuilder(apiServerBinary.getAbsolutePath(),
@@ -49,7 +50,7 @@ public class APIServerProcessManager {
                     .start();
             apiServerProcess.onExit().thenApply(p-> {
                 if (!stopped) {
-                    throw new KubeApiException("APIServer stopped unexpectedly.");
+                    throw new JenvtestException("APIServer stopped unexpectedly.");
                 }
                 return null;
             });
@@ -77,13 +78,13 @@ public class APIServerProcessManager {
             procWaiter.start();
             procWaiter.join(APIServer.STARTUP_TIMEOUT);
             if (!started.get()) {
-                throw new KubeApiException("API Server did not start properly. Check the log files.");
+                throw new JenvtestException("API Server did not start properly. Check the log files.");
             }
         } catch (IOException e) {
-            throw new KubeApiException(e);
+            throw new JenvtestException(e);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new KubeApiException(e);
+            throw new JenvtestException(e);
         }
     }
 

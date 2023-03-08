@@ -1,5 +1,6 @@
-package com.csviri.kubeapi;
+package com.csviri.jenvtest;
 
+import com.csviri.jenvtest.binary.BinaryManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +25,7 @@ public class APIServer {
 
     public APIServer(APIServerConfig config) {
         this.config = config;
-        this.binaryManager = new BinaryManager(config.getJenvtestDirectory(),config.getApiServerVersion());
+        this.binaryManager = new BinaryManager(config);
         this.certManager = new CertManager(config.getJenvtestDirectory());
         this.kubeConfigManager = new KubeConfigManager(certManager,binaryManager);
         this.etcdProcessManager = new EtcdProcessManager(binaryManager,config);
@@ -33,6 +34,7 @@ public class APIServer {
 
     public void start() {
         log.debug("Stating API Server. Using jenvtest dir: {}", config.getJenvtestDirectory());
+        binaryManager.initAndDownloadIfRequired();
         prepareLogDirectory();
         etcdProcessManager.cleanEtcdData();
         etcdProcessManager.startEtcd();

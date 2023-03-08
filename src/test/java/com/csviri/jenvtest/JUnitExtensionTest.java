@@ -1,6 +1,6 @@
-package com.csviri.kubeapi;
+package com.csviri.jenvtest;
 
-import com.csviri.kubeapi.junit.EnableAPIServer;
+import com.csviri.jenvtest.junit.EnableAPIServer;
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.ConfigMapBuilder;
 import io.fabric8.kubernetes.api.model.ObjectMetaBuilder;

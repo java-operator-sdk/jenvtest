@@ -1,4 +1,4 @@
-package com.csviri.kubeapi;
+package com.csviri.jenvtest;
 
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.ConfigMapBuilder;
@@ -13,21 +13,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ApiServerTest {
 
     @Test
-    void sanityTest() throws InterruptedException {
+    void sanityTest() {
         var kubeApi = new APIServer();
         try {
             kubeApi.start();
 
-            // todo cleanup before start
             var client = new KubernetesClientBuilder().build();
             client.resource(configMap()).createOrReplace();
             var cm = client.resource(configMap()).get();
 
             assertThat(cm).isNotNull();
         } finally {
-            kubeApi.stop();
+//            kubeApi.stop();
         }
-
     }
 
     private ConfigMap configMap() {

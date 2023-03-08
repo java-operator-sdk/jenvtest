@@ -1,4 +1,7 @@
 
+API Server bins:
+https://console.cloud.google.com/storage/browser/kubebuilder-tools
+
 bins:
 https://github.com/etcd-io/etcd/releases/download/v3.4.24/etcd-v3.4.24-linux-amd64.tar.gz
 https://dl.k8s.io/v1.26.1/bin/linux/amd64/kube-apiserver
