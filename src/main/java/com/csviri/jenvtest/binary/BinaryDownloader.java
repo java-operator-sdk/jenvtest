@@ -103,7 +103,11 @@ public class BinaryDownloader {
                                 && b.asBlobInfo().getName().contains(VersioningUtils.getOSArch()))
                 .map(b -> {
                     String stripped = b.asBlobInfo().getName().replace(TAR_PREFIX, "");
-                    return stripped.substring(0, stripped.indexOf("-"));
+                    String version = stripped.substring(0, stripped.indexOf("-"));
+                    if (version.startsWith("v")) {
+                        version = version.substring(1);
+                    }
+                    return version;
                 }).sorted(VersioningUtils.SEMVER_COMPARATOR).collect(Collectors.toList());
         if (allRelevantVersions.isEmpty()) {
             throw new JenvtestException("Cannot find relevant version to download");

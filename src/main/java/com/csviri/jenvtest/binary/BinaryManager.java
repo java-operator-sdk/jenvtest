@@ -68,6 +68,9 @@ public class BinaryManager {
                     + File.separator + config.getApiServerVersion() + PLATFORM_SUFFIX));
         }
         File binariesListDir = new File(config.getJenvtestDirectory(), BINARY_LIST_DIR);
+        if (!binariesListDir.exists()) {
+            return Optional.empty();
+        }
         var dirVersionList = List.of(binariesListDir.list((dir, name) -> name.endsWith(PLATFORM_SUFFIX)))
                 .stream().map(s -> s.substring(0, s.indexOf(PLATFORM_SUFFIX)))
                 .collect(Collectors.toList());

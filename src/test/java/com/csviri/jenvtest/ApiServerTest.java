@@ -24,7 +24,7 @@ class ApiServerTest {
 
             assertThat(cm).isNotNull();
         } finally {
-            kubeApi.stop();
+//            kubeApi.stop();
         }
     }
 
