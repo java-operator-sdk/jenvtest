@@ -5,7 +5,7 @@ import java.util.Optional;
 
 public class APIServerConfig {
 
-    public static final String CONFIG_ROOT_ENV_VAR = "JENVTEST_DIR";
+    public static final String JENVTEST_DIR_ENV_VAR = "JENVTEST_DIR";
     public static final String DIRECTORY_NAME = ".jenvtest";
 
     /**
@@ -27,7 +27,7 @@ public class APIServerConfig {
     private boolean downloadBinaries = true;
 
     public APIServerConfig() {
-        var jenvtestDirFromEnvVar = System.getenv(CONFIG_ROOT_ENV_VAR);
+        var jenvtestDirFromEnvVar = System.getenv(JENVTEST_DIR_ENV_VAR);
         if (jenvtestDirFromEnvVar != null) {
             this.jenvtestDir = jenvtestDirFromEnvVar;
         } else {
