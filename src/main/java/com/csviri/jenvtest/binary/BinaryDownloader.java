@@ -7,13 +7,16 @@ import com.google.cloud.storage.StorageOptions;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -32,11 +35,12 @@ public class BinaryDownloader {
 
     public File download(String version) {
         try {
-            String url = "https://storage.cloud.google.com/kubebuilder-tools/kubebuilder-tools-" + version +
+            String url = "https://storage.googleapis.com/kubebuilder-tools/kubebuilder-tools-" + version +
                     "-" + VersioningUtils.getOSName() + "-" + VersioningUtils.getOSArch() + ".tar.gz";
-            InputStream in = new URL(url).openStream();
+
             File tempFile = File.createTempFile("kubebuilder-tools", ".tar.gz");
-            Files.copy(in, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            log.debug("Downloading binary from url: {} to Temp file: {}", url, tempFile.getPath());
+            FileUtils.copyURLToFile(new URL(url), tempFile);
             File dir = createDirForBinaries(version);
             extractFiles(tempFile, dir);
             var deleted = tempFile.delete();
@@ -54,18 +58,20 @@ public class BinaryDownloader {
                 new GzipCompressorInputStream(new BufferedInputStream(new FileInputStream(tempFile))))) {
             var entry = tarIn.getNextTarEntry();
             while (entry != null) {
-                if (entry.isDirectory()) {
-                    entry = tarIn.getNextTarEntry();
-                } else {
-                    extractEntry(entry, dir, tarIn);
+                if (!entry.isDirectory()) {
+                    File file = extractEntry(entry, dir, tarIn);
+                    if(!file.setExecutable(true)) {
+                        throw new JenvtestException("Cannot make the file executable: "+file.getPath());
+                    }
                 }
+                entry = tarIn.getNextTarEntry();
             }
         } catch (IOException e) {
             throw new JenvtestException(e);
         }
     }
 
-    private void extractEntry(TarArchiveEntry entry, File dir, TarArchiveInputStream tarIn) throws IOException {
+    private File extractEntry(TarArchiveEntry entry, File dir, TarArchiveInputStream tarIn) throws IOException {
         String name = entry.getName();
         File targetFile;
         if (name.contains(Binaries.KUBECTL_BINARY_NAME)) {
@@ -78,6 +84,7 @@ public class BinaryDownloader {
             throw new JenvtestException("Unexpected entry with name: " + entry.getName());
         }
         Files.copy(tarIn, targetFile.toPath());
+        return targetFile;
     }
 
     private File createDirForBinaries(String version) {
@@ -90,8 +97,8 @@ public class BinaryDownloader {
     }
 
     public File downloadLatest() {
-        String latest= findLatestVersion();
-        log.info("Downloading latest version binaries: {}",latest);
+        String latest = findLatestVersion();
+        log.info("Downloading latest version binaries: {}", latest);
         return download(latest);
     }
 
