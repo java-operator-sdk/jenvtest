@@ -24,7 +24,7 @@ public class BinaryManager {
     }
 
     public void initAndDownloadIfRequired() {
-        Optional<File> maybeBinaryDir = targetBinaryDir();
+        Optional<File> maybeBinaryDir = findLatestBinariesAvailable();
         File binaryDir = maybeBinaryDir.orElse(null);
 
         if (maybeBinaryDir.isEmpty()) {
@@ -62,8 +62,8 @@ public class BinaryManager {
 
     }
 
-    private Optional<File> targetBinaryDir() {
-        if (config.getApiServerVersion() != null) {
+    private Optional<File> findLatestBinariesAvailable() {
+        if (config.getApiServerVersion().isPresent()) {
             return Optional.of(new File(config.getJenvtestDirectory(), BINARY_LIST_DIR
                     + File.separator + config.getApiServerVersion() + PLATFORM_SUFFIX));
         }
