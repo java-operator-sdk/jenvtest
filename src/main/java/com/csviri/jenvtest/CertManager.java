@@ -44,12 +44,8 @@ public class CertManager {
     }
 
     public void createCertificatesIfNeeded() {
-        try {
-            generateAPIServerCertificates();
-            generateUserCertificates();
-        } catch (IOException | InterruptedException e) {
-            throw new JenvtestException(e);
-        }
+        generateAPIServerCertificates();
+        generateUserCertificates();
     }
 
     private void generateAPIServerCertificates() {
