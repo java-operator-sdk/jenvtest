@@ -4,9 +4,7 @@ import com.csviri.jenvtest.binary.BinaryManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
-
-public class APIServer {
+public class APIServer implements UnexpectedProcessStopHandler {
 
     private static final Logger log = LoggerFactory.getLogger(APIServer.class);
 
@@ -27,39 +25,34 @@ public class APIServer {
         this.config = config;
         this.binaryManager = new BinaryManager(config);
         this.certManager = new CertManager(config.getJenvtestDirectory());
-        this.kubeConfigManager = new KubeConfigManager(certManager,binaryManager);
-        this.etcdProcessManager = new EtcdProcessManager(binaryManager,config);
-        this.apiServerProcessManager = new APIServerProcessManager(certManager,binaryManager,config);
+        this.kubeConfigManager = new KubeConfigManager(certManager, binaryManager);
+        this.etcdProcessManager = new EtcdProcessManager(binaryManager, this);
+        this.apiServerProcessManager = new APIServerProcessManager(certManager, binaryManager, this, config);
     }
 
     public void start() {
         log.debug("Stating API Server. Using jenvtest dir: {}", config.getJenvtestDirectory());
         binaryManager.initAndDownloadIfRequired();
         certManager.createCertificatesIfNeeded();
-        prepareLogDirectory();
         etcdProcessManager.cleanEtcdData();
         etcdProcessManager.startEtcd();
         apiServerProcessManager.startApiServer();
         kubeConfigManager.updateKubeConfig();
         apiServerProcessManager.waitUntilDefaultNamespaceCreated();
-        log.info("API Server ready to use");
+        log.debug("API Server ready to use");
     }
 
     public void stop() {
+        log.debug("Stopping");
         apiServerProcessManager.stopApiServer();
         etcdProcessManager.stopEtcd();
         kubeConfigManager.cleanupFromKubeConfig();
         etcdProcessManager.cleanEtcdData();
-        log.debug("Fully stopped.");
+        log.debug("Stopped");
     }
 
-    private void prepareLogDirectory() {
-        var logDir = new File(config.logDirectory());
-        if (!logDir.exists()) {
-            var res = logDir.mkdirs();
-            if (!res) {
-                log.warn("Problem with creating log dir: {}", logDir.getPath());
-            }
-        }
+    @Override
+    public void processStopped(Process process) {
+        stop();
     }
 }

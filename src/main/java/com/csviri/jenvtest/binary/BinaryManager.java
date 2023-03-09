@@ -2,7 +2,7 @@ package com.csviri.jenvtest.binary;
 
 import com.csviri.jenvtest.APIServerConfig;
 import com.csviri.jenvtest.JenvtestException;
-import com.csviri.jenvtest.VersioningUtils;
+import com.csviri.jenvtest.Utils;
 
 import java.io.File;
 import java.util.List;
@@ -14,13 +14,15 @@ import static com.csviri.jenvtest.binary.Binaries.*;
 public class BinaryManager {
 
     public static final String BINARY_LIST_DIR = "k8s";
-    public static final String PLATFORM_SUFFIX = "-" + VersioningUtils.getOSName() + "-" + VersioningUtils.getOSArch();
+    public static final String PLATFORM_SUFFIX = "-" + Utils.getOSName() + "-" + Utils.getOSArch();
 
     private Binaries binaries;
     private final APIServerConfig config;
+    BinaryDownloader downloader;
 
     public BinaryManager(APIServerConfig config) {
         this.config = config;
+        downloader = new BinaryDownloader(config.getJenvtestDirectory());
     }
 
     public void initAndDownloadIfRequired() {
@@ -31,7 +33,7 @@ public class BinaryManager {
             if (!config.getDownloadBinaries()) {
                 throw new JenvtestException("Binaries cannot be found, and download is turned off");
             }
-            BinaryDownloader downloader = new BinaryDownloader(config.getJenvtestDirectory());
+
             binaryDir = config.getApiServerVersion().isEmpty() ?
                    downloader.downloadLatest()
                    : downloader.download(config.getApiServerVersion().get());
@@ -78,7 +80,7 @@ public class BinaryManager {
         if (dirVersionList.isEmpty()) {
             return Optional.empty();
         }
-        String latest = VersioningUtils.getLatestVersion(dirVersionList) + PLATFORM_SUFFIX;
+        String latest = Utils.getLatestVersion(dirVersionList) + PLATFORM_SUFFIX;
         return Optional.of(new File(binariesListDir, latest));
     }
 
