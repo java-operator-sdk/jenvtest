@@ -11,15 +11,17 @@ import java.io.IOException;
 public class EtcdProcessManager {
 
     private static final Logger log = LoggerFactory.getLogger(EtcdProcessManager.class);
+    private static final Logger etcdLog = LoggerFactory.getLogger(EtcdProcessManager.class.getName() + ".etcdProcess");
 
     private final BinaryManager binaryManager;
-    private final APIServerConfig config;
+
     private volatile Process etcdProcess;
     private volatile boolean stopped = false;
+    private final UnexpectedProcessStopHandler processStopHandler;
 
-    public EtcdProcessManager(BinaryManager binaryManager, APIServerConfig config) {
+    public EtcdProcessManager(BinaryManager binaryManager, UnexpectedProcessStopHandler processStopHandler) {
         this.binaryManager = binaryManager;
-        this.config = config;
+        this.processStopHandler = processStopHandler;
     }
 
     public void startEtcd() {
@@ -28,19 +30,17 @@ public class EtcdProcessManager {
             if (!etcdBinary.exists()) {
                 throw new JenvtestException("Missing binary for etcd on path: " + etcdBinary.getAbsolutePath());
             }
-            var logsFile = new File(config.logDirectory(), "etcd.logs");
-
             etcdProcess = new ProcessBuilder(etcdBinary.getAbsolutePath(),
                     "--listen-client-urls=http://0.0.0.0:2379",
                     "--advertise-client-urls=http://0.0.0.0:2379")
-                    // todo log to a different logger on debug level
-                    .redirectOutput(logsFile)
-                    .redirectError(logsFile)
                     .start();
-            // todo better stop handling - we should stop the whole app this case
-            etcdProcess.onExit().thenApply(p-> {
+            Utils.redirectProcessOutputToLogger(etcdProcess.getInputStream(), etcdLog);
+            Utils.redirectProcessOutputToLogger(etcdProcess.getErrorStream(), etcdLog);
+            etcdProcess.onExit().thenApply(p -> {
                 if (!stopped) {
-                    throw new JenvtestException("Etcd stopped unexpectedly");
+                    stopped = true;
+                    log.error("etcd process stopped unexpectedly");
+                    processStopHandler.processStopped(p);
                 }
                 return null;
             });
@@ -59,6 +59,9 @@ public class EtcdProcessManager {
     }
 
     public void stopEtcd() {
+        if (stopped) {
+            return;
+        }
         stopped = true;
         if (etcdProcess != null) {
             etcdProcess.destroy();

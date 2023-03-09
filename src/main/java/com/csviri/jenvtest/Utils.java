@@ -1,9 +1,17 @@
 package com.csviri.jenvtest;
 
+import org.slf4j.Logger;
+
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Scanner;
 
-public class VersioningUtils {
+public class Utils {
+
+    private Utils() {
+    }
 
     public static final SemverComparator SEMVER_COMPARATOR = new SemverComparator();
 
@@ -43,6 +51,15 @@ public class VersioningUtils {
             }
             return 0;
         }
+    }
+
+    public static void redirectProcessOutputToLogger(InputStream outputStream, Logger logger) {
+        new Thread(() -> {
+            Scanner sc = new Scanner(outputStream);
+            while (sc.hasNextLine()) {
+                logger.trace( sc.nextLine());
+            }
+        }).start();
     }
 
 }

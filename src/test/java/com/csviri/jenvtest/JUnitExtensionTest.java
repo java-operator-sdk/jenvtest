@@ -19,7 +19,7 @@ class JUnitExtensionTest {
     void testCommunication() {
         var client = new KubernetesClientBuilder().build();
         client.resource(testConfigMap()).createOrReplace();
-        var cm = client.resource(configMap()).get();
+        var cm = client.resource(TestUtils.testConfigMap()).get();
 
         assertThat(cm).isNotNull();
     }

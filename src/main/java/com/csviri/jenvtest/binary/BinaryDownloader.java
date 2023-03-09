@@ -1,7 +1,7 @@
 package com.csviri.jenvtest.binary;
 
 import com.csviri.jenvtest.JenvtestException;
-import com.csviri.jenvtest.VersioningUtils;
+import com.csviri.jenvtest.Utils;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
@@ -35,8 +35,9 @@ public class BinaryDownloader {
 
     public File download(String version) {
         try {
+            log.info("Downloading binaries with version: {}", version);
             String url = "https://storage.googleapis.com/kubebuilder-tools/kubebuilder-tools-" + version +
-                    "-" + VersioningUtils.getOSName() + "-" + VersioningUtils.getOSArch() + ".tar.gz";
+                    "-" + Utils.getOSName() + "-" + Utils.getOSArch() + ".tar.gz";
 
             File tempFile = File.createTempFile("kubebuilder-tools", ".tar.gz");
             log.debug("Downloading binary from url: {} to Temp file: {}", url, tempFile.getPath());
@@ -98,7 +99,6 @@ public class BinaryDownloader {
 
     public File downloadLatest() {
         String latest = findLatestVersion();
-        log.info("Downloading latest version binaries: {}", latest);
         return download(latest);
     }
 
@@ -106,8 +106,8 @@ public class BinaryDownloader {
         Storage storage = StorageOptions.getDefaultInstance().getService();
         var blobs = storage.get(BUCKET_NAME).list();
         var allRelevantVersions = StreamSupport.stream(blobs.iterateAll().spliterator(), false).filter(b ->
-                        b.asBlobInfo().getName().contains(VersioningUtils.getOSName())
-                                && b.asBlobInfo().getName().contains(VersioningUtils.getOSArch()))
+                        b.asBlobInfo().getName().contains(Utils.getOSName())
+                                && b.asBlobInfo().getName().contains(Utils.getOSArch()))
                 .map(b -> {
                     String stripped = b.asBlobInfo().getName().replace(TAR_PREFIX, "");
                     String version = stripped.substring(0, stripped.indexOf("-"));
@@ -115,7 +115,7 @@ public class BinaryDownloader {
                         version = version.substring(1);
                     }
                     return version;
-                }).sorted(VersioningUtils.SEMVER_COMPARATOR).collect(Collectors.toList());
+                }).sorted(Utils.SEMVER_COMPARATOR).collect(Collectors.toList());
         if (allRelevantVersions.isEmpty()) {
             throw new JenvtestException("Cannot find relevant version to download");
         }

@@ -11,19 +11,24 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class APIServerProcessManager {
 
     private static final Logger log = LoggerFactory.getLogger(APIServerProcessManager.class);
+    private static final Logger apiLog = LoggerFactory.getLogger(APIServerProcessManager.class
+            .getName()+".apiServerProcess");
 
     private final CertManager certManager;
     private final BinaryManager binaryManager;
     private final APIServerConfig config;
     private volatile Process apiServerProcess;
     private volatile boolean stopped = false;
+    private final UnexpectedProcessStopHandler processStopHandler;
 
-    public APIServerProcessManager(CertManager certManager, BinaryManager binaryManager,APIServerConfig config) {
+    public APIServerProcessManager(CertManager certManager, BinaryManager binaryManager,
+                                   UnexpectedProcessStopHandler processStopHandler,
+                                   APIServerConfig config) {
         this.certManager = certManager;
         this.binaryManager = binaryManager;
         this.config = config;
+        this.processStopHandler = processStopHandler;
     }
-
 
     public void startApiServer() {
         var apiServerBinary = binaryManager.binaries().getApiServer();
@@ -47,15 +52,19 @@ public class APIServerProcessManager {
                     "--allow-privileged"
             )
                     .start();
+            Utils.redirectProcessOutputToLogger(apiServerProcess.getInputStream(), apiLog);
+            Utils.redirectProcessOutputToLogger(apiServerProcess.getErrorStream(), apiLog);
             apiServerProcess.onExit().thenApply(p-> {
                 if (!stopped) {
-                    throw new JenvtestException("APIServer stopped unexpectedly.");
+                    stopped = true;
+                    log.error("API Server process stopped unexpectedly");
+                    this.processStopHandler.processStopped(p);
                 }
                 return null;
             });
             log.debug("API Server started");
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new JenvtestException(e);
         }
     }
 
@@ -88,6 +97,9 @@ public class APIServerProcessManager {
     }
 
     public void stopApiServer() {
+        if (stopped) {
+            return;
+        }
         stopped = true;
         if (apiServerProcess != null) {
             apiServerProcess.destroyForcibly();
