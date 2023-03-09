@@ -5,8 +5,11 @@ import java.util.Optional;
 
 public class APIServerConfig {
 
+    public static final String JENVTEST_DOWNLOAD_BINARIES = "JENVTEST_DOWNLOAD_BINARIES";
     public static final String JENVTEST_DIR_ENV_VAR = "JENVTEST_DIR";
+
     public static final String DIRECTORY_NAME = ".jenvtest";
+
 
     /**
      * Set directory where binaries and other assets are present. Default is ~/.jenvtest.
@@ -23,7 +26,6 @@ public class APIServerConfig {
      * If true, tries to download binaries. If the apiServerVersion is not set and some local binaries found
      * won't try to download them again.
      * */
-    // todo config with env var
     private boolean downloadBinaries = true;
 
     public APIServerConfig() {
@@ -32,6 +34,10 @@ public class APIServerConfig {
             this.jenvtestDir = jenvtestDirFromEnvVar;
         } else {
             this.jenvtestDir = new File(System.getProperty("user.home"), DIRECTORY_NAME).getPath();
+        }
+        var downloadBinariesEnvVal = System.getenv(JENVTEST_DOWNLOAD_BINARIES);
+        if (downloadBinariesEnvVal != null) {
+            this.downloadBinaries = Boolean.parseBoolean(downloadBinariesEnvVal);
         }
     }
 
