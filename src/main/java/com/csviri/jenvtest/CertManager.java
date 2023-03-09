@@ -42,7 +42,7 @@ public class CertManager {
         log.debug("Generating API Server certificates");
         Process process = new ProcessBuilder("openssl", "req", "-nodes", "-x509", "-sha256", "-newkey", "rsa:4096", "-keyout", key.getPath(), "-out",
                 cert.getPath(),
-                "-days", "356", "-subj", "/C=NL/ST=Zuid Holland/L=Rotterdam/O=ACME Corp/OU=IT Dept/CN=example.org",
+                "-days", "356", "-subj", "/CN=example.org",
                 "-addext", "subjectAltName = IP:127.0.0.1,DNS:kubernetes," +
                 "DNS:kubernetes.default,DNS:kubernetes.default.svc,DNS:kubernetes.default.svc.cluster,DNS:kubernetes.default.svc.cluster.local")
                 .start();
@@ -58,7 +58,7 @@ public class CertManager {
         log.debug("Generating Client certificates");
         var process = new ProcessBuilder("openssl", "req", "-nodes", "-x509", "-sha256", "-newkey",
                 "rsa:4096", "-keyout", key.getPath(), "-out", cert.getPath(), "-days", "356", "-subj",
-                "/C=NL/ST=Zuid Holland/L=Rotterdam/O=system:masters/OU=IT Dept/CN=jenvtest")
+                "/O=system:masters/CN=jenvtest")
                 .start();
         process.waitFor();
     }
