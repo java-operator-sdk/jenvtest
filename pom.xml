@@ -27,6 +27,7 @@
         <commons-compress.version>1.22</commons-compress.version>
         <google.cloud.libraries.version>26.9.0</google.cloud.libraries.version>
         <commons-io.version>2.11.0</commons-io.version>
+        <bouncycastle.version>1.72</bouncycastle.version>
     </properties>
 
     <dependencyManagement>
@@ -102,10 +103,13 @@
             <version>${assertj.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk18on</artifactId>
+            <version>${bouncycastle.version}</version>
+        </dependency>
     </dependencies>
-
-
-
+    
     <build>
         <plugins>
             <plugin>
