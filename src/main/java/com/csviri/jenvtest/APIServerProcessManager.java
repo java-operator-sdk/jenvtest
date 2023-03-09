@@ -26,7 +26,6 @@ public class APIServerProcessManager {
 
 
     public void startApiServer() {
-        certManager.ensureAPIServerCertificates();
         var apiServerBinary = binaryManager.binaries().getApiServer();
         try {
             if (!apiServerBinary.exists()) {

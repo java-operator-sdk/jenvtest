@@ -35,6 +35,7 @@ public class APIServer {
     public void start() {
         log.debug("Stating API Server. Using jenvtest dir: {}", config.getJenvtestDirectory());
         binaryManager.initAndDownloadIfRequired();
+        certManager.createCertificatesIfNeeded();
         prepareLogDirectory();
         etcdProcessManager.cleanEtcdData();
         etcdProcessManager.startEtcd();
