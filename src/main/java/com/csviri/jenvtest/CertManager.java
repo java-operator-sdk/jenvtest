@@ -52,8 +52,7 @@ public class CertManager {
         }
     }
 
-    // todo generate only if not exists?
-    private void generateAPIServerCertificates() throws IOException, InterruptedException {
+    private void generateAPIServerCertificates() {
         var cert = new File(jenvtestDir, API_SERVER_CERT_NAME);
         var key = new File(jenvtestDir, API_SERVER_KEY_NAME);
         if (cert.exists() && key.exists()) {
@@ -72,7 +71,7 @@ public class CertManager {
         return new GeneralName(GeneralName.dNSName, dns);
     }
 
-    private void generateUserCertificates() throws IOException, InterruptedException {
+    private void generateUserCertificates() {
         var cert = new File(jenvtestDir, CLIENT_CERT_NAME);
         var key = new File(jenvtestDir, CLIENT_KEY_NAME);
         if (cert.exists() && key.exists()) {
