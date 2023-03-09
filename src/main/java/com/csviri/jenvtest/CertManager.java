@@ -59,7 +59,7 @@ public class CertManager {
         if (cert.exists() && key.exists()) {
             return;
         }
-        log.debug("Generating API Server certificates");
+        log.info("Generating API Server certificates");
         generateKeyAndCertificate("CN=example.org", new File(jenvtestDir, API_SERVER_KEY_NAME),
                 new File(jenvtestDir, API_SERVER_CERT_NAME),
                 new GeneralName(GeneralName.iPAddress, "127.0.0.1"),
@@ -78,7 +78,7 @@ public class CertManager {
         if (cert.exists() && key.exists()) {
             return;
         }
-        log.debug("Generating Client certificates");
+        log.info("Generating Client certificates");
         generateKeyAndCertificate("O=system:masters,CN=jenvtest", new File(jenvtestDir, CLIENT_KEY_NAME),
                 new File(jenvtestDir, CLIENT_CERT_NAME));
     }
