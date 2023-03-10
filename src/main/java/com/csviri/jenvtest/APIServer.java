@@ -1,6 +1,7 @@
 package com.csviri.jenvtest;
 
 import com.csviri.jenvtest.binary.BinaryManager;
+import com.csviri.jenvtest.process.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

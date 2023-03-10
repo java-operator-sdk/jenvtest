@@ -1,5 +1,6 @@
-package com.csviri.jenvtest;
+package com.csviri.jenvtest.junit;
 
+import com.csviri.jenvtest.TestUtils;
 import com.csviri.jenvtest.junit.EnableAPIServer;
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.ConfigMapBuilder;

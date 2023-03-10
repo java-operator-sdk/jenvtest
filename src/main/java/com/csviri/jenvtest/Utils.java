@@ -1,9 +1,9 @@
 package com.csviri.jenvtest;
 
+import com.csviri.jenvtest.binary.OSInfoProvider;
 import org.slf4j.Logger;
 
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
@@ -14,19 +14,6 @@ public class Utils {
     }
 
     public static final SemverComparator SEMVER_COMPARATOR = new SemverComparator();
-
-    public static String getOSName() {
-        String os = System.getProperty("os.name").toLowerCase();
-        if (os.contains("win")) {
-            return "windows";
-        } else {
-            return os;
-        }
-    }
-
-    public static String getOSArch() {
-        return System.getProperty("os.arch").toLowerCase();
-    }
 
     public static String getLatestVersion(List<String> versions) {
         versions.sort(SEMVER_COMPARATOR);
@@ -60,6 +47,10 @@ public class Utils {
                 logger.trace( sc.nextLine());
             }
         }).start();
+    }
+
+    public static String platformSuffix(OSInfoProvider osInfoProvider) {
+        return "-" + osInfoProvider.getOSName() + "-" + osInfoProvider.getOSArch();
     }
 
 }

@@ -2,12 +2,9 @@ package com.csviri.jenvtest.binary;
 
 import com.csviri.jenvtest.JenvtestException;
 import com.csviri.jenvtest.Utils;
-import com.google.cloud.storage.Storage;
-import com.google.cloud.storage.StorageOptions;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,43 +12,47 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 public class BinaryDownloader {
 
     private static final Logger log = LoggerFactory.getLogger(BinaryDownloader.class);
 
-    private static final String BUCKET_NAME = "kubebuilder-tools";
-    private static final String TAR_PREFIX = "kubebuilder-tools-";
+    private static final String OBJECT_TAR_PREFIX = "kubebuilder-tools-";
 
-    private String jenvtestDir;
+    private final String jenvtestDir;
+    private final BinaryRepo binaryRepo;
+    private final OSInfoProvider osInfoProvider;
 
-    public BinaryDownloader(String jenvtestDir) {
+    public BinaryDownloader(String jenvtestDir, OSInfoProvider osInfoProvider) {
         this.jenvtestDir = jenvtestDir;
+        this.osInfoProvider = osInfoProvider;
+        this.binaryRepo = new BinaryRepo(osInfoProvider);
+
+    }
+
+    BinaryDownloader(String jenvtestDir, BinaryRepo binaryRepo,OSInfoProvider osInfoProvider) {
+        this.jenvtestDir = jenvtestDir;
+        this.binaryRepo = binaryRepo;
+        this.osInfoProvider = osInfoProvider;
     }
 
     public File download(String version) {
-        try {
-            log.info("Downloading binaries with version: {}", version);
-            String url = "https://storage.googleapis.com/kubebuilder-tools/kubebuilder-tools-" + version +
-                    "-" + Utils.getOSName() + "-" + Utils.getOSArch() + ".tar.gz";
-
-            File tempFile = File.createTempFile("kubebuilder-tools", ".tar.gz");
-            log.debug("Downloading binary from url: {} to Temp file: {}", url, tempFile.getPath());
-            FileUtils.copyURLToFile(new URL(url), tempFile);
-            File dir = createDirForBinaries(version);
-            extractFiles(tempFile, dir);
-            var deleted = tempFile.delete();
-            if (!deleted) {
-                log.warn("Unable to delete temp file: {}", tempFile.getPath());
-            }
-            return dir;
-        } catch (IOException e) {
-            throw new JenvtestException(e);
+        log.info("Downloading binaries with version: {}", version);
+        var tempFile = binaryRepo.downloadVersionToTempFile(version);
+        File dir = createDirForBinaries(version);
+        extractFiles(tempFile, dir);
+        var deleted = tempFile.delete();
+        if (!deleted) {
+            log.warn("Unable to delete temp file: {}", tempFile.getPath());
         }
+        return dir;
+    }
+
+    public File downloadLatest() {
+        String latest = findLatestVersion();
+        return download(latest);
     }
 
     private void extractFiles(File tempFile, File dir) {
@@ -61,8 +62,8 @@ public class BinaryDownloader {
             while (entry != null) {
                 if (!entry.isDirectory()) {
                     File file = extractEntry(entry, dir, tarIn);
-                    if(!file.setExecutable(true)) {
-                        throw new JenvtestException("Cannot make the file executable: "+file.getPath());
+                    if (!file.setExecutable(true)) {
+                        throw new JenvtestException("Cannot make the file executable: " + file.getPath());
                     }
                 }
                 entry = tarIn.getNextTarEntry();
@@ -90,26 +91,20 @@ public class BinaryDownloader {
 
     private File createDirForBinaries(String version) {
         var dir = new File(jenvtestDir, BinaryManager.BINARY_LIST_DIR + File.separator
-                + version + BinaryManager.PLATFORM_SUFFIX);
+                + version + Utils.platformSuffix(osInfoProvider));
         if (!dir.mkdirs()) {
             throw new JenvtestException("Cannot created director: " + dir.getPath());
         }
         return dir;
     }
 
-    public File downloadLatest() {
-        String latest = findLatestVersion();
-        return download(latest);
-    }
-
-    private String findLatestVersion() {
-        Storage storage = StorageOptions.getDefaultInstance().getService();
-        var blobs = storage.get(BUCKET_NAME).list();
-        var allRelevantVersions = StreamSupport.stream(blobs.iterateAll().spliterator(), false).filter(b ->
-                        b.asBlobInfo().getName().contains(Utils.getOSName())
-                                && b.asBlobInfo().getName().contains(Utils.getOSArch()))
-                .map(b -> {
-                    String stripped = b.asBlobInfo().getName().replace(TAR_PREFIX, "");
+    public String findLatestVersion() {
+        var objects = binaryRepo.listObjectNames();
+        var allRelevantVersions = objects.filter(o ->
+                        o.contains(osInfoProvider.getOSName())
+                                && o.contains(osInfoProvider.getOSArch()))
+                .map(o -> {
+                    String stripped = o.replace(OBJECT_TAR_PREFIX, "");
                     String version = stripped.substring(0, stripped.indexOf("-"));
                     if (version.startsWith("v")) {
                         version = version.substring(1);

@@ -1,5 +1,7 @@
-package com.csviri.jenvtest;
+package com.csviri.jenvtest.process;
 
+import com.csviri.jenvtest.JenvtestException;
+import com.csviri.jenvtest.Utils;
 import com.csviri.jenvtest.binary.BinaryManager;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;

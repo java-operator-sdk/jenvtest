@@ -1,24 +1,27 @@
 package com.csviri.jenvtest;
 
+import com.csviri.jenvtest.CertManager;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 class CertManagerTest {
 
     File certsDir = new File("target","certs");
     CertManager certManager = new CertManager(certsDir.getPath());
 
-    @AfterEach
+    @BeforeEach
     void cleanup() throws IOException {
+        if(!certsDir.mkdirs()) {
+            throw new IllegalStateException("Cannot create test dir");
+        }
         if (certsDir.exists()) {
             FileUtils.cleanDirectory(certsDir);
         }
@@ -26,8 +29,6 @@ class CertManagerTest {
 
     @Test
     void generatesCertificates() throws IOException {
-        certsDir.mkdirs();
-        FileUtils.cleanDirectory(certsDir);
 
         certManager.createCertificatesIfNeeded();
 

@@ -14,15 +14,16 @@ import static com.csviri.jenvtest.binary.Binaries.*;
 public class BinaryManager {
 
     public static final String BINARY_LIST_DIR = "k8s";
-    public static final String PLATFORM_SUFFIX = "-" + Utils.getOSName() + "-" + Utils.getOSArch();
 
     private Binaries binaries;
     private final APIServerConfig config;
-    private BinaryDownloader downloader;
+    private final BinaryDownloader downloader;
+    private final OSInfoProvider osInfoProvider;
 
     public BinaryManager(APIServerConfig config) {
         this.config = config;
-        downloader = new BinaryDownloader(config.getJenvtestDir());
+        this.osInfoProvider = new OSInfoProvider();
+        this.downloader = new BinaryDownloader(config.getJenvtestDir(), osInfoProvider);
     }
 
     public void initAndDownloadIfRequired() {
@@ -63,22 +64,24 @@ public class BinaryManager {
     }
 
     private Optional<File> findLatestBinariesAvailable() {
+        var platformSuffix = Utils.platformSuffix(osInfoProvider);
         if (config.getApiServerVersion().isPresent()) {
             return Optional.of(new File(config.getJenvtestDir(), BINARY_LIST_DIR
-                    + File.separator + config.getApiServerVersion() + PLATFORM_SUFFIX));
+                    + File.separator + config.getApiServerVersion() + platformSuffix));
         }
         File binariesListDir = new File(config.getJenvtestDir(), BINARY_LIST_DIR);
         if (!binariesListDir.exists()) {
             return Optional.empty();
         }
-        var dirVersionList = List.of(binariesListDir.list((dir, name) -> name.endsWith(PLATFORM_SUFFIX)))
-                .stream().map(s -> s.substring(0, s.indexOf(PLATFORM_SUFFIX)))
+        var dirVersionList = List.of(binariesListDir.list((dir, name) -> name != null
+                        && name.endsWith(platformSuffix)))
+                .stream().map(s -> s.substring(0, s.indexOf(platformSuffix)))
                 .collect(Collectors.toList());
 
         if (dirVersionList.isEmpty()) {
             return Optional.empty();
         }
-        String latest = Utils.getLatestVersion(dirVersionList) + PLATFORM_SUFFIX;
+        String latest = Utils.getLatestVersion(dirVersionList) + platformSuffix;
         return Optional.of(new File(binariesListDir, latest));
     }
 
