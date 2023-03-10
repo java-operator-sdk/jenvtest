@@ -10,19 +10,30 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ApiServerTest {
 
     @Test
-    void sanityTest() {
-        var kubeApi = new APIServer();
-        try {
-            kubeApi.start();
-
-            var client = new KubernetesClientBuilder().build();
-            client.resource(testConfigMap()).createOrReplace();
-            var cm = client.resource(testConfigMap()).get();
-
-            assertThat(cm).isNotNull();
-        } finally {
-            kubeApi.stop();
-        }
+    void trivialCase() {
+        testWithAPIServer(new APIServer());
     }
+
+    @Test
+    void apiServerWithSpecificVersion() {
+        testWithAPIServer(new APIServer(APIServerConfigBuilder.anAPIServerConfig()
+                .withApiServerVersion("1.26.0")
+                .build()));
+
+    }
+
+
+    void testWithAPIServer(APIServer kubeApi) {
+        kubeApi.start();
+
+        var client = new KubernetesClientBuilder().build();
+        client.resource(testConfigMap()).create();
+        var cm = client.resource(testConfigMap()).get();
+
+        assertThat(cm).isNotNull();
+
+        kubeApi.stop();
+    }
+
 
 }
