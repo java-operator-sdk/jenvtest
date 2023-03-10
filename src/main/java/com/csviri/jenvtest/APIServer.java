@@ -18,20 +18,20 @@ public class APIServer implements UnexpectedProcessStopHandler {
     private final APIServerProcessManager apiServerProcessManager;
 
     public APIServer() {
-        this(new APIServerConfig());
+        this(APIServerConfigBuilder.anAPIServerConfig().build());
     }
 
     public APIServer(APIServerConfig config) {
         this.config = config;
         this.binaryManager = new BinaryManager(config);
-        this.certManager = new CertManager(config.getJenvtestDirectory());
+        this.certManager = new CertManager(config.getJenvtestDir());
         this.kubeConfigManager = new KubeConfigManager(certManager, binaryManager);
         this.etcdProcessManager = new EtcdProcessManager(binaryManager, this);
         this.apiServerProcessManager = new APIServerProcessManager(certManager, binaryManager, this, config);
     }
 
     public void start() {
-        log.debug("Stating API Server. Using jenvtest dir: {}", config.getJenvtestDirectory());
+        log.debug("Stating API Server. Using jenvtest dir: {}", config.getJenvtestDir());
         binaryManager.initAndDownloadIfRequired();
         certManager.createCertificatesIfNeeded();
         etcdProcessManager.cleanEtcdData();

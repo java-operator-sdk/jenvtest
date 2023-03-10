@@ -38,7 +38,7 @@ public class APIServerProcessManager {
             }
 
             apiServerProcess = new ProcessBuilder(apiServerBinary.getAbsolutePath(),
-                    "--cert-dir", config.getJenvtestDirectory(),
+                    "--cert-dir", config.getJenvtestDir(),
                     "--etcd-servers", "http://0.0.0.0:2379",
                     "--authorization-mode", "RBAC",
                     "--service-account-issuer", "https://localhost",

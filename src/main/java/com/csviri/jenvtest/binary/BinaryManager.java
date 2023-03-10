@@ -18,11 +18,11 @@ public class BinaryManager {
 
     private Binaries binaries;
     private final APIServerConfig config;
-    BinaryDownloader downloader;
+    private BinaryDownloader downloader;
 
     public BinaryManager(APIServerConfig config) {
         this.config = config;
-        downloader = new BinaryDownloader(config.getJenvtestDirectory());
+        downloader = new BinaryDownloader(config.getJenvtestDir());
     }
 
     public void initAndDownloadIfRequired() {
@@ -30,10 +30,9 @@ public class BinaryManager {
         File binaryDir = maybeBinaryDir.orElse(null);
 
         if (maybeBinaryDir.isEmpty()) {
-            if (!config.getDownloadBinaries()) {
+            if (!config.isDownloadBinaries()) {
                 throw new JenvtestException("Binaries cannot be found, and download is turned off");
             }
-
             binaryDir = config.getApiServerVersion().isEmpty() ?
                    downloader.downloadLatest()
                    : downloader.download(config.getApiServerVersion().get());
@@ -61,15 +60,14 @@ public class BinaryManager {
             throw new JenvtestException("Binaries not found.");
         }
         return binaries;
-
     }
 
     private Optional<File> findLatestBinariesAvailable() {
         if (config.getApiServerVersion().isPresent()) {
-            return Optional.of(new File(config.getJenvtestDirectory(), BINARY_LIST_DIR
+            return Optional.of(new File(config.getJenvtestDir(), BINARY_LIST_DIR
                     + File.separator + config.getApiServerVersion() + PLATFORM_SUFFIX));
         }
-        File binariesListDir = new File(config.getJenvtestDirectory(), BINARY_LIST_DIR);
+        File binariesListDir = new File(config.getJenvtestDir(), BINARY_LIST_DIR);
         if (!binariesListDir.exists()) {
             return Optional.empty();
         }
