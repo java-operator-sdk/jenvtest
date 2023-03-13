@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 
 import com.csviri.jenvtest.KubeAPIServer;
 
-public class APIServerExtension implements BeforeAllCallback, AfterAllCallback {
+public class KubeAPIServerExtension implements BeforeAllCallback, AfterAllCallback {
 
   private KubeAPIServer kubeApiServer;
 

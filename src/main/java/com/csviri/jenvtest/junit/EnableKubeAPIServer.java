@@ -8,7 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-@ExtendWith(APIServerExtension.class)
+@ExtendWith(KubeAPIServerExtension.class)
 @Target({TYPE, ANNOTATION_TYPE})
 @Retention(RUNTIME)
 public @interface EnableKubeAPIServer {
