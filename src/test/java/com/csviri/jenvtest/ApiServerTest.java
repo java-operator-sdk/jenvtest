@@ -19,7 +19,6 @@ class ApiServerTest {
         testWithAPIServer(new APIServer(APIServerConfigBuilder.anAPIServerConfig()
                 .withApiServerVersion("1.26.0")
                 .build()));
-
     }
 
 

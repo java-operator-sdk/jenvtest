@@ -27,7 +27,7 @@ public class BinaryManager {
     }
 
     public void initAndDownloadIfRequired() {
-        Optional<File> maybeBinaryDir = findLatestBinariesAvailable();
+        Optional<File> maybeBinaryDir = findTargetBinariesIfAvailable();
         File binaryDir = maybeBinaryDir.orElse(null);
 
         if (maybeBinaryDir.isEmpty()) {
@@ -63,11 +63,16 @@ public class BinaryManager {
         return binaries;
     }
 
-    private Optional<File> findLatestBinariesAvailable() {
+    private Optional<File> findTargetBinariesIfAvailable() {
         var platformSuffix = Utils.platformSuffix(osInfoProvider);
         if (config.getApiServerVersion().isPresent()) {
-            return Optional.of(new File(config.getJenvtestDir(), BINARY_LIST_DIR
-                    + File.separator + config.getApiServerVersion() + platformSuffix));
+            var targetVersionDir = new File(config.getJenvtestDir(), BINARY_LIST_DIR
+                    + File.separator + config.getApiServerVersion().get() + platformSuffix);
+            if (targetVersionDir.exists()){
+                return Optional.of(targetVersionDir);
+            } else {
+                return Optional.empty();
+            }
         }
         File binariesListDir = new File(config.getJenvtestDir(), BINARY_LIST_DIR);
         if (!binariesListDir.exists()) {
