@@ -16,7 +16,7 @@ jobs:
   check_format_and_tests:
     strategy:
       matrix:
-        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        os: [ ubuntu-latest, windows-latest, macos-latest-xl ]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
