@@ -2,6 +2,6 @@ package com.csviri.jenvtest.process;
 
 public interface UnexpectedProcessStopHandler {
 
-    void processStopped(Process process);
+  void processStopped(Process process);
 
 }
