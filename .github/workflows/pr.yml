@@ -5,12 +5,15 @@ env:
 
 concurrency:
   cancel-in-progress: true
+  group: ${{ github.ref }}-${{ github.workflow }}
+
 on:
   pull_request:
     branches: [ main ]
   workflow_dispatch:
+
 jobs:
-  check_format_and_unit_tests:
+  check_format_and_tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -22,8 +25,8 @@ jobs:
           cache: 'maven'
       - name: Check code format
         run: |
-          ./mvnw ${MAVEN_ARGS} formatter:validate -Dconfigfile=$PWD/contributing/eclipse-google-style.xml -pl '!operator-framework-bom' --file pom.xml
-          ./mvnw ${MAVEN_ARGS} impsort:check -pl '!operator-framework-bom' --file pom.xml
+          ./mvnw ${MAVEN_ARGS} formatter:validate -Dconfigfile=$PWD/contributing/eclipse-google-style.xml --file pom.xml
+          ./mvnw ${MAVEN_ARGS} impsort:check --file pom.xml
       - name: Run unit tests
         run: ./mvnw ${MAVEN_ARGS} -B test --file pom.xml
 
