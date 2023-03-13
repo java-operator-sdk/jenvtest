@@ -2,7 +2,7 @@ package com.csviri.jenvtest;
 
 import java.io.File;
 
-public final class APIServerConfigBuilder {
+public final class KubeAPIServerConfigBuilder {
 
   public static final String JENVTEST_DOWNLOAD_BINARIES = "JENVTEST_DOWNLOAD_BINARIES";
   public static final String JENVTEST_DIR_ENV_VAR = "JENVTEST_DIR";
@@ -14,28 +14,28 @@ public final class APIServerConfigBuilder {
   private String apiServerVersion;
   private Boolean downloadBinaries;
 
-  public APIServerConfigBuilder() {}
+  public KubeAPIServerConfigBuilder() {}
 
-  public static APIServerConfigBuilder anAPIServerConfig() {
-    return new APIServerConfigBuilder();
+  public static KubeAPIServerConfigBuilder anAPIServerConfig() {
+    return new KubeAPIServerConfigBuilder();
   }
 
-  public APIServerConfigBuilder withJenvtestDir(String jenvtestDir) {
+  public KubeAPIServerConfigBuilder withJenvtestDir(String jenvtestDir) {
     this.jenvtestDir = jenvtestDir;
     return this;
   }
 
-  public APIServerConfigBuilder withApiServerVersion(String apiServerVersion) {
+  public KubeAPIServerConfigBuilder withApiServerVersion(String apiServerVersion) {
     this.apiServerVersion = apiServerVersion;
     return this;
   }
 
-  public APIServerConfigBuilder withDownloadBinaries(boolean downloadBinaries) {
+  public KubeAPIServerConfigBuilder withDownloadBinaries(boolean downloadBinaries) {
     this.downloadBinaries = downloadBinaries;
     return this;
   }
 
-  public APIServerConfig build() {
+  public KubeAPIServerConfig build() {
     if (jenvtestDir == null) {
       var jenvtestDirFromEnvVar = System.getenv(JENVTEST_DIR_ENV_VAR);
       if (jenvtestDirFromEnvVar != null) {
@@ -53,11 +53,11 @@ public final class APIServerConfigBuilder {
       }
     }
     if (apiServerVersion == null) {
-      var apiServerVersionEnvVar = System.getenv(JENVTEST_DIR_ENV_VAR);
+      var apiServerVersionEnvVar = System.getenv(JENVTEST_API_SERVER_VERSION_ENV_VAR);
       if (apiServerVersionEnvVar != null) {
         this.apiServerVersion = apiServerVersionEnvVar;
       }
     }
-    return new APIServerConfig(jenvtestDir, apiServerVersion, downloadBinaries);
+    return new KubeAPIServerConfig(jenvtestDir, apiServerVersion, downloadBinaries);
   }
 }

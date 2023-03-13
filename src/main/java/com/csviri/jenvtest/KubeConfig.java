@@ -9,15 +9,15 @@ import org.slf4j.LoggerFactory;
 
 import com.csviri.jenvtest.binary.BinaryManager;
 
-public class KubeConfigManager {
+public class KubeConfig {
 
-  private static final Logger log = LoggerFactory.getLogger(KubeConfigManager.class);
+  private static final Logger log = LoggerFactory.getLogger(KubeConfig.class);
   public static final String JENVTEST = "jenvtest";
 
   private CertManager certManager;
   private BinaryManager binaryManager;
 
-  public KubeConfigManager(CertManager certManager, BinaryManager binaryManager) {
+  public KubeConfig(CertManager certManager, BinaryManager binaryManager) {
     this.certManager = certManager;
     this.binaryManager = binaryManager;
   }

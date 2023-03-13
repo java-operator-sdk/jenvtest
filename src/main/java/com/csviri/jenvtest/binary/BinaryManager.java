@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.csviri.jenvtest.APIServerConfig;
 import com.csviri.jenvtest.JenvtestException;
+import com.csviri.jenvtest.KubeAPIServerConfig;
 import com.csviri.jenvtest.Utils;
 
 import static com.csviri.jenvtest.binary.Binaries.*;
@@ -16,13 +16,13 @@ public class BinaryManager {
   public static final String BINARY_LIST_DIR = "k8s";
 
   private Binaries binaries;
-  private final APIServerConfig config;
+  private final KubeAPIServerConfig config;
   private final BinaryDownloader downloader;
-  private final OSInfoProvider osInfoProvider;
+  private final OSInfo osInfoProvider;
 
-  public BinaryManager(APIServerConfig config) {
+  public BinaryManager(KubeAPIServerConfig config) {
     this.config = config;
-    this.osInfoProvider = new OSInfoProvider();
+    this.osInfoProvider = new OSInfo();
     this.downloader = new BinaryDownloader(config.getJenvtestDir(), osInfoProvider);
   }
 

@@ -10,22 +10,22 @@ import org.slf4j.LoggerFactory;
 import com.csviri.jenvtest.*;
 import com.csviri.jenvtest.binary.BinaryManager;
 
-public class APIServerProcessManager {
+public class KubeAPIServerProcess {
 
-  private static final Logger log = LoggerFactory.getLogger(APIServerProcessManager.class);
-  private static final Logger apiLog = LoggerFactory.getLogger(APIServerProcessManager.class
+  private static final Logger log = LoggerFactory.getLogger(KubeAPIServerProcess.class);
+  private static final Logger apiLog = LoggerFactory.getLogger(KubeAPIServerProcess.class
       .getName() + ".apiServerProcess");
 
   private final CertManager certManager;
   private final BinaryManager binaryManager;
-  private final APIServerConfig config;
+  private final KubeAPIServerConfig config;
   private volatile Process apiServerProcess;
   private volatile boolean stopped = false;
   private final UnexpectedProcessStopHandler processStopHandler;
 
-  public APIServerProcessManager(CertManager certManager, BinaryManager binaryManager,
+  public KubeAPIServerProcess(CertManager certManager, BinaryManager binaryManager,
       UnexpectedProcessStopHandler processStopHandler,
-      APIServerConfig config) {
+      KubeAPIServerConfig config) {
     this.certManager = certManager;
     this.binaryManager = binaryManager;
     this.config = config;
@@ -87,7 +87,7 @@ public class APIServerProcessManager {
         }
       });
       procWaiter.start();
-      procWaiter.join(APIServer.STARTUP_TIMEOUT);
+      procWaiter.join(KubeAPIServer.STARTUP_TIMEOUT);
       if (!started.get()) {
         throw new JenvtestException("API Server did not start properly. Check the log files.");
       }

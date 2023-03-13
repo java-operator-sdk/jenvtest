@@ -20,9 +20,9 @@ public class BinaryRepo {
 
   private static final String BUCKET_NAME = "kubebuilder-tools";
 
-  private final OSInfoProvider osInfoProvider;
+  private final OSInfo osInfoProvider;
 
-  public BinaryRepo(OSInfoProvider osInfoProvider) {
+  public BinaryRepo(OSInfo osInfoProvider) {
     this.osInfoProvider = osInfoProvider;
   }
 

@@ -1,6 +1,6 @@
 package com.csviri.jenvtest.binary;
 
-public class OSInfoProvider {
+public class OSInfo {
 
   public String getOSName() {
     String os = System.getProperty("os.name").toLowerCase();
