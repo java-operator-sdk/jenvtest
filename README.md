@@ -11,10 +11,10 @@ Project is in early phases, heading towards mvp release.
 
 ### Unit Tests
 
-See sample unit test [here](https://github.com/csviri/jenvtest/blob/e22ecef78b916f43e35832e1154da90361db2802/src/test/java/com/csviri/kubeapi/JUnitExtensionTest.java)
+See sample unit test [here](https://github.com/csviri/jenvtest/blob/main/src/test/java/com/csviri/jenvtest/junit/JUnitExtensionTest.java)
 
 ```java
-@EnableAPIServer
+@EnableKubeAPIServer
 class JUnitExtensionTest {
 
     @Test
