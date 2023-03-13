@@ -16,7 +16,9 @@ jobs:
   check_format_and_tests:
     strategy:
       matrix:
-        os: [ ubuntu-latest, windows-latest, macos-latest-xl ]
+#        macos-latest-xl -> not yet available (just part as a plan?)
+#        macos-latest -> is not amd64 (but x86) that is not supported
+        os: [ ubuntu-latest, windows-latest ]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
