@@ -6,6 +6,8 @@ public class OSInfo {
     String os = System.getProperty("os.name").toLowerCase();
     if (os.contains("win")) {
       return "windows";
+    } else if (os.contains("mac")) {
+      return "darwin";
     } else {
       return os;
     }

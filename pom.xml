@@ -8,7 +8,7 @@
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>k8s-api-wrapper</name>
+    <name>jenvtest</name>
     <description>Java Wrapper Utility for Kubernetes API Server</description>
 
     <properties>
