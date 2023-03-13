@@ -1,8 +1,8 @@
 package com.csviri.jenvtest.binary;
 
-import org.junit.jupiter.api.Test;
-
 import java.util.List;
+
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -10,12 +10,13 @@ import static org.mockito.Mockito.when;
 
 class BinaryDownloaderTest {
 
-    public static final String VERSION = "1.23.1";
-    BinaryRepo mockBinaryRepo = mock(BinaryRepo.class);
-    OSInfoProvider mockOsInfoProvider = mock(OSInfoProvider.class);
-    BinaryDownloader binaryDownloader = new BinaryDownloader("target", mockBinaryRepo, mockOsInfoProvider);
+  public static final String VERSION = "1.23.1";
+  BinaryRepo mockBinaryRepo = mock(BinaryRepo.class);
+  OSInfoProvider mockOsInfoProvider = mock(OSInfoProvider.class);
+  BinaryDownloader binaryDownloader =
+      new BinaryDownloader("target", mockBinaryRepo, mockOsInfoProvider);
 
-    @Test
+  @Test
     void findsLatestBinary() {
         when(mockOsInfoProvider.getOSName()).thenReturn("linux");
         when(mockOsInfoProvider.getOSArch()).thenReturn("amd64");
