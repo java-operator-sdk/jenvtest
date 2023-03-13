@@ -1,0 +1,29 @@
+name: Verify Pull Request
+
+env:
+  MAVEN_ARGS: -V -ntp -e
+
+concurrency:
+  cancel-in-progress: true
+on:
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+jobs:
+  check_format_and_unit_tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Java and Maven
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: 'maven'
+      - name: Check code format
+        run: |
+          ./mvnw ${MAVEN_ARGS} formatter:validate -Dconfigfile=$PWD/contributing/eclipse-google-style.xml -pl '!operator-framework-bom' --file pom.xml
+          ./mvnw ${MAVEN_ARGS} impsort:check -pl '!operator-framework-bom' --file pom.xml
+      - name: Run unit tests
+        run: ./mvnw ${MAVEN_ARGS} -B test --file pom.xml
+
