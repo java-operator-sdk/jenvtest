@@ -11,6 +11,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @ExtendWith(APIServerExtension.class)
 @Target({TYPE, ANNOTATION_TYPE})
 @Retention(RUNTIME)
-public @interface EnableAPIServer {
+public @interface EnableKubeAPIServer {
 
 }

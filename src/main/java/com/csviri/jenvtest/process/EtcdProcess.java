@@ -11,11 +11,11 @@ import com.csviri.jenvtest.JenvtestException;
 import com.csviri.jenvtest.Utils;
 import com.csviri.jenvtest.binary.BinaryManager;
 
-public class EtcdProcessManager {
+public class EtcdProcess {
 
-  private static final Logger log = LoggerFactory.getLogger(EtcdProcessManager.class);
+  private static final Logger log = LoggerFactory.getLogger(EtcdProcess.class);
   private static final Logger etcdLog =
-      LoggerFactory.getLogger(EtcdProcessManager.class.getName() + ".etcdProcess");
+      LoggerFactory.getLogger(EtcdProcess.class.getName() + ".etcdProcess");
 
   private final BinaryManager binaryManager;
 
@@ -23,7 +23,7 @@ public class EtcdProcessManager {
   private volatile boolean stopped = false;
   private final UnexpectedProcessStopHandler processStopHandler;
 
-  public EtcdProcessManager(BinaryManager binaryManager,
+  public EtcdProcess(BinaryManager binaryManager,
       UnexpectedProcessStopHandler processStopHandler) {
     this.binaryManager = binaryManager;
     this.processStopHandler = processStopHandler;

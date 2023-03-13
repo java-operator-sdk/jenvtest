@@ -4,20 +4,20 @@ import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
-import com.csviri.jenvtest.APIServer;
+import com.csviri.jenvtest.KubeAPIServer;
 
 public class APIServerExtension implements BeforeAllCallback, AfterAllCallback {
 
-  private APIServer apiServer;
+  private KubeAPIServer kubeApiServer;
 
   @Override
   public void beforeAll(ExtensionContext extensionContext) throws Exception {
-    apiServer = new APIServer();
-    apiServer.start();
+    kubeApiServer = new KubeAPIServer();
+    kubeApiServer.start();
   }
 
   @Override
   public void afterAll(ExtensionContext extensionContext) throws Exception {
-    apiServer.stop();
+    kubeApiServer.stop();
   }
 }

@@ -9,7 +9,7 @@ import com.csviri.jenvtest.TestUtils;
 import static com.csviri.jenvtest.TestUtils.testConfigMap;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@EnableAPIServer
+@EnableKubeAPIServer
 class JUnitExtensionTest {
 
   @Test

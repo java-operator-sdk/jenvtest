@@ -24,16 +24,16 @@ public class BinaryDownloader {
 
   private final String jenvtestDir;
   private final BinaryRepo binaryRepo;
-  private final OSInfoProvider osInfoProvider;
+  private final OSInfo osInfoProvider;
 
-  public BinaryDownloader(String jenvtestDir, OSInfoProvider osInfoProvider) {
+  public BinaryDownloader(String jenvtestDir, OSInfo osInfoProvider) {
     this.jenvtestDir = jenvtestDir;
     this.osInfoProvider = osInfoProvider;
     this.binaryRepo = new BinaryRepo(osInfoProvider);
 
   }
 
-  BinaryDownloader(String jenvtestDir, BinaryRepo binaryRepo, OSInfoProvider osInfoProvider) {
+  BinaryDownloader(String jenvtestDir, BinaryRepo binaryRepo, OSInfo osInfoProvider) {
     this.jenvtestDir = jenvtestDir;
     this.binaryRepo = binaryRepo;
     this.osInfoProvider = osInfoProvider;

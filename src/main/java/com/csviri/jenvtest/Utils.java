@@ -7,7 +7,7 @@ import java.util.Scanner;
 
 import org.slf4j.Logger;
 
-import com.csviri.jenvtest.binary.OSInfoProvider;
+import com.csviri.jenvtest.binary.OSInfo;
 
 public class Utils {
 
@@ -47,8 +47,8 @@ public class Utils {
     }).start();
   }
 
-  public static String platformSuffix(OSInfoProvider osInfoProvider) {
-    return "-" + osInfoProvider.getOSName() + "-" + osInfoProvider.getOSArch();
+  public static String platformSuffix(OSInfo osInfo) {
+    return "-" + osInfo.getOSName() + "-" + osInfo.getOSArch();
   }
 
 }

@@ -7,22 +7,22 @@ import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import static com.csviri.jenvtest.TestUtils.testConfigMap;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ApiServerTest {
+class KubeApiServerTest {
 
   @Test
   void trivialCase() {
-    testWithAPIServer(new APIServer());
+    testWithAPIServer(new KubeAPIServer());
   }
 
   @Test
   void apiServerWithSpecificVersion() {
-    testWithAPIServer(new APIServer(APIServerConfigBuilder.anAPIServerConfig()
+    testWithAPIServer(new KubeAPIServer(KubeAPIServerConfigBuilder.anAPIServerConfig()
         .withApiServerVersion("1.26.0")
         .build()));
   }
 
 
-  void testWithAPIServer(APIServer kubeApi) {
+  void testWithAPIServer(KubeAPIServer kubeApi) {
     kubeApi.start();
     var client = new KubernetesClientBuilder().build();
     client.resource(testConfigMap()).create();

@@ -2,7 +2,7 @@ package com.csviri.jenvtest;
 
 import java.util.Optional;
 
-public class APIServerConfig {
+public class KubeAPIServerConfig {
 
   /**
    * Set directory where binaries and other assets are present. Default is ~/.jenvtest.
@@ -20,7 +20,7 @@ public class APIServerConfig {
    */
   private final boolean downloadBinaries;
 
-  APIServerConfig(String jenvtestDir, String apiServerVersion, boolean downloadBinaries) {
+  KubeAPIServerConfig(String jenvtestDir, String apiServerVersion, boolean downloadBinaries) {
     this.jenvtestDir = jenvtestDir;
     this.apiServerVersion = apiServerVersion;
     this.downloadBinaries = downloadBinaries;
