@@ -18,12 +18,12 @@ public class BinaryManager {
   private Binaries binaries;
   private final KubeAPIServerConfig config;
   private final BinaryDownloader downloader;
-  private final OSInfo osInfoProvider;
+  private final OSInfo osInfo;
 
   public BinaryManager(KubeAPIServerConfig config) {
     this.config = config;
-    this.osInfoProvider = new OSInfo();
-    this.downloader = new BinaryDownloader(config.getJenvtestDir(), osInfoProvider);
+    this.osInfo = new OSInfo();
+    this.downloader = new BinaryDownloader(config.getJenvtestDir(), osInfo);
   }
 
   public void initAndDownloadIfRequired() {
@@ -65,7 +65,7 @@ public class BinaryManager {
   }
 
   private Optional<File> findTargetBinariesIfAvailable() {
-    var platformSuffix = Utils.platformSuffix(osInfoProvider);
+    var platformSuffix = Utils.platformSuffix(osInfo);
     if (config.getApiServerVersion().isPresent()) {
       var targetVersionDir = new File(config.getJenvtestDir(), BINARY_LIST_DIR
           + File.separator + config.getApiServerVersion().get() + platformSuffix);

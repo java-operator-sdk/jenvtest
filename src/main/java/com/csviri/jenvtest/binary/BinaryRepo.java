@@ -20,17 +20,17 @@ public class BinaryRepo {
 
   private static final String BUCKET_NAME = "kubebuilder-tools";
 
-  private final OSInfo osInfoProvider;
+  private final OSInfo osInfo;
 
-  public BinaryRepo(OSInfo osInfoProvider) {
-    this.osInfoProvider = osInfoProvider;
+  public BinaryRepo(OSInfo osInfo) {
+    this.osInfo = osInfo;
   }
 
 
   public File downloadVersionToTempFile(String version) {
     try {
       String url = "https://storage.googleapis.com/kubebuilder-tools/kubebuilder-tools-" + version +
-          "-" + osInfoProvider.getOSName() + "-" + osInfoProvider.getOSArch() + ".tar.gz";
+          "-" + osInfo.getOSName() + "-" + osInfo.getOSArch() + ".tar.gz";
 
       File tempFile = File.createTempFile("kubebuilder-tools-" + version, ".tar.gz");
       log.debug("Downloading binary from url: {} to Temp file: {}", url, tempFile.getPath());
