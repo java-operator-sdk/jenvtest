@@ -4,6 +4,7 @@ Jenvtest is similar to envtest, to support unit testing with API Server - just f
 https://book.kubebuilder.io/reference/envtest.html
 
 It runs the API Server binaries directly (without nodes and other components). Thus, only etcd and Kubernetes API Server.
+Linux, Windows, Mac is supported on amd64 architecture.
 
 Project is in early phases, heading towards mvp release.
 
