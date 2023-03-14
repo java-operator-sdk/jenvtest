@@ -26,5 +26,5 @@ public class OSInfo {
       return "amd64";
     }
   }
-  
+
 }
