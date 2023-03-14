@@ -89,7 +89,7 @@ public class KubeAPIServerProcess {
       procWaiter.start();
       procWaiter.join(KubeAPIServer.STARTUP_TIMEOUT);
       if (!started.get()) {
-        throw new JenvtestException("API Server did not start properly. Check the log files.");
+        throw new JenvtestException("API Server did not start properly");
       }
     } catch (IOException e) {
       throw new JenvtestException(e);
