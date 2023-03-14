@@ -42,7 +42,7 @@ public class Utils {
     new Thread(() -> {
       Scanner sc = new Scanner(outputStream);
       while (sc.hasNextLine()) {
-        logger.trace(sc.nextLine());
+        logger.debug(sc.nextLine());
       }
     }).start();
   }
