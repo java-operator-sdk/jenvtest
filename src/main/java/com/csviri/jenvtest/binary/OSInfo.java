@@ -13,10 +13,18 @@ public class OSInfo {
     }
   }
 
+  /**
+   * Only amd64 and ppc64 binaries available.
+   *
+   * @return ppc64le if on that architecture otherwise amd64.
+   */
   public String getOSArch() {
-    return "amd64";
-    // return System.getProperty("os.arch").toLowerCase();
+    var osArch = System.getProperty("os.arch").toLowerCase();
+    if (osArch.contains("ppc64")) {
+      return "ppc64le";
+    } else {
+      return "amd64";
+    }
   }
-
-
+  
 }
