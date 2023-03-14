@@ -14,7 +14,8 @@ public class OSInfo {
   }
 
   public String getOSArch() {
-    return System.getProperty("os.arch").toLowerCase();
+    return "amd64";
+    // return System.getProperty("os.arch").toLowerCase();
   }
 
 

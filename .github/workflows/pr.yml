@@ -18,7 +18,7 @@ jobs:
       matrix:
 #        macos-latest-xl -> not yet available (just part as a plan?)
 #        macos-latest -> is not amd64 (but x86) that is not supported
-        os: [ ubuntu-latest, windows-latest ]
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
