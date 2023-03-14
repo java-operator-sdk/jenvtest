@@ -5,37 +5,3 @@ https://console.cloud.google.com/storage/browser/kubebuilder-tools
 bins:
 https://github.com/etcd-io/etcd/releases/download/v3.4.24/etcd-v3.4.24-linux-amd64.tar.gz
 https://dl.k8s.io/v1.26.1/bin/linux/amd64/kube-apiserver
-
-Gen self signed for api server:
-https://raymii.org/s/tutorials/OpenSSL_generate_self_signed_cert_with_Subject_Alternative_name_oneliner.html
-
-cert generate https://gist.github.com/fntlnz/cf14feb5a46b2eda428e000157447309
-
-server cert:
-openssl req -nodes -x509 -sha256 -newkey rsa:4096   -keyout apiserver.key   -out apiserver.crt   -days 356   -subj "/C=NL/ST=Zuid Holland/L=Rotterdam/O=ACME Corp/OU=IT Dept/CN=example.org"    -addext "subjectAltName = IP:127.0.0.1,DNS:kubernetes,DNS:kubernetes.default,DNS:kubernetes.default.svc,DNS:kubernetes.default.svc.cluster,DNS:kubernetes.default.svc.cluster.local"
-
-client cert (no CA) :
-openssl req -nodes -x509 -sha256 -newkey rsa:4096   -keyout client.key   -out client.crt   -days 356   -subj "/C=NL/ST=Zuid Holland/L=Rotterdam/O=system:masters/OU=IT Dept/CN=attila"
-
-run etcd:
- ./etcd --listen-client-urls=http://0.0.0.0:2379 --advertise-client-urls=http://0.0.0.0:2379 --wal-dir=/home/csviri/.jenvtest/etcddata/ --unsafe-no-fsync=true
-
-run self signed:
-
- ./kube-apiserver --cert-dir /home/csviri/.jenvtest/  --etcd-servers http://0.0.0.0:2379 --authorization-mode RBAC --service-account-issuer https://localhost --service-account-signing-key-file /home/csviri/.jenvtest/apiserver.key --service-account-signing-key-file /home/csviri/.jenvtest/apiserver.key --service-account-key-file /home/csviri/.jenvtest/apiserver.key --service-account-issuer /home/csviri/.jenvtest/apiserver.cert --disable-admission-plugins ServiceAccount --client-ca-file /home/csviri/.jenvtest/client.crt
-
-// ./kube-apiserver --cert-dir .
-// --etcd-servers http://0.0.0.0:2379
-// --authorization-mode RBAC
-// --service-account-issuer https://localhost
-// --service-account-signing-key-file /home/csviri/Downloads/kubeapi/tempcerts/apiserver.key
-// --service-account-key-file /home/csviri/Downloads/kubeapi/tempcerts/apiserver.key
-// --service-account-issuer /home/csviri/Downloads/kubeapi/tempcerts/apiserver.cert
-// --disable-admission-plugins ServiceAccount
-// --client-ca-file /home/csviri/Downloads/kubeapi/client-certs/rootCACert.pem
-
-client group (O): system:masters
-
-Gen cert from java (with bc):
-https://gamlor.info/posts-output/2019-10-29-java-create-certs-bouncy/en/
-https://www.bouncycastle.org/docs/pkixdocs1.8on/org/bouncycastle/openssl/jcajce/JcaPEMWriter.html
