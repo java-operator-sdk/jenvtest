@@ -14,7 +14,7 @@ public class KubeAPIServerProcess {
 
   private static final Logger log = LoggerFactory.getLogger(KubeAPIServerProcess.class);
   private static final Logger apiLog = LoggerFactory.getLogger(KubeAPIServerProcess.class
-      .getName() + ".apiServerProcess");
+      .getName() + ".APIServerProcessLogs");
 
   private final CertManager certManager;
   private final BinaryManager binaryManager;

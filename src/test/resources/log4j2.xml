@@ -6,7 +6,9 @@
     </Console>
   </Appenders>
   <Loggers>
-    <Root level="debug">
+    <Logger name="com.csviri.jenvtest" level="debug">
+    </Logger>
+    <Root level="error">
       <AppenderRef ref="Console"/>
     </Root>
   </Loggers>

@@ -32,6 +32,8 @@
         <impsort-maven-plugin.version>1.8.0</impsort-maven-plugin.version>
         <formatter-maven-plugin.version>2.22.0</formatter-maven-plugin.version>
         <directory-maven-plugin.version>1.0</directory-maven-plugin.version>
+        <jetty.version>11.0.14</jetty.version>
+        <kubernetes.webhooks.framework.version>1.0.0</kubernetes.webhooks.framework.version>
     </properties>
 
     <dependencyManagement>
@@ -113,9 +115,21 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
+            <version>${jetty.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpkix-jdk18on</artifactId>
             <version>${bouncycastle.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.javaoperatorsdk</groupId>
+            <artifactId>kubernetes-webhooks-framework-core</artifactId>
+            <version>${kubernetes.webhooks.framework.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
