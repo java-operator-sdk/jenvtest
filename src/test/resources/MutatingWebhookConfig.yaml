@@ -14,4 +14,4 @@ webhooks:
       url: "https://127.0.0.1:8443/mutate"
     admissionReviewVersions: ["v1"]
     sideEffects: None
-    timeoutSeconds: 5
+    timeoutSeconds: 10

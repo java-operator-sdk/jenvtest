@@ -16,7 +16,7 @@
         <slf4j.version>1.7.36</slf4j.version>
         <log4j.version>2.19.0</log4j.version>
         <awaitility.version>4.2.0</awaitility.version>
-        <fabric8-client.version>6.5.0</fabric8-client.version>
+        <fabric8-client.version>6.4.1</fabric8-client.version>
         <assertj.version>3.24.2</assertj.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -33,6 +33,7 @@
         <formatter-maven-plugin.version>2.22.0</formatter-maven-plugin.version>
         <directory-maven-plugin.version>1.0</directory-maven-plugin.version>
         <jetty.version>11.0.14</jetty.version>
+        <kubernetes.webhooks.framework.version>1.0.0</kubernetes.webhooks.framework.version>
     </properties>
 
     <dependencyManagement>
@@ -123,6 +124,12 @@
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpkix-jdk18on</artifactId>
             <version>${bouncycastle.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.javaoperatorsdk</groupId>
+            <artifactId>kubernetes-webhooks-framework-core</artifactId>
+            <version>${kubernetes.webhooks.framework.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

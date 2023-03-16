@@ -80,7 +80,7 @@ public class CertManager {
   }
 
 
-  private static void generateKeyAndCertificate(String dirName, File keyFile, File certFile,
+  public static void generateKeyAndCertificate(String dirName, File keyFile, File certFile,
       GeneralName... generalNames) {
     try {
       KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");

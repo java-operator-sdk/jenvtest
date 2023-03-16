@@ -15,7 +15,7 @@ public class EtcdProcess {
 
   private static final Logger log = LoggerFactory.getLogger(EtcdProcess.class);
   private static final Logger etcdLog =
-      LoggerFactory.getLogger(EtcdProcess.class.getName() + ".Process");
+      LoggerFactory.getLogger(EtcdProcess.class.getName() + ".EtcdProcessLogs");
 
   private final BinaryManager binaryManager;
 
