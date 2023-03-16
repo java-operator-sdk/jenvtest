@@ -40,6 +40,16 @@ class JUnitExtensionTest {
 }
 ```
 
+### Testing Mutation and Validation Webhooks
+
+An additional benefits os running K8S API Server this way, is that it makes easy to test 
+[Conversion Hooks]()https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definition-versioning/#webhook-conversion 
+and/or
+[Dynamic Admission Controllers](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/)
+
+You would probably use some additional framework to implement those hooks, like [kubernetes-webooks-framework](https://github.com/java-operator-sdk/kubernetes-webooks-framework)
+with Quarkus or Spring. However, we demonstrate how it works in [this test](https://github.com/csviri/jenvtest/blob/main/src/test/java/com/csviri/jenvtest/KubernetesMutationHookHandlingTest.java)
+
 ### Download binaries
 
 Binaries are downloaded automatically under $JENVTEST_DIR/k8s/[target-platform-and-version].
