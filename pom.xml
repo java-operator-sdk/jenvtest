@@ -10,6 +10,7 @@
 
     <name>JEnvTest Project</name>
     <description>Library to support testing against Kubernetes API server</description>
+    <url>https://github.com/java-operator-sdk/jenvtest</url>
 
     <licenses>
         <license>
@@ -23,6 +24,13 @@
         <developerConnection>scm:git:git@github.com/java-operator-sdk/jenvtest.git</developerConnection>
         <url>https://github.com/java-operator-sdk/jenvtest/tree/main</url>
     </scm>
+
+    <developers>
+        <developer>
+            <name>Attila Mészáros</name>
+            <email>csviri@gmail.com</email>
+        </developer>
+    </developers>
 
     <properties>
         <junit.version>5.9.1</junit.version>
