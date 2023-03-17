@@ -1,12 +1,10 @@
-package io.javaoperatorsdk.jenvtest.junit;
+package io.javaoperatorsdk.jenvtest;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
-import io.javaoperatorsdk.jenvtest.TestUtils;
-
-import static io.javaoperatorsdk.jenvtest.TestUtils.testConfigMap;
-import static org.assertj.core.api.Assertions.assertThat;
+import io.javaoperatorsdk.jenvtest.junit.EnableKubeAPIServer;
 
 @EnableKubeAPIServer
 class JUnitExtensionTest {
@@ -14,9 +12,9 @@ class JUnitExtensionTest {
   @Test
   void testCommunication() {
     var client = new KubernetesClientBuilder().build();
-    client.resource(testConfigMap()).createOrReplace();
+    client.resource(TestUtils.testConfigMap()).createOrReplace();
     var cm = client.resource(TestUtils.testConfigMap()).get();
 
-    assertThat(cm).isNotNull();
+    Assertions.assertThat(cm).isNotNull();
   }
 }

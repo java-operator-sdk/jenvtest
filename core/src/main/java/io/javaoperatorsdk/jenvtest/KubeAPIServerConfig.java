@@ -10,7 +10,7 @@ public class KubeAPIServerConfig {
   private final String jenvtestDir;
 
   /**
-   * If not set the latest binary will be selected automatically Sample: 1.26.1, 1.25.0.
+   * If not set the latest binary will be selected automatically. Sample: 1.26.1, 1.25.0.
    */
   private final String apiServerVersion;
 
@@ -18,12 +18,12 @@ public class KubeAPIServerConfig {
    * If true, tries to download binaries. If the apiServerVersion is not set and some local binaries
    * found won't try to download them again.
    */
-  private final boolean downloadBinaries;
+  private final boolean offlineMode;
 
-  KubeAPIServerConfig(String jenvtestDir, String apiServerVersion, boolean downloadBinaries) {
+  KubeAPIServerConfig(String jenvtestDir, String apiServerVersion, boolean offlineMode) {
     this.jenvtestDir = jenvtestDir;
     this.apiServerVersion = apiServerVersion;
-    this.downloadBinaries = downloadBinaries;
+    this.offlineMode = offlineMode;
   }
 
   public String getJenvtestDir() {
@@ -34,7 +34,7 @@ public class KubeAPIServerConfig {
     return Optional.ofNullable(apiServerVersion);
   }
 
-  public boolean isDownloadBinaries() {
-    return downloadBinaries;
+  public boolean isOfflineMode() {
+    return offlineMode;
   }
 }

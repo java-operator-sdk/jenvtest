@@ -12,7 +12,7 @@ class BinaryManagerTest {
   @Test
   void throwsExceptionIfBinaryNotPresentAndInOfflineMode() {
     BinaryManager binaryManager = new BinaryManager(KubeAPIServerConfigBuilder.anAPIServerConfig()
-        .withDownloadBinaries(false)
+        .withOfflineMode(true)
         .withApiServerVersion("1.0.1")
         .build());
 
