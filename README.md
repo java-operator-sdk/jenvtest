@@ -3,11 +3,8 @@
 jenvtest makes it easy to implement integration tests with Kubernetes API Server in Java.
 Inspired by [envtest](https://book.kubebuilder.io/reference/envtest.html) in go.
 
-It runs the API Server binaries directly (without nodes and other components). Thus, only etcd and Kubernetes API
-Server.
+It runs the API Server binaries directly (without nodes and other components, but with etcd). 
 Linux, Windows, Mac is supported.
-
-Project is in early phases, heading towards mvp release.
 
 ## Usage
 
