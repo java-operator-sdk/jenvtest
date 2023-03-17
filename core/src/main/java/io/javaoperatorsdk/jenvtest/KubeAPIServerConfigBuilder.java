@@ -12,7 +12,7 @@ public final class KubeAPIServerConfigBuilder {
 
   private String jenvtestDir;
   private String apiServerVersion;
-  private Boolean downloadBinaries;
+  private Boolean offlineMode;
 
   public KubeAPIServerConfigBuilder() {}
 
@@ -30,8 +30,8 @@ public final class KubeAPIServerConfigBuilder {
     return this;
   }
 
-  public KubeAPIServerConfigBuilder withDownloadBinaries(boolean downloadBinaries) {
-    this.downloadBinaries = downloadBinaries;
+  public KubeAPIServerConfigBuilder withOfflineMode(boolean downloadBinaries) {
+    this.offlineMode = downloadBinaries;
     return this;
   }
 
@@ -44,12 +44,12 @@ public final class KubeAPIServerConfigBuilder {
         this.jenvtestDir = new File(System.getProperty("user.home"), DIRECTORY_NAME).getPath();
       }
     }
-    if (downloadBinaries == null) {
+    if (offlineMode == null) {
       var downloadBinariesEnvVal = System.getenv(JENVTEST_DOWNLOAD_BINARIES);
       if (downloadBinariesEnvVal != null) {
-        this.downloadBinaries = Boolean.parseBoolean(downloadBinariesEnvVal);
+        this.offlineMode = Boolean.parseBoolean(downloadBinariesEnvVal);
       } else {
-        this.downloadBinaries = true;
+        this.offlineMode = false;
       }
     }
     if (apiServerVersion == null) {
@@ -58,6 +58,6 @@ public final class KubeAPIServerConfigBuilder {
         this.apiServerVersion = apiServerVersionEnvVar;
       }
     }
-    return new KubeAPIServerConfig(jenvtestDir, apiServerVersion, downloadBinaries);
+    return new KubeAPIServerConfig(jenvtestDir, apiServerVersion, offlineMode);
   }
 }

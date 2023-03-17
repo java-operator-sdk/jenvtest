@@ -29,7 +29,7 @@ public class BinaryManager {
     File binaryDir = maybeBinaryDir.orElse(null);
 
     if (maybeBinaryDir.isEmpty()) {
-      if (!config.isDownloadBinaries()) {
+      if (config.isOfflineMode()) {
         throw new JenvtestException("Binaries cannot be found, and download is turned off");
       }
       binaryDir = config.getApiServerVersion().isEmpty() ? downloader.downloadLatest()

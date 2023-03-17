@@ -10,6 +10,17 @@ Project is in early phases, heading towards mvp release.
 
 ## Usage 
 
+Include dependency:
+
+```xml
+<dependency>
+   <groupId>io.javaoperatorsdk</groupId>
+   <artifactId>jenvtest</artifactId>
+   <version>[version]</version>
+   <scope>test</scope>
+</dependency>
+```
+
 ### In Unit Tests
 
 See sample unit test [here](https://github.com/java-operator-sdk/jenvtest/blob/main/samples/src/test/java/io/javaoperatorsdk/jenvtest/JUnitExtensionTest.java#L10-L10)
