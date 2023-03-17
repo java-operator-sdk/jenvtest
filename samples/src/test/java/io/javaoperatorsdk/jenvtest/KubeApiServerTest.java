@@ -1,5 +1,6 @@
 package io.javaoperatorsdk.jenvtest;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
@@ -27,7 +28,7 @@ class KubeApiServerTest {
     client.resource(TestUtils.testConfigMap()).create();
     var cm = client.resource(TestUtils.testConfigMap()).get();
 
-    assertThat(cm).isNotNull();
+    Assertions.assertThat(cm).isNotNull();
 
     kubeApi.stop();
   }
