@@ -24,6 +24,7 @@ class KubeApiServerTest {
 
   void testWithAPIServer(KubeAPIServer kubeApi) {
     kubeApi.start();
+
     var client = new KubernetesClientBuilder().build();
     client.resource(TestUtils.testConfigMap()).create();
     var cm = client.resource(TestUtils.testConfigMap()).get();

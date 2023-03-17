@@ -10,9 +10,9 @@ Project is in early phases, heading towards mvp release.
 
 ## Usage 
 
-### Unit Tests
+### In Unit Tests
 
-See sample unit test [here](https://github.com/csviri/jenvtest/blob/main/src/test/java/com/csviri/jenvtest/junit/JUnitExtensionTest.java)
+See sample unit test [here](https://github.com/java-operator-sdk/jenvtest/blob/main/samples/src/test/java/io/javaoperatorsdk/jenvtest/JUnitExtensionTest.java#L10-L10)
 
 ```java
  
@@ -42,6 +42,12 @@ class JUnitExtensionTest {
 }
 ```
 
+### API
+
+The underlying API can be used directly. See [KubeApiServer](https://github.com/java-operator-sdk/jenvtest/blob/main/core/src/main/java/io/javaoperatorsdk/jenvtest/KubeAPIServer.java#L47-L47)
+
+https://github.com/java-operator-sdk/jenvtest/blob/main/samples/src/test/java/io/javaoperatorsdk/jenvtest/KubeApiServerTest.java#L12-L35
+
 ### Testing Mutation and Validation Webhooks
 
 An additional benefits os running K8S API Server this way, is that it makes easy to test 
@@ -50,7 +56,7 @@ and/or
 [Dynamic Admission Controllers](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/)
 
 In general using additional standard frameworks to implement webhookhooks is adviced, like [kubernetes-webooks-framework](https://github.com/java-operator-sdk/kubernetes-webooks-framework)
-with Quarkus or Spring. However, we demonstrate how it works in [this test](https://github.com/csviri/jenvtest/blob/main/src/test/java/com/csviri/jenvtest/KubernetesMutationHookHandlingTest.java)
+with Quarkus or Spring. However, we demonstrate how it works in [this test](https://github.com/java-operator-sdk/jenvtest/blob/main/samples/src/test/java/io/javaoperatorsdk/jenvtest/KubernetesMutationHookHandlingTest.java#L53-L53)
 
 ### How does it work
 
