@@ -11,6 +11,19 @@
     <name>JEnvTest Project</name>
     <description>Library to support testing against Kubernetes API server</description>
 
+    <licenses>
+        <license>
+            <name>Apache 2 License</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.html</url>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:git://github.com/java-operator-sdk/jenvtest.git</connection>
+        <developerConnection>scm:git:git@github.com/java-operator-sdk/jenvtest.git</developerConnection>
+        <url>https://github.com/java-operator-sdk/jenvtest/tree/main</url>
+    </scm>
+
     <properties>
         <junit.version>5.9.1</junit.version>
         <slf4j.version>1.7.36</slf4j.version>
