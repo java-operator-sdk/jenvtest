@@ -49,7 +49,7 @@ An additional benefits os running K8S API Server this way, is that it makes easy
 and/or
 [Dynamic Admission Controllers](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/)
 
-You would probably use some additional framework to implement those hooks, like [kubernetes-webooks-framework](https://github.com/java-operator-sdk/kubernetes-webooks-framework)
+In general using additional standard frameworks to implement webhookhooks is adviced, like [kubernetes-webooks-framework](https://github.com/java-operator-sdk/kubernetes-webooks-framework)
 with Quarkus or Spring. However, we demonstrate how it works in [this test](https://github.com/csviri/jenvtest/blob/main/src/test/java/com/csviri/jenvtest/KubernetesMutationHookHandlingTest.java)
 
 ### How does it work
