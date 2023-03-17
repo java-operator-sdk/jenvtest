@@ -12,7 +12,6 @@ import java.security.cert.X509Certificate;
 import java.util.Base64;
 import java.util.HashMap;
 
-import io.javaoperatorsdk.jenvtest.junit.EnableKubeAPIServer;
 import org.apache.commons.io.FileUtils;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.cert.X509CertificateHolder;
@@ -35,6 +34,7 @@ import io.fabric8.kubernetes.api.model.networking.v1.*;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import io.fabric8.kubernetes.client.utils.Serialization;
+import io.javaoperatorsdk.jenvtest.junit.EnableKubeAPIServer;
 import io.javaoperatorsdk.webhook.admission.AdmissionController;
 
 import jakarta.servlet.http.HttpServletRequest;

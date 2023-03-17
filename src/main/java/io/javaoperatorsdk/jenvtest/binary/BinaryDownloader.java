@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.stream.Collectors;
 
-import io.javaoperatorsdk.jenvtest.Utils;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
@@ -15,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.javaoperatorsdk.jenvtest.JenvtestException;
+import io.javaoperatorsdk.jenvtest.Utils;
 
 public class BinaryDownloader {
 

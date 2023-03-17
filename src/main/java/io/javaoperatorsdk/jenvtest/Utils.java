@@ -5,8 +5,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 
-import io.javaoperatorsdk.jenvtest.binary.OSInfo;
 import org.slf4j.Logger;
+
+import io.javaoperatorsdk.jenvtest.binary.OSInfo;
 
 public class Utils {
 

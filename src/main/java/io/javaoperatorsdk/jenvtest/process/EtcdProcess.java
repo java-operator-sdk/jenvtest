@@ -3,12 +3,12 @@ package io.javaoperatorsdk.jenvtest.process;
 import java.io.File;
 import java.io.IOException;
 
-import io.javaoperatorsdk.jenvtest.JenvtestException;
-import io.javaoperatorsdk.jenvtest.Utils;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.javaoperatorsdk.jenvtest.JenvtestException;
+import io.javaoperatorsdk.jenvtest.Utils;
 import io.javaoperatorsdk.jenvtest.binary.BinaryManager;
 
 public class EtcdProcess {

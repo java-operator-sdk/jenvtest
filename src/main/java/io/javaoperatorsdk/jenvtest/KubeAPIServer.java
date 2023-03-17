@@ -1,12 +1,12 @@
 package io.javaoperatorsdk.jenvtest;
 
-import io.javaoperatorsdk.jenvtest.process.EtcdProcess;
-import io.javaoperatorsdk.jenvtest.process.KubeAPIServerProcess;
-import io.javaoperatorsdk.jenvtest.process.UnexpectedProcessStopHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.javaoperatorsdk.jenvtest.binary.BinaryManager;
+import io.javaoperatorsdk.jenvtest.process.EtcdProcess;
+import io.javaoperatorsdk.jenvtest.process.KubeAPIServerProcess;
+import io.javaoperatorsdk.jenvtest.process.UnexpectedProcessStopHandler;
 
 public class KubeAPIServer implements UnexpectedProcessStopHandler {
 

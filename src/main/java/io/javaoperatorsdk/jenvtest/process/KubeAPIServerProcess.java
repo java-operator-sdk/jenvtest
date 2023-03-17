@@ -4,11 +4,10 @@ import java.io.IOException;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import io.javaoperatorsdk.jenvtest.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
+import io.javaoperatorsdk.jenvtest.*;
 import io.javaoperatorsdk.jenvtest.binary.BinaryManager;
 
 public class KubeAPIServerProcess {
