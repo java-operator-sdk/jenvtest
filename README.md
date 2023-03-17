@@ -1,32 +1,34 @@
 # jenvtest
 
-jenvtest makes it easy to implement integration tests with Kubernetes API Server in Java. 
+jenvtest makes it easy to implement integration tests with Kubernetes API Server in Java.
 Inspired by [envtest](https://book.kubebuilder.io/reference/envtest.html) in go.
 
-It runs the API Server binaries directly (without nodes and other components). Thus, only etcd and Kubernetes API Server.
+It runs the API Server binaries directly (without nodes and other components). Thus, only etcd and Kubernetes API
+Server.
 Linux, Windows, Mac is supported.
 
 Project is in early phases, heading towards mvp release.
 
-## Usage 
+## Usage
 
 Include dependency:
 
 ```xml
 <dependency>
-   <groupId>io.javaoperatorsdk</groupId>
-   <artifactId>jenvtest</artifactId>
-   <version>[version]</version>
-   <scope>test</scope>
+    <groupId>io.javaoperatorsdk</groupId>
+    <artifactId>jenvtest</artifactId>
+    <version>[version]</version>
+    <scope>test</scope>
 </dependency>
 ```
 
 ### In Unit Tests
 
-See sample unit test [here](https://github.com/java-operator-sdk/jenvtest/blob/main/samples/src/test/java/io/javaoperatorsdk/jenvtest/JUnitExtensionTest.java#L10-L10)
+See sample unit
+test [here](https://github.com/java-operator-sdk/jenvtest/blob/main/samples/src/test/java/io/javaoperatorsdk/jenvtest/JUnitExtensionTest.java#L10-L10)
 
 ```java
- 
+
 @EnableKubeAPIServer // Start/Stop Kube API Server in the background
 class JUnitExtensionTest {
 
@@ -46,7 +48,7 @@ class JUnitExtensionTest {
                         .withName("test1")
                         .withNamespace("default")
                         .build())
-                .withData(Map.of("key","data"))
+                .withData(Map.of("key", "data"))
                 .build();
     }
 
@@ -55,26 +57,61 @@ class JUnitExtensionTest {
 
 ### API
 
-The underlying API can be used directly. See [KubeApiServer](https://github.com/java-operator-sdk/jenvtest/blob/main/core/src/main/java/io/javaoperatorsdk/jenvtest/KubeAPIServer.java#L47-L47)
+The underlying API can be used directly.
+See [KubeApiServer](https://github.com/java-operator-sdk/jenvtest/blob/main/core/src/main/java/io/javaoperatorsdk/jenvtest/KubeAPIServer.java#L47-L47)
 
-https://github.com/java-operator-sdk/jenvtest/blob/main/samples/src/test/java/io/javaoperatorsdk/jenvtest/KubeApiServerTest.java#L12-L35
+See
+it's [usage in a test](https://github.com/java-operator-sdk/jenvtest/blob/main/samples/src/test/java/io/javaoperatorsdk/jenvtest/KubeApiServerTest.java#L12-L35).
+
+```java
+class KubeApiServerTest {
+
+    @Test
+    void trivialCase() {
+        testWithAPIServer(new KubeAPIServer());
+    }
+
+    @Test
+    void apiServerWithSpecificVersion() {
+        testWithAPIServer(new KubeAPIServer(
+                KubeAPIServerConfigBuilder.anAPIServerConfig()
+                        .withApiServerVersion("1.26.0")
+                        .build()));
+    }
+
+
+    void testWithAPIServer(KubeAPIServer kubeApi) {
+        kubeApi.start();
+
+        var client = new KubernetesClientBuilder().build();
+        client.resource(TestUtils.testConfigMap()).create();
+        var cm = client.resource(TestUtils.testConfigMap()).get();
+
+        Assertions.assertThat(cm).isNotNull();
+
+        kubeApi.stop();
+    }
+}
+```
 
 ### Testing Mutation and Validation Webhooks
 
-An additional benefits os running K8S API Server this way, is that it makes easy to test 
-[Conversion Hooks](https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definition-versioning/#webhook-conversion) 
+An additional benefits os running K8S API Server this way, is that it makes easy to test
+[Conversion Hooks](https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definition-versioning/#webhook-conversion)
 and/or
 [Dynamic Admission Controllers](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/)
 
-In general using additional standard frameworks to implement webhookhooks is adviced, like [kubernetes-webooks-framework](https://github.com/java-operator-sdk/kubernetes-webooks-framework)
-with Quarkus or Spring. However, we demonstrate how it works in [this test](https://github.com/java-operator-sdk/jenvtest/blob/main/samples/src/test/java/io/javaoperatorsdk/jenvtest/KubernetesMutationHookHandlingTest.java#L53-L53)
+In general using additional standard frameworks to implement webhookhooks is adviced,
+like [kubernetes-webooks-framework](https://github.com/java-operator-sdk/kubernetes-webooks-framework)
+with Quarkus or Spring. However, we demonstrate how it works
+in [this test](https://github.com/java-operator-sdk/jenvtest/blob/main/samples/src/test/java/io/javaoperatorsdk/jenvtest/KubernetesMutationHookHandlingTest.java#L53-L53)
 
 ### How does it work
 
 In the background Kubernetes and etcd (and kubectl) binaries are downloaded if not found locally.
 
 All the certificates for the Kube API Server and for the client is generated. The client config file
-(`~/kube/config`) file is updated, to any client can be used to talk to the API Server. 
+(`~/kube/config`) file is updated, to any client can be used to talk to the API Server.
 
 #### Downloading binaries
 
