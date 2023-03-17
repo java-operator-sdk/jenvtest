@@ -3,13 +3,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.csviri.jenvtest</groupId>
+    <groupId>io.javaoperatorsdk</groupId>
     <artifactId>jenvtest</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>jenvtest</name>
-    <description>Java Wrapper Utility for Kubernetes API Server</description>
+    <description>Library to support testing against Kubernetes API server</description>
 
     <properties>
         <junit.version>5.9.1</junit.version>
