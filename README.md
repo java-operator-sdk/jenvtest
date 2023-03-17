@@ -1,7 +1,7 @@
 # jenvtest
 
-Jenvtest is similar to envtest, to support unit testing with API Server - just for Java:
-https://book.kubebuilder.io/reference/envtest.html
+jenvtest makes it easy to implement integration tests with Kubernetes API Server in Java. 
+Inspired by [envtest](https://book.kubebuilder.io/reference/envtest.html) in go.
 
 It runs the API Server binaries directly (without nodes and other components). Thus, only etcd and Kubernetes API Server.
 Linux, Windows, Mac is supported.
@@ -15,11 +15,13 @@ Project is in early phases, heading towards mvp release.
 See sample unit test [here](https://github.com/csviri/jenvtest/blob/main/src/test/java/com/csviri/jenvtest/junit/JUnitExtensionTest.java)
 
 ```java
-@EnableKubeAPIServer
+ 
+@EnableKubeAPIServer // Start/Stop Kube API Server in the background
 class JUnitExtensionTest {
 
     @Test
     void testCommunication() {
+        // use a Kubernetes client to communicate with the server
         var client = new KubernetesClientBuilder().build();
         client.resource(configMap()).createOrReplace();
         var cm = client.resource(configMap()).get();
@@ -50,10 +52,18 @@ and/or
 You would probably use some additional framework to implement those hooks, like [kubernetes-webooks-framework](https://github.com/java-operator-sdk/kubernetes-webooks-framework)
 with Quarkus or Spring. However, we demonstrate how it works in [this test](https://github.com/csviri/jenvtest/blob/main/src/test/java/com/csviri/jenvtest/KubernetesMutationHookHandlingTest.java)
 
-### Download binaries
+### How does it work
 
-Binaries are downloaded automatically under $JENVTEST_DIR/k8s/[target-platform-and-version].
+In the background Kubernetes and etcd (and kubectl) binaries are downloaded if not found locally.
+
+All the certificates for the Kube API Server and for the client is generated. The client config file
+(`~/kube/config`) file is updated, to any client can be used to talk to the API Server. 
+
+#### Downloading binaries
+
+Binaries are downloaded automatically under ~/.jenvtest/k8s/[target-platform-and-version].
 
 Also [`setup-envtest`](https://pkg.go.dev/sigs.k8s.io/controller-runtime/tools/setup-envtest#section-readme) can be used
 to download binaries manually. By executing `setup-envtest use --bin-dir ~/.jenvtest` will download the latest required
 binaries to the default directory.
+
