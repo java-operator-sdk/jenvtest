@@ -83,6 +83,7 @@
                     <groupId>org.mockito</groupId>
                     <artifactId>mockito-core</artifactId>
                     <version>${mokito.version}</version>
+                    <scope>test</scope>
                 </dependency>
                 <dependency>
                     <groupId>org.slf4j</groupId>
