@@ -52,7 +52,7 @@ class JUnitExtensionTest {
 }
 ```
 
-### API
+### Public API
 
 The underlying API can be used directly.
 See [KubeApiServer](https://github.com/java-operator-sdk/jenvtest/blob/main/core/src/main/java/io/javaoperatorsdk/jenvtest/KubeAPIServer.java#L47-L47)
@@ -98,7 +98,7 @@ An additional benefits os running K8S API Server this way, is that it makes easy
 and/or
 [Dynamic Admission Controllers](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/)
 
-In general using additional standard frameworks to implement webhookhooks is adviced,
+In general, it is a best practice to use additional standard frameworks to implement Kubernetes webhooks,
 like [kubernetes-webooks-framework](https://github.com/java-operator-sdk/kubernetes-webooks-framework)
 with Quarkus or Spring. However, we demonstrate how it works
 in [this test](https://github.com/java-operator-sdk/jenvtest/blob/main/samples/src/test/java/io/javaoperatorsdk/jenvtest/KubernetesMutationHookHandlingTest.java#L53-L53)
@@ -112,9 +112,10 @@ All the certificates for the Kube API Server and for the client is generated. Th
 
 #### Downloading binaries
 
-Binaries are downloaded automatically under ~/.jenvtest/k8s/[target-platform-and-version].
+Binaries are downloaded automatically under ~/.jenvtest/k8s/[target-platform-and-version] if no binary found locally.
+If there are multiple binaries found, the latest if selected (unless a target version is not specified).
 
 Also [`setup-envtest`](https://pkg.go.dev/sigs.k8s.io/controller-runtime/tools/setup-envtest#section-readme) can be used
 to download binaries manually. By executing `setup-envtest use --bin-dir ~/.jenvtest` will download the latest required
-binaries to the default directory.
+binaries to the default directory. This is useful if always running the tests in offline mode.
 
