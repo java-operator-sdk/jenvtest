@@ -1,11 +1,9 @@
 package io.javaoperatorsdk.jenvtest;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import io.fabric8.kubernetes.client.KubernetesClientBuilder;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import static io.javaoperatorsdk.jenvtest.TestUtils.NON_LATEST_API_SERVER_VERSION;
+import static io.javaoperatorsdk.jenvtest.TestUtils.simpleTest;
 
 class KubeApiServerTest {
 
@@ -17,20 +15,14 @@ class KubeApiServerTest {
   @Test
   void apiServerWithSpecificVersion() {
     testWithAPIServer(new KubeAPIServer(KubeAPIServerConfigBuilder.anAPIServerConfig()
-        .withApiServerVersion("1.26.0")
+        .withApiServerVersion(NON_LATEST_API_SERVER_VERSION)
         .build()));
   }
 
 
   void testWithAPIServer(KubeAPIServer kubeApi) {
     kubeApi.start();
-
-    var client = new KubernetesClientBuilder().build();
-    client.resource(TestUtils.testConfigMap()).create();
-    var cm = client.resource(TestUtils.testConfigMap()).get();
-
-    Assertions.assertThat(cm).isNotNull();
-
+    simpleTest();
     kubeApi.stop();
   }
 }
