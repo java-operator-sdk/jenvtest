@@ -13,4 +13,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 public @interface EnableKubeAPIServer {
 
+  String NOT_SET = "NOT_SET";
+
+  /**
+   * The target Kube API Version. Sample: 1.26.1
+   */
+  String kubeAPIVersion() default NOT_SET;
+
 }
