@@ -22,9 +22,10 @@ public class KubeConfig {
     this.binaryManager = binaryManager;
   }
 
-  public void updateKubeConfig() {
+  public void updateKubeConfig(int apiServerPort) {
     log.debug("Updating kubeconfig");
-    execWithKubectlConfigAndWait("set-cluster", JENVTEST, "--server=https://127.0.0.1:6443",
+    execWithKubectlConfigAndWait("set-cluster", JENVTEST,
+        "--server=https://127.0.0.1:" + apiServerPort,
         "--certificate-authority=" + certManager.getAPIServerCertPath());
     execWithKubectlConfigAndWait("set-credentials", JENVTEST,
         "--client-certificate=" + certManager.getClientCertPath(),

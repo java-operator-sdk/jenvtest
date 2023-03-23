@@ -29,16 +29,17 @@ public class EtcdProcess {
     this.processStopHandler = processStopHandler;
   }
 
-  public void startEtcd() {
+  public int startEtcd() {
     var etcdBinary = binaryManager.binaries().getEtcd();
+    var port = Utils.findFreePort();
     try {
       if (!etcdBinary.exists()) {
         throw new JenvtestException(
             "Missing binary for etcd on path: " + etcdBinary.getAbsolutePath());
       }
       etcdProcess = new ProcessBuilder(etcdBinary.getAbsolutePath(),
-          "--listen-client-urls=http://0.0.0.0:2379",
-          "--advertise-client-urls=http://0.0.0.0:2379")
+          "--listen-client-urls=http://0.0.0.0:" + port,
+          "--advertise-client-urls=http://0.0.0.0:" + port)
           .start();
       Utils.redirectProcessOutputToLogger(etcdProcess.getInputStream(), etcdLog);
       Utils.redirectProcessOutputToLogger(etcdProcess.getErrorStream(), etcdLog);
@@ -51,6 +52,7 @@ public class EtcdProcess {
         return null;
       });
       log.debug("etcd started");
+      return port;
     } catch (IOException e) {
       throw new JenvtestException(e);
     }
