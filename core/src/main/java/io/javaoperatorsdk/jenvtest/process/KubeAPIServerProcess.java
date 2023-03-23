@@ -32,17 +32,18 @@ public class KubeAPIServerProcess {
     this.processStopHandler = processStopHandler;
   }
 
-  public void startApiServer() {
+  public int startApiServer(int etcdPort) {
     var apiServerBinary = binaryManager.binaries().getApiServer();
     try {
       if (!apiServerBinary.exists()) {
         throw new JenvtestException(
             "Missing binary for API Server on path: " + apiServerBinary.getAbsolutePath());
       }
-
+      var port = Utils.findFreePort();
       apiServerProcess = new ProcessBuilder(apiServerBinary.getAbsolutePath(),
           "--cert-dir", config.getJenvtestDir(),
-          "--etcd-servers", "http://0.0.0.0:2379",
+          "--secure-port", "" + port,
+          "--etcd-servers", "http://0.0.0.0:" + etcdPort,
           "--authorization-mode", "RBAC",
           "--service-account-issuer", "https://localhost",
           "--service-account-signing-key-file", certManager.getAPIServerKeyPath(),
@@ -65,6 +66,7 @@ public class KubeAPIServerProcess {
         return null;
       });
       log.debug("API Server started");
+      return port;
     } catch (IOException e) {
       throw new JenvtestException(e);
     }
