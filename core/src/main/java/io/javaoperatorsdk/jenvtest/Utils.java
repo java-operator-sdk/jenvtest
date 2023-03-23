@@ -1,6 +1,8 @@
 package io.javaoperatorsdk.jenvtest;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.ServerSocket;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
@@ -51,4 +53,11 @@ public class Utils {
     return "-" + osInfo.getOSName() + "-" + osInfo.getOSArch();
   }
 
+  public static int findFreePort() {
+    try (ServerSocket socket = new ServerSocket(0)) {
+      return socket.getLocalPort();
+    } catch (IOException e) {
+    }
+    return -1;
+  }
 }
