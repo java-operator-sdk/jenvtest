@@ -41,7 +41,7 @@
         <assertj.version>3.24.2</assertj.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <commons-compress.version>1.22</commons-compress.version>
+        <commons-compress.version>1.23.0</commons-compress.version>
         <google.cloud.libraries.version>26.11.0</google.cloud.libraries.version>
         <commons-io.version>2.11.0</commons-io.version>
         <bouncycastle.version>1.72</bouncycastle.version>
