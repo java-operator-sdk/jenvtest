@@ -1,6 +1,9 @@
 package io.javaoperatorsdk.jenvtest.process;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -39,21 +42,9 @@ public class KubeAPIServerProcess {
         throw new JenvtestException(
             "Missing binary for API Server on path: " + apiServerBinary.getAbsolutePath());
       }
-      var port = Utils.findFreePort();
-      apiServerProcess = new ProcessBuilder(apiServerBinary.getAbsolutePath(),
-          "--cert-dir", config.getJenvtestDir(),
-          "--secure-port", "" + port,
-          "--etcd-servers", "http://0.0.0.0:" + etcdPort,
-          "--authorization-mode", "RBAC",
-          "--service-account-issuer", "https://localhost",
-          "--service-account-signing-key-file", certManager.getAPIServerKeyPath(),
-          "--service-account-signing-key-file", certManager.getAPIServerKeyPath(),
-          "--service-account-key-file", certManager.getAPIServerKeyPath(),
-          "--service-account-issuer", certManager.getAPIServerCertPath(),
-          "--disable-admission-plugins", "ServiceAccount",
-          "--client-ca-file", certManager.getClientCertPath(),
-          "--service-cluster-ip-range", "10.0.0.0/24",
-          "--allow-privileged")
+      var apiServerPort = Utils.findFreePort();
+      var command = createCommand(apiServerBinary, apiServerPort, etcdPort);
+      apiServerProcess = new ProcessBuilder(command)
           .start();
       Utils.redirectProcessOutputToLogger(apiServerProcess.getInputStream(), apiLog);
       Utils.redirectProcessOutputToLogger(apiServerProcess.getErrorStream(), apiLog);
@@ -66,10 +57,30 @@ public class KubeAPIServerProcess {
         return null;
       });
       log.debug("API Server started");
-      return port;
+      return apiServerPort;
     } catch (IOException e) {
       throw new JenvtestException(e);
     }
+  }
+
+  private List<String> createCommand(File apiServerBinary, int apiServerPort, int etcdPort) {
+    var command = new ArrayList<String>();
+    command.add(apiServerBinary.getAbsolutePath());
+    command.addAll(config.getApiServerFlags());
+    command.addAll(List.of("--cert-dir", config.getJenvtestDir(),
+        "--secure-port", "" + apiServerPort,
+        "--etcd-servers", "http://0.0.0.0:" + etcdPort,
+        "--authorization-mode", "RBAC",
+        "--service-account-issuer", "https://localhost",
+        "--service-account-signing-key-file", certManager.getAPIServerKeyPath(),
+        "--service-account-signing-key-file", certManager.getAPIServerKeyPath(),
+        "--service-account-key-file", certManager.getAPIServerKeyPath(),
+        "--service-account-issuer", certManager.getAPIServerCertPath(),
+        "--disable-admission-plugins", "ServiceAccount",
+        "--client-ca-file", certManager.getClientCertPath(),
+        "--service-cluster-ip-range", "10.0.0.0/24",
+        "--allow-privileged"));
+    return command;
   }
 
   public void waitUntilDefaultNamespaceCreated() {

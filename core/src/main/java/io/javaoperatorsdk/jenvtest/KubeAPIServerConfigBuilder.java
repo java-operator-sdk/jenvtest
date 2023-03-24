@@ -1,6 +1,8 @@
 package io.javaoperatorsdk.jenvtest;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public final class KubeAPIServerConfigBuilder {
 
@@ -13,6 +15,7 @@ public final class KubeAPIServerConfigBuilder {
   private String jenvtestDir;
   private String apiServerVersion;
   private Boolean offlineMode;
+  private final List<String> apiServerFlags = new ArrayList<>(0);
 
   public KubeAPIServerConfigBuilder() {}
 
@@ -58,6 +61,28 @@ public final class KubeAPIServerConfigBuilder {
         this.apiServerVersion = apiServerVersionEnvVar;
       }
     }
-    return new KubeAPIServerConfig(jenvtestDir, apiServerVersion, offlineMode);
+    return new KubeAPIServerConfig(jenvtestDir, apiServerVersion, offlineMode, apiServerFlags);
+  }
+
+  public void withApiServerFlags(List<String> flags) {
+    apiServerFlags.addAll(flags);
+  }
+
+  public void withApiServerFlag(String key, String value) {
+    checkKeyPrefix(key);
+    apiServerFlags.add(key);
+    apiServerFlags.add(value);
+  }
+
+  public void withApiServerFlag(String key) {
+    checkKeyPrefix(key);
+    apiServerFlags.add(key);
+  }
+
+  private void checkKeyPrefix(String key) {
+    if (!key.startsWith("--")) {
+      throw new JenvtestException(
+          "Kube API Server flag needs to start with double dash: '--'; Instead found key: " + key);
+    }
   }
 }
