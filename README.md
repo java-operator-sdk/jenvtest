@@ -25,7 +25,7 @@ Include dependency:
 ### In Unit Tests
 
 See sample unit
-test [here](https://github.com/java-operator-sdk/jenvtest/blob/main/samples/src/test/java/io/javaoperatorsdk/jenvtest/JUnitExtensionTest.java#L10-L10)
+test [here](https://github.com/java-operator-sdk/jenvtest/blob/6fadd8cb07ea0a61410175abf1f6ec495bf6a20f/samples/src/test/java/io/javaoperatorsdk/jenvtest/JUnitExtensionOnClassTest.java)
 
 ```java
 
