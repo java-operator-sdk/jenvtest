@@ -14,4 +14,10 @@ class JUnitExtensionOnMethodTest {
     simpleTest();
   }
 
+  @Test
+  @EnableKubeAPIServer(apiServerFlags = {"--min-request-timeout", "1"})
+  void testAdditionalFlags() {
+    // todo test with informer
+    simpleTest();
+  }
 }
