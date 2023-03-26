@@ -5,7 +5,7 @@
 
     <groupId>io.javaoperatorsdk</groupId>
     <artifactId>jenvtest-project</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.3.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>JEnvTest Project</name>
@@ -34,22 +34,22 @@
 
     <properties>
         <junit.version>5.9.2</junit.version>
-        <slf4j.version>1.7.36</slf4j.version>
+        <slf4j.version>2.0.7</slf4j.version>
         <log4j.version>2.20.0</log4j.version>
         <awaitility.version>4.2.0</awaitility.version>
-        <fabric8-client.version>6.5.0</fabric8-client.version>
+        <fabric8-client.version>6.5.1</fabric8-client.version>
         <assertj.version>3.24.2</assertj.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <commons-compress.version>1.22</commons-compress.version>
-        <google.cloud.libraries.version>26.9.0</google.cloud.libraries.version>
+        <commons-compress.version>1.23.0</commons-compress.version>
+        <google.cloud.libraries.version>26.11.0</google.cloud.libraries.version>
         <commons-io.version>2.11.0</commons-io.version>
         <bouncycastle.version>1.72</bouncycastle.version>
-        <mokito.version>5.1.1</mokito.version>
+        <mokito.version>5.2.0</mokito.version>
         <maven.compiler.target>11</maven.compiler.target>
         <maven.compiler.source>11</maven.compiler.source>
         <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
-        <maven-surefire-plugin.version>3.0.0-M9</maven-surefire-plugin.version>
+        <maven-surefire-plugin.version>3.0.0</maven-surefire-plugin.version>
         <impsort-maven-plugin.version>1.8.0</impsort-maven-plugin.version>
         <formatter-maven-plugin.version>2.22.0</formatter-maven-plugin.version>
         <directory-maven-plugin.version>1.0</directory-maven-plugin.version>

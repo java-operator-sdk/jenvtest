@@ -6,11 +6,12 @@ import io.javaoperatorsdk.jenvtest.junit.EnableKubeAPIServer;
 
 import static io.javaoperatorsdk.jenvtest.TestUtils.simpleTest;
 
-@EnableKubeAPIServer
-class JUnitExtensionTest {
+class JUnitExtensionOnMethodTest {
 
   @Test
+  @EnableKubeAPIServer
   void testCommunication() {
     simpleTest();
   }
+
 }

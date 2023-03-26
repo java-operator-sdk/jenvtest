@@ -9,7 +9,7 @@ import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @ExtendWith(KubeAPIServerExtension.class)
-@Target({TYPE, ANNOTATION_TYPE})
+@Target({TYPE, METHOD, ANNOTATION_TYPE})
 @Retention(RUNTIME)
 public @interface EnableKubeAPIServer {
 
@@ -20,4 +20,5 @@ public @interface EnableKubeAPIServer {
    */
   String kubeAPIVersion() default NOT_SET;
 
+  String[] apiServerFlags() default {};
 }
