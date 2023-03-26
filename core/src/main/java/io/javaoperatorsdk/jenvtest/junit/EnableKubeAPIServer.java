@@ -20,5 +20,10 @@ public @interface EnableKubeAPIServer {
    */
   String kubeAPIVersion() default NOT_SET;
 
+  /**
+   * Flags to pass to Kube API Server on startup. Key and value are two separated items, like
+   * specifying min-request-timeout needs to add in order two values: "--min-request-timeout" for
+   * the key and "300" for the actual desired value.
+   */
   String[] apiServerFlags() default {};
 }
