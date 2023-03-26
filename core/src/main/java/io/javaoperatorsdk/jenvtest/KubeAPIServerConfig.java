@@ -1,5 +1,6 @@
 package io.javaoperatorsdk.jenvtest;
 
+import java.util.List;
 import java.util.Optional;
 
 public class KubeAPIServerConfig {
@@ -20,10 +21,19 @@ public class KubeAPIServerConfig {
    */
   private final boolean offlineMode;
 
-  KubeAPIServerConfig(String jenvtestDir, String apiServerVersion, boolean offlineMode) {
+  /**
+   * Flags to pass to Kube API Server on startup. Key and value are two separated items, like
+   * specifying min-request-timeout needs to add in order two values: "--min-request-timeout" and
+   * "300" for the actual desired value.
+   */
+  private final List<String> apiServerFlags;
+
+  KubeAPIServerConfig(String jenvtestDir, String apiServerVersion, boolean offlineMode,
+      List<String> apiServerFlags) {
     this.jenvtestDir = jenvtestDir;
     this.apiServerVersion = apiServerVersion;
     this.offlineMode = offlineMode;
+    this.apiServerFlags = apiServerFlags;
   }
 
   public String getJenvtestDir() {
@@ -36,5 +46,9 @@ public class KubeAPIServerConfig {
 
   public boolean isOfflineMode() {
     return offlineMode;
+  }
+
+  public List<String> getApiServerFlags() {
+    return apiServerFlags;
   }
 }

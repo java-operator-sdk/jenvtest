@@ -2,6 +2,7 @@ package io.javaoperatorsdk.jenvtest.junit;
 
 import java.lang.reflect.AnnotatedElement;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -46,11 +47,11 @@ public class KubeAPIServerExtension
   private void startIfAnnotationPresent(ExtensionContext extensionContext) {
     extensionContext.getElement().ifPresent(ae -> {
       var annotation = getExtensionAnnotationInstance(ae);
-      annotation.ifPresent(a -> startApiServer(extensionContext, a));
+      annotation.ifPresent(this::startApiServer);
     });
   }
 
-  private void startApiServer(ExtensionContext context, EnableKubeAPIServer annotation) {
+  private void startApiServer(EnableKubeAPIServer annotation) {
     kubeApiServer = new KubeAPIServer(annotationToConfig(annotation));
     kubeApiServer.start();
   }
@@ -68,6 +69,9 @@ public class KubeAPIServerExtension
     var version = annotation.kubeAPIVersion();
     if (!NOT_SET.equals(version)) {
       builder.withApiServerVersion(version);
+    }
+    if (annotation.apiServerFlags().length > 0) {
+      builder.withApiServerFlags(List.of(annotation.apiServerFlags()));
     }
     return builder.build();
   }
