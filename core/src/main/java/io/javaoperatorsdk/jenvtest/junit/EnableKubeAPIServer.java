@@ -5,6 +5,8 @@ import java.lang.annotation.Target;
 
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import io.javaoperatorsdk.jenvtest.KubeAPIServerConfig;
+
 import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
@@ -21,9 +23,7 @@ public @interface EnableKubeAPIServer {
   String kubeAPIVersion() default NOT_SET;
 
   /**
-   * Flags to pass to Kube API Server on startup. Key and value are two separated items, like
-   * specifying min-request-timeout needs to add in order two values: "--min-request-timeout" for
-   * the key and "300" for the actual desired value.
+   * See {@link KubeAPIServerConfig} docs for details.
    */
   String[] apiServerFlags() default {};
 }

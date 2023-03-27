@@ -25,6 +25,9 @@ public class KubeAPIServerConfig {
    * Flags to pass to Kube API Server on startup. Key and value are two separated items, like
    * specifying min-request-timeout needs to add in order two values: "--min-request-timeout" and
    * "300" for the actual desired value.
+   *
+   * See Kubernetes docs for possible flags:
+   * https://kubernetes.io/docs/reference/command-line-tools-reference/kube-apiserver/
    */
   private final List<String> apiServerFlags;
 
