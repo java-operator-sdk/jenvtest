@@ -3,6 +3,7 @@ package io.javaoperatorsdk.jenvtest.process;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -13,6 +14,8 @@ import org.slf4j.LoggerFactory;
 
 import io.javaoperatorsdk.jenvtest.*;
 import io.javaoperatorsdk.jenvtest.binary.BinaryManager;
+
+import static io.javaoperatorsdk.jenvtest.KubeAPIServer.STARTUP_TIMEOUT;
 
 public class KubeAPIServerProcess {
 
@@ -93,7 +96,7 @@ public class KubeAPIServerProcess {
         if (defaultNamespaceExists()) {
           return;
         }
-        if (LocalTime.now().isAfter(startedAt.plusSeconds(10))) {
+        if (LocalTime.now().isAfter(startedAt.plus(STARTUP_TIMEOUT, ChronoUnit.MILLIS))) {
           throw new JenvtestException("API Server did not start properly");
         }
         Thread.sleep(POLLING_INTERVAL);
