@@ -2,6 +2,7 @@ package io.javaoperatorsdk.jenvtest.process;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -15,9 +16,11 @@ import io.javaoperatorsdk.jenvtest.binary.BinaryManager;
 
 public class KubeAPIServerProcess {
 
+  public static final int REQUEST_WAIT_TIMEOUT = 500;
   private static final Logger log = LoggerFactory.getLogger(KubeAPIServerProcess.class);
   private static final Logger apiLog = LoggerFactory.getLogger(KubeAPIServerProcess.class
       .getName() + ".APIServerProcessLogs");
+  public static final int POLLING_INTERVAL = 250;
 
   private final CertManager certManager;
   private final BinaryManager binaryManager;
@@ -85,27 +88,42 @@ public class KubeAPIServerProcess {
 
   public void waitUntilDefaultNamespaceCreated() {
     try {
-      AtomicBoolean started = new AtomicBoolean(false);
+      var startedAt = LocalTime.now();
+      while (true) {
+        if (defaultNamespaceExists()) {
+          return;
+        }
+        if (LocalTime.now().isAfter(startedAt.plusSeconds(10))) {
+          throw new JenvtestException("API Server did not start properly");
+        }
+        Thread.sleep(POLLING_INTERVAL);
+      }
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new JenvtestException(e);
+    }
+  }
+
+  private boolean defaultNamespaceExists() {
+    try {
       var proc = new ProcessBuilder(binaryManager.binaries().getKubectl().getPath(), "get", "ns",
-          "--watch").start();
-      var procWaiter = new Thread(() -> {
+          "default").start();
+      AtomicBoolean defaultFound = new AtomicBoolean(false);
+      var procIsReader = new Thread(() -> {
         log.debug("Starting proc waiter thread.");
         try (Scanner sc = new Scanner(proc.getInputStream())) {
           while (sc.hasNextLine()) {
             String line = sc.nextLine();
-            log.debug("kubectl ns watch: {}", line);
             if (line.contains("default")) {
-              started.set(true);
+              defaultFound.set(true);
               return;
             }
           }
         }
       });
-      procWaiter.start();
-      procWaiter.join(KubeAPIServer.STARTUP_TIMEOUT);
-      if (!started.get()) {
-        throw new JenvtestException("API Server did not start properly");
-      }
+      procIsReader.start();
+      procIsReader.join(REQUEST_WAIT_TIMEOUT);
+      return defaultFound.get();
     } catch (IOException e) {
       throw new JenvtestException(e);
     } catch (InterruptedException e) {
