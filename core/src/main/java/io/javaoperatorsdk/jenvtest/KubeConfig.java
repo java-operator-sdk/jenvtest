@@ -40,6 +40,7 @@ public class KubeConfig {
     unset("contexts." + JENVTEST);
     unset("clusters." + JENVTEST);
     unset("users." + JENVTEST);
+    unset("current-context");
   }
 
   private void unset(String target) {
