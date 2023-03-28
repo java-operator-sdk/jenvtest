@@ -89,9 +89,11 @@ public class KubeAPIServerProcess {
       var proc = new ProcessBuilder(binaryManager.binaries().getKubectl().getPath(), "get", "ns",
           "--watch").start();
       var procWaiter = new Thread(() -> {
+        log.debug("Starting proc waiter thread.");
         try (Scanner sc = new Scanner(proc.getInputStream())) {
           while (sc.hasNextLine()) {
             String line = sc.nextLine();
+            log.debug("kubectl ns watch: {}", line);
             if (line.contains("default")) {
               started.set(true);
               return;
