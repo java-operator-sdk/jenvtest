@@ -135,7 +135,7 @@ public class KubeAPIServerProcess {
   private HttpRequest getHttpRequest() {
     try {
       return HttpRequest.newBuilder()
-          .uri(new URI("https://localhost:" + apiServerPort + "/readyz"))
+          .uri(new URI("https://127.0.0.1:" + apiServerPort + "/readyz"))
           .GET()
           .build();
     } catch (URISyntaxException e) {
