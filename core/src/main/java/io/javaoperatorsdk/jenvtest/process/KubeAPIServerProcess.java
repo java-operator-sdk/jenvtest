@@ -2,6 +2,7 @@ package io.javaoperatorsdk.jenvtest.process;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -124,6 +125,10 @@ public class KubeAPIServerProcess {
       var response = client.send(request, HttpResponse.BodyHandlers.ofString());
       log.trace("Ready Response message:{} code: {}", response.body(), response.statusCode());
       return response.statusCode() == 200;
+    } catch (ConnectException e) {
+      // still want to retry
+      log.warn("Cannot connect to the server", e);
+      return false;
     } catch (IOException e) {
       throw new JenvtestException(e);
     } catch (InterruptedException e) {
