@@ -2,6 +2,11 @@ package io.javaoperatorsdk.jenvtest.process;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -31,6 +36,7 @@ public class KubeAPIServerProcess {
   private volatile Process apiServerProcess;
   private volatile boolean stopped = false;
   private final UnexpectedProcessStopHandler processStopHandler;
+  private int apiServerPort;
 
   public KubeAPIServerProcess(CertManager certManager, BinaryManager binaryManager,
       UnexpectedProcessStopHandler processStopHandler,
@@ -48,7 +54,7 @@ public class KubeAPIServerProcess {
         throw new JenvtestException(
             "Missing binary for API Server on path: " + apiServerBinary.getAbsolutePath());
       }
-      var apiServerPort = Utils.findFreePort();
+      apiServerPort = Utils.findFreePort();
       var command = createCommand(apiServerBinary, apiServerPort, etcdPort);
       apiServerProcess = new ProcessBuilder(command)
           .start();
@@ -93,7 +99,7 @@ public class KubeAPIServerProcess {
     try {
       var startedAt = LocalTime.now();
       while (true) {
-        if (defaultNamespaceExists()) {
+        if (healthy()) {
           return;
         }
         if (LocalTime.now().isAfter(startedAt.plus(STARTUP_TIMEOUT, ChronoUnit.MILLIS))) {
@@ -107,27 +113,19 @@ public class KubeAPIServerProcess {
     }
   }
 
-  private boolean defaultNamespaceExists() {
+  private boolean healthy() {
     try {
-      var proc = new ProcessBuilder(binaryManager.binaries().getKubectl().getPath(), "get", "ns",
-          "default").start();
-      AtomicBoolean defaultFound = new AtomicBoolean(false);
-      var procIsReader = new Thread(() -> {
-        log.debug("Starting proc waiter thread.");
-        try (Scanner sc = new Scanner(proc.getInputStream())) {
-          while (sc.hasNextLine()) {
-            String line = sc.nextLine();
-            if (line.contains("default")) {
-              defaultFound.set(true);
-              return;
-            }
-          }
-        }
-      });
-      procIsReader.start();
-      procIsReader.join(REQUEST_WAIT_TIMEOUT);
-      return defaultFound.get();
-    } catch (IOException e) {
+    var client = HttpClient.newBuilder().build();
+    HttpRequest request = HttpRequest.newBuilder()
+              .uri(new URI("https://localhost:"+apiServerPort+"/livez"))
+              .GET()
+              .build();
+
+      var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+      String body = response.body();
+
+      return true;
+    } catch (URISyntaxException | IOException e) {
       throw new JenvtestException(e);
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
