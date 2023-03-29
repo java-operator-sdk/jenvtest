@@ -56,7 +56,7 @@ public class KubeAPIServerProcess {
         }
         return null;
       });
-      log.debug("API Server started");
+      log.debug("Kube API Server started on port: {}", apiServerPort);
       return apiServerPort;
     } catch (IOException e) {
       throw new JenvtestException(e);

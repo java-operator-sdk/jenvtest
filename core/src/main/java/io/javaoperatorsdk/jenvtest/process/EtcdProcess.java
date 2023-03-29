@@ -51,7 +51,7 @@ public class EtcdProcess {
         }
         return null;
       });
-      log.debug("etcd started");
+      log.debug("etcd started on port: {}", port);
       return port;
     } catch (IOException e) {
       throw new JenvtestException(e);
