@@ -2,17 +2,22 @@ package io.javaoperatorsdk.jenvtest.process;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
-import java.util.concurrent.atomic.AtomicBoolean;
+
+import javax.net.ssl.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,11 +29,10 @@ import static io.javaoperatorsdk.jenvtest.KubeAPIServer.STARTUP_TIMEOUT;
 
 public class KubeAPIServerProcess {
 
-  public static final int REQUEST_WAIT_TIMEOUT = 500;
   private static final Logger log = LoggerFactory.getLogger(KubeAPIServerProcess.class);
   private static final Logger apiLog = LoggerFactory.getLogger(KubeAPIServerProcess.class
       .getName() + ".APIServerProcessLogs");
-  public static final int POLLING_INTERVAL = 250;
+  public static final int POLLING_INTERVAL = 150;
 
   private final CertManager certManager;
   private final BinaryManager binaryManager;
@@ -97,9 +101,11 @@ public class KubeAPIServerProcess {
 
   public void waitUntilDefaultNamespaceCreated() {
     try {
+      var client = getHttpClient();
+      var request = getHttpRequest();
       var startedAt = LocalTime.now();
       while (true) {
-        if (healthy()) {
+        if (ready(client, request)) {
           return;
         }
         if (LocalTime.now().isAfter(startedAt.plus(STARTUP_TIMEOUT, ChronoUnit.MILLIS))) {
@@ -113,22 +119,78 @@ public class KubeAPIServerProcess {
     }
   }
 
-  private boolean healthy() {
+  private boolean ready(HttpClient client, HttpRequest request) {
     try {
-    var client = HttpClient.newBuilder().build();
-    HttpRequest request = HttpRequest.newBuilder()
-              .uri(new URI("https://localhost:"+apiServerPort+"/livez"))
-              .GET()
-              .build();
-
       var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-      String body = response.body();
-
-      return true;
-    } catch (URISyntaxException | IOException e) {
+      log.trace("Ready Response message:{} code: {}", response.body(), response.statusCode());
+      return response.statusCode() == 200;
+    } catch (IOException e) {
       throw new JenvtestException(e);
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
+      throw new JenvtestException(e);
+    }
+  }
+
+  private HttpRequest getHttpRequest() {
+    try {
+      return HttpRequest.newBuilder()
+          .uri(new URI("https://localhost:" + apiServerPort + "/readyz"))
+          .GET()
+          .build();
+    } catch (URISyntaxException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private static HttpClient getHttpClient() {
+    try {
+      var sslContext = SSLContext.getInstance("TLS");
+      sslContext.init(
+          null,
+          new TrustManager[] {
+              new X509ExtendedTrustManager() {
+                @Override
+                public void checkClientTrusted(X509Certificate[] chain, String authType,
+                    Socket socket) throws CertificateException {
+
+                }
+
+                public X509Certificate[] getAcceptedIssuers() {
+                  return null;
+                }
+
+                public void checkClientTrusted(
+                    final X509Certificate[] a_certificates,
+                    final String a_auth_type) {}
+
+                public void checkServerTrusted(
+                    final X509Certificate[] a_certificates,
+                    final String a_auth_type) {}
+
+
+                public void checkServerTrusted(
+                    final X509Certificate[] a_certificates,
+                    final String a_auth_type,
+                    final Socket a_socket) {}
+
+                @Override
+                public void checkClientTrusted(X509Certificate[] chain, String authType,
+                    SSLEngine engine) throws CertificateException {
+
+                }
+
+                public void checkServerTrusted(
+                    final X509Certificate[] a_certificates,
+                    final String a_auth_type,
+                    final SSLEngine a_engine) {}
+              }
+          },
+          null);
+      return HttpClient.newBuilder()
+          .sslContext(sslContext)
+          .build();
+    } catch (NoSuchAlgorithmException | KeyManagementException e) {
       throw new JenvtestException(e);
     }
   }
