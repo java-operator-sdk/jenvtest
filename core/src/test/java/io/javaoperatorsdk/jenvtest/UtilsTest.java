@@ -17,4 +17,16 @@ class UtilsTest {
     assertThat(Utils.getLatestVersion(new ArrayList<>(List.of("1.22", "1.23.1", "1.24"))))
         .isEqualTo("1.24");
   }
+
+  @Test
+  void checksIfVersionIsWildcard() {
+    assertThat(Utils.isWildcardVersion("1.25.*")).isTrue();
+    assertThat(Utils.isWildcardVersion("1.26.2")).isFalse();
+  }
+
+  @Test
+  void wildcardToPrefix() {
+    assertThat(Utils.wildcardToPrefix("1.25.*")).isEqualTo("1.25");
+  }
+
 }

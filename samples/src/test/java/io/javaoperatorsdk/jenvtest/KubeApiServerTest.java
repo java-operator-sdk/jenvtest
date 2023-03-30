@@ -2,8 +2,11 @@ package io.javaoperatorsdk.jenvtest;
 
 import org.junit.jupiter.api.Test;
 
+import io.fabric8.kubernetes.client.KubernetesClientBuilder;
+
 import static io.javaoperatorsdk.jenvtest.TestUtils.NON_LATEST_API_SERVER_VERSION;
 import static io.javaoperatorsdk.jenvtest.TestUtils.simpleTest;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class KubeApiServerTest {
 
@@ -19,6 +22,19 @@ class KubeApiServerTest {
         .build()));
   }
 
+  @Test
+  void usingWildcardVersion() {
+    var kubeApi = new KubeAPIServer(KubeAPIServerConfigBuilder.anAPIServerConfig()
+        .withApiServerVersion("1.26.*")
+        .build());
+    kubeApi.start();
+
+    var client = new KubernetesClientBuilder().build();
+    TestUtils.simpleTest(client);
+    assertThat(client.getKubernetesVersion().getMinor()).isEqualTo("26");
+
+    kubeApi.stop();
+  }
 
   void testWithAPIServer(KubeAPIServer kubeApi) {
     kubeApi.start();
