@@ -73,7 +73,8 @@ public class KubeAPIServerProcess {
         }
         return null;
       });
-      log.debug("Kube API Server started on port: {} using binaries: {}", apiServerPort, apiServerBinary);
+      log.debug("Kube API Server started on port: {} using binaries: {}", apiServerPort,
+          apiServerBinary);
       return apiServerPort;
     } catch (IOException e) {
       throw new JenvtestException(e);

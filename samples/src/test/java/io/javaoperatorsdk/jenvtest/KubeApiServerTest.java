@@ -1,7 +1,8 @@
 package io.javaoperatorsdk.jenvtest;
 
-import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import org.junit.jupiter.api.Test;
+
+import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 
 import static io.javaoperatorsdk.jenvtest.TestUtils.NON_LATEST_API_SERVER_VERSION;
 import static io.javaoperatorsdk.jenvtest.TestUtils.simpleTest;
@@ -24,8 +25,8 @@ class KubeApiServerTest {
   @Test
   void usingWildcardVersion() {
     var kubeApi = new KubeAPIServer(KubeAPIServerConfigBuilder.anAPIServerConfig()
-            .withApiServerVersion("1.25.*")
-            .build());
+        .withApiServerVersion("1.25.*")
+        .build());
     kubeApi.start();
     var client = new KubernetesClientBuilder().build();
     TestUtils.simpleTest(client);
