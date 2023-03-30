@@ -25,12 +25,13 @@ class KubeApiServerTest {
   @Test
   void usingWildcardVersion() {
     var kubeApi = new KubeAPIServer(KubeAPIServerConfigBuilder.anAPIServerConfig()
-        .withApiServerVersion("1.25.*")
+        .withApiServerVersion("1.26.*")
         .build());
     kubeApi.start();
+
     var client = new KubernetesClientBuilder().build();
     TestUtils.simpleTest(client);
-    assertThat(client.getKubernetesVersion().getMinor()).isEqualTo("25");
+    assertThat(client.getKubernetesVersion().getMinor()).isEqualTo("26");
 
     kubeApi.stop();
   }
