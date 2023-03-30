@@ -11,7 +11,9 @@ public class KubeAPIServerConfig {
   private final String jenvtestDir;
 
   /**
-   * If not set the latest binary will be selected automatically. Sample: 1.26.1, 1.25.0.
+   * If not set the latest binary will be selected automatically. Sample: '1.26.1', '1.25.0'.
+   * Wildcards for patch version is supported, like: '1.25.*'. In this case latest patch version is
+   * used.
    */
   private final String apiServerVersion;
 
