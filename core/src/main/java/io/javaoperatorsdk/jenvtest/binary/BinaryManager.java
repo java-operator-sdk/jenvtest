@@ -1,13 +1,17 @@
 package io.javaoperatorsdk.jenvtest.binary;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import io.javaoperatorsdk.jenvtest.JenvtestException;
 import io.javaoperatorsdk.jenvtest.KubeAPIServerConfig;
 import io.javaoperatorsdk.jenvtest.Utils;
+
+import static io.javaoperatorsdk.jenvtest.Utils.isWildcardVersion;
 
 public class BinaryManager {
 
@@ -26,16 +30,29 @@ public class BinaryManager {
 
   public void initAndDownloadIfRequired() {
     Optional<File> maybeBinaryDir = findTargetBinariesIfAvailable();
-    File binaryDir = maybeBinaryDir.orElse(null);
-
+    File binaryDir;
     if (maybeBinaryDir.isEmpty()) {
       if (config.isOfflineMode()) {
         throw new JenvtestException("Binaries cannot be found, and download is turned off");
       }
-      binaryDir = config.getApiServerVersion().isEmpty() ? downloader.downloadLatest()
-          : downloader.download(config.getApiServerVersion().get());
+      binaryDir = downloadBinary();
+    } else {
+      binaryDir = maybeBinaryDir.orElseThrow();
     }
     initBinariesPojo(binaryDir);
+  }
+
+  private File downloadBinary() {
+    if (config.getApiServerVersion().isEmpty()) {
+      return downloader.downloadLatest();
+    } else {
+      String version = config.getApiServerVersion().orElseThrow();
+      if (Utils.isWildcardVersion(version)) {
+        return downloader.downloadLatestWildcard(version);
+      } else {
+        return downloader.download(version);
+      }
+    }
   }
 
   private void initBinariesPojo(File binaryDir) {
@@ -64,9 +81,18 @@ public class BinaryManager {
 
   private Optional<File> findTargetBinariesIfAvailable() {
     var platformSuffix = Utils.platformSuffix(osInfo);
-    if (config.getApiServerVersion().isPresent()) {
+    var apiServerVersion = config.getApiServerVersion().orElse(null);
+    if (apiServerVersion != null) {
+      if (isWildcardVersion(apiServerVersion)) {
+        var targetWildcardVersion = findLatestVersionForWildcard(apiServerVersion);
+        if (targetWildcardVersion.isEmpty()) {
+          return Optional.empty();
+        } else {
+          apiServerVersion = targetWildcardVersion.orElseThrow();
+        }
+      }
       var targetVersionDir = new File(config.getJenvtestDir(), BINARY_LIST_DIR
-          + File.separator + config.getApiServerVersion().get() + platformSuffix);
+          + File.separator + apiServerVersion + platformSuffix);
       if (targetVersionDir.exists()) {
         return Optional.of(targetVersionDir);
       } else {
@@ -74,19 +100,36 @@ public class BinaryManager {
       }
     }
     File binariesListDir = new File(config.getJenvtestDir(), BINARY_LIST_DIR);
-    if (!binariesListDir.exists()) {
-      return Optional.empty();
-    }
-    var dirVersionList = List.of(binariesListDir.list((dir, name) -> name != null
-        && name.endsWith(platformSuffix)))
-        .stream().map(s -> s.substring(0, s.indexOf(platformSuffix)))
-        .collect(Collectors.toList());
-
+    var dirVersionList = listBinaryDirectories();
     if (dirVersionList.isEmpty()) {
       return Optional.empty();
     }
     String latest = Utils.getLatestVersion(dirVersionList) + platformSuffix;
     return Optional.of(new File(binariesListDir, latest));
   }
+
+  private Optional<String> findLatestVersionForWildcard(String wildcardVersion) {
+    var targetPrefix = Utils.wildcardToPrefix(wildcardVersion);
+    var dirs = listBinaryDirectories();
+    var filteredDirs =
+        dirs.stream().filter(d -> d.startsWith(targetPrefix)).collect(Collectors.toList());
+    if (filteredDirs.isEmpty()) {
+      return Optional.empty();
+    }
+    return Optional.of(Utils.getLatestVersion(filteredDirs));
+  }
+
+  private List<String> listBinaryDirectories() {
+    var platformSuffix = Utils.platformSuffix(osInfo);
+    File binariesListDir = new File(config.getJenvtestDir(), BINARY_LIST_DIR);
+    if (!binariesListDir.exists()) {
+      return Collections.emptyList();
+    }
+    return Stream
+        .of(binariesListDir.list((dir, name) -> name != null && name.endsWith(platformSuffix)))
+        .map(s -> s.substring(0, s.indexOf(platformSuffix)))
+        .collect(Collectors.toList());
+  }
+
 
 }

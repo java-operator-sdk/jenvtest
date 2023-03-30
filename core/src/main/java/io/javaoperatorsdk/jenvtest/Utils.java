@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import io.javaoperatorsdk.jenvtest.binary.OSInfo;
 
 public class Utils {
+  public static final String WILDCARD_SUFFIX = ".*";
 
   private Utils() {}
 
@@ -60,4 +61,13 @@ public class Utils {
     }
     return -1;
   }
+
+  public static boolean isWildcardVersion(String version) {
+    return version.endsWith(WILDCARD_SUFFIX);
+  }
+
+  public static String wildcardToPrefix(String wildcardVersion) {
+    return wildcardVersion.substring(0, wildcardVersion.lastIndexOf("."));
+  }
+
 }

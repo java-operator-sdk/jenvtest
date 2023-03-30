@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
@@ -56,6 +57,11 @@ public class BinaryDownloader {
     return download(latest);
   }
 
+  public File downloadLatestWildcard(String wildcardVersion) {
+    String latest = findLatestOfWildcard(wildcardVersion);
+    return download(latest);
+  }
+
   private void extractFiles(File tempFile, File dir) {
     try (TarArchiveInputStream tarIn = new TarArchiveInputStream(
         new GzipCompressorInputStream(new BufferedInputStream(new FileInputStream(tempFile))))) {
@@ -101,8 +107,28 @@ public class BinaryDownloader {
   }
 
   public String findLatestVersion() {
+    var allRelevantVersions =
+        listAllRelevantVersions().sorted(Utils.SEMVER_COMPARATOR).collect(Collectors.toList());
+    if (allRelevantVersions.isEmpty()) {
+      throw new JenvtestException("Cannot find relevant version to download");
+    }
+    return allRelevantVersions.get(allRelevantVersions.size() - 1);
+  }
+
+  public String findLatestOfWildcard(String wildcardVersion) {
+    var allRelevantVersions = listAllRelevantVersions()
+        .filter(v -> v.startsWith(Utils.wildcardToPrefix(wildcardVersion)))
+        .sorted(Utils.SEMVER_COMPARATOR).collect(Collectors.toList());
+    if (allRelevantVersions.isEmpty()) {
+      throw new JenvtestException(
+          "Cannot find relevant version to download for wildcard version: " + wildcardVersion);
+    }
+    return allRelevantVersions.get(allRelevantVersions.size() - 1);
+  }
+
+  private Stream<String> listAllRelevantVersions() {
     var objects = binaryRepo.listObjectNames();
-    var allRelevantVersions = objects.filter(o -> o.contains(osInfoProvider.getOSName())
+    return objects.filter(o -> o.contains(osInfoProvider.getOSName())
         && o.contains(osInfoProvider.getOSArch()))
         .map(o -> {
           String stripped = o.replace(OBJECT_TAR_PREFIX, "");
@@ -111,10 +137,6 @@ public class BinaryDownloader {
             version = version.substring(1);
           }
           return version;
-        }).sorted(Utils.SEMVER_COMPARATOR).collect(Collectors.toList());
-    if (allRelevantVersions.isEmpty()) {
-      throw new JenvtestException("Cannot find relevant version to download");
-    }
-    return allRelevantVersions.get(allRelevantVersions.size() - 1);
+        });
   }
 }
