@@ -32,14 +32,19 @@ public class EtcdProcess {
   public int startEtcd() {
     var etcdBinary = binaryManager.binaries().getEtcd();
     var port = Utils.findFreePort();
+    var peerPort = Utils.findFreePort();
     try {
       if (!etcdBinary.exists()) {
         throw new JenvtestException(
             "Missing binary for etcd on path: " + etcdBinary.getAbsolutePath());
       }
       etcdProcess = new ProcessBuilder(etcdBinary.getAbsolutePath(),
-          "--listen-client-urls=http://0.0.0.0:" + port,
-          "--advertise-client-urls=http://0.0.0.0:" + port)
+          "--listen-client-urls", "http://0.0.0.0:" + port,
+          "--advertise-client-urls", "http://0.0.0.0:" + port,
+          // the below added because of stability
+          "--initial-cluster", "default=http://localhost:" + peerPort,
+          "--initial-advertise-peer-urls", "http://localhost:" + peerPort,
+          "--listen-peer-urls", "http://localhost:" + peerPort)
           .start();
       Utils.redirectProcessOutputToLogger(etcdProcess.getInputStream(), etcdLog);
       Utils.redirectProcessOutputToLogger(etcdProcess.getErrorStream(), etcdLog);
