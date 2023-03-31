@@ -44,7 +44,9 @@ public class KubeAPIServer implements UnexpectedProcessStopHandler {
     etcdProcess.cleanEtcdData();
     var etcdPort = etcdProcess.startEtcd();
     var apiServerPort = kubeApiServerProcess.startApiServer(etcdPort);
-    kubeConfig.updateKubeConfig(apiServerPort);
+    if (config.isUpdateKubeConfig()) {
+      kubeConfig.updateKubeConfig(apiServerPort);
+    }
     kubeApiServerProcess.waitUntilDefaultNamespaceCreated();
     log.debug("API Server ready to use");
   }
