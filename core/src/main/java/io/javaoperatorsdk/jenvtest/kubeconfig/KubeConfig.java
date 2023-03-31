@@ -1,21 +1,27 @@
-package io.javaoperatorsdk.jenvtest;
+package io.javaoperatorsdk.jenvtest.kubeconfig;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.javaoperatorsdk.jenvtest.JenvtestException;
 import io.javaoperatorsdk.jenvtest.binary.BinaryManager;
+import io.javaoperatorsdk.jenvtest.cert.CertManager;
 
 public class KubeConfig {
 
   private static final Logger log = LoggerFactory.getLogger(KubeConfig.class);
   public static final String JENVTEST = "jenvtest";
 
-  private CertManager certManager;
-  private BinaryManager binaryManager;
+  private final CertManager certManager;
+  private final BinaryManager binaryManager;
 
   public KubeConfig(CertManager certManager, BinaryManager binaryManager) {
     this.certManager = certManager;
@@ -45,6 +51,18 @@ public class KubeConfig {
 
   private void unset(String target) {
     execWithKubectlConfigAndWait("unset", target);
+  }
+
+  public String generateKubeConfigYaml(int apiServerPort) {
+    try (InputStream is = KubeConfig.class.getResourceAsStream("/kubeconfig-template.yaml")) {
+      String template = IOUtils.toString(is, StandardCharsets.UTF_8);
+      Object[] args = new Object[] {certManager.getAPIServerCertPath(),
+          apiServerPort, certManager.getClientCertPath(), certManager.getClientKeyPath()};
+      MessageFormat format = new MessageFormat(template);
+      return format.format(args);
+    } catch (IOException e) {
+      throw new JenvtestException(e);
+    }
   }
 
   private void execWithKubectlConfigAndWait(String... arguments) {

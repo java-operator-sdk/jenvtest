@@ -1,4 +1,4 @@
-package io.javaoperatorsdk.jenvtest;
+package io.javaoperatorsdk.jenvtest.cert;
 
 import java.io.File;
 import java.io.IOException;

@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import io.javaoperatorsdk.jenvtest.*;
 import io.javaoperatorsdk.jenvtest.binary.BinaryManager;
+import io.javaoperatorsdk.jenvtest.cert.CertManager;
 
 import static io.javaoperatorsdk.jenvtest.KubeAPIServer.STARTUP_TIMEOUT;
 
@@ -210,5 +211,9 @@ public class KubeAPIServerProcess {
       apiServerProcess.destroyForcibly();
     }
     log.debug("API Server stopped");
+  }
+
+  public int getApiServerPort() {
+    return apiServerPort;
   }
 }

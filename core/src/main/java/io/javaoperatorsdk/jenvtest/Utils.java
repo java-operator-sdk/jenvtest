@@ -58,6 +58,7 @@ public class Utils {
     try (ServerSocket socket = new ServerSocket(0)) {
       return socket.getLocalPort();
     } catch (IOException e) {
+
     }
     return -1;
   }
