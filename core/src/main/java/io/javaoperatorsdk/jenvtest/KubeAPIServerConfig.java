@@ -33,12 +33,15 @@ public class KubeAPIServerConfig {
    */
   private final List<String> apiServerFlags;
 
+  private final boolean updateKubeConfig;
+
   KubeAPIServerConfig(String jenvtestDir, String apiServerVersion, boolean offlineMode,
-      List<String> apiServerFlags) {
+      List<String> apiServerFlags, boolean updateKubeConfig) {
     this.jenvtestDir = jenvtestDir;
     this.apiServerVersion = apiServerVersion;
     this.offlineMode = offlineMode;
     this.apiServerFlags = apiServerFlags;
+    this.updateKubeConfig = updateKubeConfig;
   }
 
   public String getJenvtestDir() {
@@ -55,5 +58,9 @@ public class KubeAPIServerConfig {
 
   public List<String> getApiServerFlags() {
     return apiServerFlags;
+  }
+
+  public boolean isUpdateKubeConfig() {
+    return updateKubeConfig;
   }
 }

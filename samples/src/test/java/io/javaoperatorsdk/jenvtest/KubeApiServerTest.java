@@ -39,7 +39,9 @@ class KubeApiServerTest {
 
   @Test
   void creatingClientFromConfigString() {
-    var kubeApi = new KubeAPIServer();
+    var kubeApi = new KubeAPIServer(KubeAPIServerConfigBuilder.anAPIServerConfig()
+        .withUpdateKubeConfig(false)
+        .build());
     kubeApi.start();
 
     var client =

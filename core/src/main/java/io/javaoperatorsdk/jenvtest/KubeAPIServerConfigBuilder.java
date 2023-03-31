@@ -15,6 +15,7 @@ public final class KubeAPIServerConfigBuilder {
   private String jenvtestDir;
   private String apiServerVersion;
   private Boolean offlineMode;
+  private boolean updateKubeConfig = true;
   private final List<String> apiServerFlags = new ArrayList<>(0);
 
   public KubeAPIServerConfigBuilder() {}
@@ -61,22 +62,31 @@ public final class KubeAPIServerConfigBuilder {
         this.apiServerVersion = apiServerVersionEnvVar;
       }
     }
-    return new KubeAPIServerConfig(jenvtestDir, apiServerVersion, offlineMode, apiServerFlags);
+    return new KubeAPIServerConfig(jenvtestDir, apiServerVersion, offlineMode, apiServerFlags,
+        updateKubeConfig);
   }
 
-  public void withApiServerFlags(List<String> flags) {
+  public KubeAPIServerConfigBuilder withUpdateKubeConfig(boolean updateKubeConfig) {
+    this.updateKubeConfig = updateKubeConfig;
+    return this;
+  }
+
+  public KubeAPIServerConfigBuilder withApiServerFlags(List<String> flags) {
     apiServerFlags.addAll(flags);
+    return this;
   }
 
-  public void withApiServerFlag(String key, String value) {
+  public KubeAPIServerConfigBuilder withApiServerFlag(String key, String value) {
     checkKeyPrefix(key);
     apiServerFlags.add(key);
     apiServerFlags.add(value);
+    return this;
   }
 
-  public void withApiServerFlag(String key) {
+  public KubeAPIServerConfigBuilder withApiServerFlag(String key) {
     checkKeyPrefix(key);
     apiServerFlags.add(key);
+    return this;
   }
 
   private void checkKeyPrefix(String key) {
