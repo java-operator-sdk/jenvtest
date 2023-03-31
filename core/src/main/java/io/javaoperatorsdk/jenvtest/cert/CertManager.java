@@ -1,4 +1,4 @@
-package io.javaoperatorsdk.jenvtest;
+package io.javaoperatorsdk.jenvtest.cert;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -26,6 +26,8 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import io.javaoperatorsdk.jenvtest.JenvtestException;
 
 public class CertManager {
 

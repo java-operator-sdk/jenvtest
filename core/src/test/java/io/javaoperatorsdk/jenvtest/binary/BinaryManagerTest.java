@@ -15,7 +15,6 @@ class BinaryManagerTest {
         .withOfflineMode(true)
         .withApiServerVersion("1.0.1")
         .build());
-
     assertThrows(JenvtestException.class, binaryManager::initAndDownloadIfRequired);
   }
 

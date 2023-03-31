@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.javaoperatorsdk.jenvtest.binary.BinaryManager;
+import io.javaoperatorsdk.jenvtest.cert.CertManager;
+import io.javaoperatorsdk.jenvtest.kubeconfig.KubeConfig;
 import io.javaoperatorsdk.jenvtest.process.EtcdProcess;
 import io.javaoperatorsdk.jenvtest.process.KubeAPIServerProcess;
 import io.javaoperatorsdk.jenvtest.process.UnexpectedProcessStopHandler;
@@ -54,6 +56,10 @@ public class KubeAPIServer implements UnexpectedProcessStopHandler {
     kubeConfig.cleanupFromKubeConfig();
     etcdProcess.cleanEtcdData();
     log.debug("Stopped");
+  }
+
+  public String getKubeConfigYaml() {
+    return kubeConfig.generateKubeConfigYaml(kubeApiServerProcess.getApiServerPort());
   }
 
   @Override
