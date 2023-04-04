@@ -77,7 +77,7 @@ public class EtcdProcess {
     }
     stopped = true;
     if (etcdProcess != null) {
-      etcdProcess.destroy();
+      etcdProcess.destroyForcibly();
     }
     log.debug("etcd stopped");
   }
