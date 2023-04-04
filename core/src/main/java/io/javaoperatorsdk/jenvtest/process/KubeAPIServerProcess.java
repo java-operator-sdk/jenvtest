@@ -125,7 +125,7 @@ public class KubeAPIServerProcess {
   private boolean ready(HttpClient client, HttpRequest request) {
     try {
       var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-      log.trace("Ready Response message:{} code: {} Api Server Port: {}", response.body(),
+      log.debug("Ready Response message:{} code: {} Api Server Port: {}", response.body(),
           response.statusCode(),
           apiServerPort);
       return response.statusCode() == 200;
