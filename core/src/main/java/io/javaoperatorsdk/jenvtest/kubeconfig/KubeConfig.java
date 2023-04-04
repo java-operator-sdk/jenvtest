@@ -78,7 +78,10 @@ public class KubeConfig {
       args.add("config");
       args.addAll(List.of(arguments));
       var process = new ProcessBuilder(args).start();
-      String stdout = IOUtils.toString(process.getInputStream(), Charset.defaultCharset());
+      String stdout;
+      try (InputStream is = process.getInputStream()) {
+        stdout = IOUtils.toString(is, Charset.defaultCharset());
+      }
       process.waitFor();
       return stdout;
     } catch (IOException e) {
