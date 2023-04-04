@@ -2,6 +2,7 @@ package io.javaoperatorsdk.jenvtest.process;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -22,6 +23,8 @@ public class EtcdProcess {
   private volatile Process etcdProcess;
   private volatile boolean stopped = false;
   private final UnexpectedProcessStopHandler processStopHandler;
+  private File tempWalDir;
+  private File tempDataDir;
 
   public EtcdProcess(BinaryManager binaryManager,
       UnexpectedProcessStopHandler processStopHandler) {
@@ -30,15 +33,22 @@ public class EtcdProcess {
   }
 
   public int startEtcd() {
-    var etcdBinary = binaryManager.binaries().getEtcd();
-    var port = Utils.findFreePort();
-    var peerPort = Utils.findFreePort();
     try {
+      var etcdBinary = binaryManager.binaries().getEtcd();
+      tempWalDir = Files.createTempDirectory("etcdwal").toFile();
+      tempDataDir = Files.createTempDirectory("etcddata").toFile();
+      log.trace("Using temp wal dir: {} and temp data dir: {}", tempWalDir.getPath(),
+          tempDataDir.getPath());
+      var port = Utils.findFreePort();
+      var peerPort = Utils.findFreePort();
+
       if (!etcdBinary.exists()) {
         throw new JenvtestException(
             "Missing binary for etcd on path: " + etcdBinary.getAbsolutePath());
       }
       etcdProcess = new ProcessBuilder(etcdBinary.getAbsolutePath(),
+          "-data-dir", tempDataDir.getPath(),
+          "-wal-dir", tempWalDir.getPath(),
           "--listen-client-urls", "http://0.0.0.0:" + port,
           "--advertise-client-urls", "http://0.0.0.0:" + port,
           // the below added because of stability
@@ -65,7 +75,8 @@ public class EtcdProcess {
 
   public void cleanEtcdData() {
     try {
-      FileUtils.deleteDirectory(new File("default.etcd"));
+      FileUtils.deleteDirectory(tempDataDir);
+      FileUtils.deleteDirectory(tempWalDir);
     } catch (IOException e) {
       throw new JenvtestException(e);
     }

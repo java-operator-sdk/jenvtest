@@ -41,7 +41,6 @@ public class KubeAPIServer implements UnexpectedProcessStopHandler {
     log.debug("Stating API Server. Using jenvtest dir: {}", config.getJenvtestDir());
     binaryManager.initAndDownloadIfRequired();
     certManager.createCertificatesIfNeeded();
-    etcdProcess.cleanEtcdData();
     var etcdPort = etcdProcess.startEtcd();
     var apiServerPort = kubeApiServerProcess.startApiServer(etcdPort);
     if (config.isUpdateKubeConfig()) {
