@@ -70,5 +70,4 @@ public class Utils {
   public static String wildcardToPrefix(String wildcardVersion) {
     return wildcardVersion.substring(0, wildcardVersion.lastIndexOf("."));
   }
-
 }
