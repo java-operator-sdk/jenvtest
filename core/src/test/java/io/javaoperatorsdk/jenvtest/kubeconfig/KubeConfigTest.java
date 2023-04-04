@@ -14,6 +14,7 @@ class KubeConfigTest {
   public static final String CLIENT_KEY_PATH = "~/.jenvtest/clientcertkey";
   public static final String CLIENT_CERT_PATH = "~/.jenvtest/clientcertpath";
   public static final int API_SERVER_PORT = 32101;
+
   CertManager certManagerMock = mock(CertManager.class);
   KubeConfig kubeConfig = new KubeConfig(certManagerMock, null);
 
