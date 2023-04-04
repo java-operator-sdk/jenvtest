@@ -55,9 +55,7 @@ public class KubeAPIServer implements UnexpectedProcessStopHandler {
     log.debug("Stopping");
     kubeApiServerProcess.stopApiServer();
     etcdProcess.stopEtcd();
-    // if (config.isUpdateKubeConfig()) {
     kubeConfig.restoreKubeConfig();
-    // }
     etcdProcess.cleanEtcdData();
     log.debug("Stopped");
   }
