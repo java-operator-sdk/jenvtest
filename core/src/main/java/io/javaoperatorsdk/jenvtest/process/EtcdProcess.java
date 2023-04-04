@@ -37,7 +37,8 @@ public class EtcdProcess {
       var etcdBinary = binaryManager.binaries().getEtcd();
       tempWalDir = Files.createTempDirectory("etcdwal").toFile();
       tempDataDir = Files.createTempDirectory("etcddata").toFile();
-      log.trace("Using temp wal dir: {} and temp data dir: {}",tempWalDir.getPath(),tempDataDir.getPath());
+      log.trace("Using temp wal dir: {} and temp data dir: {}", tempWalDir.getPath(),
+          tempDataDir.getPath());
       var port = Utils.findFreePort();
       var peerPort = Utils.findFreePort();
 
