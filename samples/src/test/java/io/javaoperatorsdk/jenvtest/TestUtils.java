@@ -33,11 +33,12 @@ public class TestUtils {
   }
 
   public static void simpleTest(KubernetesClient client) {
-
     client.resource(TestUtils.testConfigMap()).create();
     var cm = client.resource(TestUtils.testConfigMap()).get();
 
     Assertions.assertThat(cm).isNotNull();
+
+    client.resource(cm).delete();
   }
 
 }
