@@ -27,14 +27,25 @@ public class KubeAPIServerExtension
 
   @Override
   public void beforeAll(ExtensionContext extensionContext) {
-    getFieldForKubeConfigInjection(extensionContext, true);
-    startIfAnnotationPresent(extensionContext, true);
+    var kubeConfigField = getFieldForKubeConfigInjection(extensionContext, true);
+    startIfAnnotationPresent(extensionContext, kubeConfigField.isEmpty());
+    kubeConfigField.ifPresent(f -> setKubeConfigYamlToField(extensionContext, f));
+  }
+
+  private void setKubeConfigYamlToField(ExtensionContext extensionContext, Field kubeConfigField) {
+    try {
+      kubeConfigField.setAccessible(true);
+      kubeConfigField.set(extensionContext.getTestClass().orElseThrow(),
+          kubeApiServer.getKubeConfigYaml());
+    } catch (IllegalAccessException e) {
+      throw new JenvtestException(e);
+    }
   }
 
   private Optional<Field> getFieldForKubeConfigInjection(ExtensionContext extensionContext,
       boolean findStatic) {
     Class<?> clazz = extensionContext.getTestClass().orElseThrow();
-    var kubeConfigFields = Arrays.stream(clazz.getFields())
+    var kubeConfigFields = Arrays.stream(clazz.getDeclaredFields())
         .filter(f -> f.getAnnotationsByType(KubeConfig.class).length > 0)
         .collect(Collectors.toList());
     if (kubeConfigFields.isEmpty()) {
