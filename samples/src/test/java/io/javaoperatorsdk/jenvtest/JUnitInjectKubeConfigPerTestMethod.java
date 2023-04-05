@@ -9,24 +9,24 @@ import io.javaoperatorsdk.jenvtest.junit.KubeConfig;
 
 import static io.javaoperatorsdk.jenvtest.TestUtils.simpleTest;
 
-@EnableKubeAPIServer
-class JUnitInjectKubeConfig {
+class JUnitInjectKubeConfigPerTestMethod {
 
-  /** needs to be static if shared between tests */
   @KubeConfig
-  static String kubeConfigYaml;
+  String kubeConfigYaml;
 
   @Test
+  @EnableKubeAPIServer
   void testCommunication1() {
     testWithClientFromGeneratedYaml();
   }
 
   @Test
+  @EnableKubeAPIServer
   void testCommunication2() {
     testWithClientFromGeneratedYaml();
   }
 
-  private static void testWithClientFromGeneratedYaml() {
+  private void testWithClientFromGeneratedYaml() {
     var client = new KubernetesClientBuilder()
         .withConfig(Config.fromKubeconfig(kubeConfigYaml))
         .build();

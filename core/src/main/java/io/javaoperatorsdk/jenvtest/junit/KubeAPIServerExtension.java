@@ -27,15 +27,37 @@ public class KubeAPIServerExtension
 
   @Override
   public void beforeAll(ExtensionContext extensionContext) {
-    var kubeConfigField = getFieldForKubeConfigInjection(extensionContext, true);
+    initialize(extensionContext, true);
+  }
+
+  @Override
+  public void afterAll(ExtensionContext extensionContext) {
+    stopIfAnnotationPresent(extensionContext);
+  }
+
+  @Override
+  public void beforeEach(ExtensionContext extensionContext) {
+    initialize(extensionContext, false);
+  }
+
+  @Override
+  public void afterEach(ExtensionContext extensionContext) {
+    stopIfAnnotationPresent(extensionContext);
+  }
+
+
+  private void initialize(ExtensionContext extensionContext, boolean staticContext) {
+    var kubeConfigField = getFieldForKubeConfigInjection(extensionContext, staticContext);
     startIfAnnotationPresent(extensionContext, kubeConfigField.isEmpty());
     kubeConfigField.ifPresent(f -> setKubeConfigYamlToField(extensionContext, f));
   }
 
   private void setKubeConfigYamlToField(ExtensionContext extensionContext, Field kubeConfigField) {
     try {
+      var target = extensionContext.getTestInstance()
+          .orElseGet(() -> extensionContext.getTestClass().orElseThrow());
       kubeConfigField.setAccessible(true);
-      kubeConfigField.set(extensionContext.getTestClass().orElseThrow(),
+      kubeConfigField.set(target,
           kubeApiServer.getKubeConfigYaml());
     } catch (IllegalAccessException e) {
       throw new JenvtestException(e);
@@ -66,21 +88,6 @@ public class KubeAPIServerExtension
     } else {
       return Optional.of(field);
     }
-  }
-
-  @Override
-  public void afterAll(ExtensionContext extensionContext) {
-    stopIfAnnotationPresent(extensionContext);
-  }
-
-  @Override
-  public void beforeEach(ExtensionContext extensionContext) {
-    startIfAnnotationPresent(extensionContext, true);
-  }
-
-  @Override
-  public void afterEach(ExtensionContext extensionContext) {
-    stopIfAnnotationPresent(extensionContext);
   }
 
   private void startIfAnnotationPresent(ExtensionContext extensionContext,
