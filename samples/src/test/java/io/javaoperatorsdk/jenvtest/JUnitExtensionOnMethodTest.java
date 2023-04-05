@@ -14,4 +14,9 @@ class JUnitExtensionOnMethodTest {
     simpleTest();
   }
 
+  @Test
+  @EnableKubeAPIServer
+  void testCommunication2() {
+    simpleTest();
+  }
 }

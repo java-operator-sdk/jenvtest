@@ -10,9 +10,12 @@ import io.javaoperatorsdk.jenvtest.junit.KubeConfig;
 import static io.javaoperatorsdk.jenvtest.TestUtils.simpleTest;
 
 @EnableKubeAPIServer
-class JUnitInjectKubeConfig {
+class JUnitInjectKubeConfigTest {
 
-  /** needs to be static if shared between tests */
+  /**
+   * Needs to be static if shared between tests. If present in the test, the "~/kube/config" is not
+   * updated
+   */
   @KubeConfig
   static String kubeConfigYaml;
 
