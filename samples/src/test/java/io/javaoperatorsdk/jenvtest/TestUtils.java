@@ -7,6 +7,7 @@ import org.assertj.core.api.Assertions;
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.ConfigMapBuilder;
 import io.fabric8.kubernetes.api.model.ObjectMetaBuilder;
+import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 
@@ -26,6 +27,11 @@ public class TestUtils {
             .build())
         .withData(Map.of("key", "data"))
         .build();
+  }
+
+  public static void simpleTest(String kubeConfigYaml) {
+    simpleTest(
+        new KubernetesClientBuilder().withConfig(Config.fromKubeconfig(kubeConfigYaml)).build());
   }
 
   public static void simpleTest() {

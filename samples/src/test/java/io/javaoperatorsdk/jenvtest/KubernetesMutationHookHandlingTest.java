@@ -31,11 +31,13 @@ import org.slf4j.LoggerFactory;
 import io.fabric8.kubernetes.api.model.admission.v1.AdmissionReview;
 import io.fabric8.kubernetes.api.model.admissionregistration.v1.MutatingWebhookConfiguration;
 import io.fabric8.kubernetes.api.model.networking.v1.*;
+import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import io.fabric8.kubernetes.client.utils.Serialization;
 import io.javaoperatorsdk.jenvtest.cert.CertManager;
 import io.javaoperatorsdk.jenvtest.junit.EnableKubeAPIServer;
+import io.javaoperatorsdk.jenvtest.junit.KubeConfig;
 import io.javaoperatorsdk.webhook.admission.AdmissionController;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -51,6 +53,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @EnableKubeAPIServer
 class KubernetesMutationHookHandlingTest {
+
+  @KubeConfig
+  static String kubeConfig;
 
   private static final Logger log =
       LoggerFactory.getLogger(KubernetesMutationHookHandlingTest.class);
@@ -76,7 +81,8 @@ class KubernetesMutationHookHandlingTest {
 
   @Test
   void handleMutatingWebhook() {
-    var client = new KubernetesClientBuilder().build();
+    var client =
+        new KubernetesClientBuilder().withConfig(Config.fromKubeconfig(kubeConfig)).build();
     applyConfig(client);
 
     var ingress = client.resource(testIngress()).create();
