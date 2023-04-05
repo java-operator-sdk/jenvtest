@@ -1,6 +1,7 @@
 package io.javaoperatorsdk.jenvtest.junit;
 
 import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -26,7 +27,34 @@ public class KubeAPIServerExtension
 
   @Override
   public void beforeAll(ExtensionContext extensionContext) {
-    startIfAnnotationPresent(extensionContext);
+    getFieldForKubeConfigInjection(extensionContext, true);
+    startIfAnnotationPresent(extensionContext, true);
+  }
+
+  private Optional<Field> getFieldForKubeConfigInjection(ExtensionContext extensionContext,
+      boolean findStatic) {
+    Class<?> clazz = extensionContext.getTestClass().orElseThrow();
+    var kubeConfigFields = Arrays.stream(clazz.getFields())
+        .filter(f -> f.getAnnotationsByType(KubeConfig.class).length > 0)
+        .collect(Collectors.toList());
+    if (kubeConfigFields.isEmpty()) {
+      return Optional.empty();
+    }
+    if (kubeConfigFields.size() > 1) {
+      throw new JenvtestException(
+          "More fields annotation with @" + KubeConfig.class.getSimpleName() + " annotation");
+    }
+    var field = kubeConfigFields.get(0);
+    if (!field.getType().equals(String.class)) {
+      throw new JenvtestException(
+          "Field annotated with @" + KubeConfig.class.getSimpleName() + " is not a String");
+    }
+
+    if (java.lang.reflect.Modifier.isStatic(field.getModifiers()) != findStatic) {
+      return Optional.empty();
+    } else {
+      return Optional.of(field);
+    }
   }
 
   @Override
@@ -36,7 +64,7 @@ public class KubeAPIServerExtension
 
   @Override
   public void beforeEach(ExtensionContext extensionContext) {
-    startIfAnnotationPresent(extensionContext);
+    startIfAnnotationPresent(extensionContext, true);
   }
 
   @Override
@@ -44,15 +72,16 @@ public class KubeAPIServerExtension
     stopIfAnnotationPresent(extensionContext);
   }
 
-  private void startIfAnnotationPresent(ExtensionContext extensionContext) {
+  private void startIfAnnotationPresent(ExtensionContext extensionContext,
+      boolean updateKubeConfig) {
     extensionContext.getElement().ifPresent(ae -> {
       var annotation = getExtensionAnnotationInstance(ae);
-      annotation.ifPresent(this::startApiServer);
+      annotation.ifPresent(a -> startApiServer(a, updateKubeConfig));
     });
   }
 
-  private void startApiServer(EnableKubeAPIServer annotation) {
-    kubeApiServer = new KubeAPIServer(annotationToConfig(annotation));
+  private void startApiServer(EnableKubeAPIServer annotation, boolean updateKubeConfig) {
+    kubeApiServer = new KubeAPIServer(annotationToConfig(annotation, updateKubeConfig));
     kubeApiServer.start();
   }
 
@@ -64,7 +93,8 @@ public class KubeAPIServerExtension
     });
   }
 
-  private KubeAPIServerConfig annotationToConfig(EnableKubeAPIServer annotation) {
+  private KubeAPIServerConfig annotationToConfig(EnableKubeAPIServer annotation,
+      boolean updateKubeConfig) {
     var builder = KubeAPIServerConfigBuilder.anAPIServerConfig();
     var version = annotation.kubeAPIVersion();
     if (!NOT_SET.equals(version)) {
@@ -73,6 +103,7 @@ public class KubeAPIServerExtension
     if (annotation.apiServerFlags().length > 0) {
       builder.withApiServerFlags(List.of(annotation.apiServerFlags()));
     }
+    builder.withUpdateKubeConfig(updateKubeConfig);
     return builder.build();
   }
 
