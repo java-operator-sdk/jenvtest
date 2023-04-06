@@ -53,7 +53,7 @@ class KubeApiServerTest {
     kubeApi.stop();
   }
 
-  // @Test
+  @Test
   void creatingClientFromConfigString() {
     var kubeApi = new KubeAPIServer(KubeAPIServerConfigBuilder.anAPIServerConfig()
         .withUpdateKubeConfig(false)
