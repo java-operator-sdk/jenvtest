@@ -89,8 +89,7 @@ class KubeApiServerTest {
 }
 ```
 
-
-### Kubernetes Fabric8 Client Support 
+### Fabric8 Kubernetes Client Support 
 
 There is a dedicated support for [Fabric8 Kubernetes Client](https://github.com/fabric8io/kubernetes-client).
 
@@ -117,7 +116,6 @@ class JUnitFabric8ClientInjectionTest {
     // emitted code     
 }  
 ```
-
 
 ### Testing Mutation and Validation Webhooks
 
