@@ -25,26 +25,27 @@ Include dependency:
 ### In Unit Tests
 
 See sample unit
-test [here](https://github.com/java-operator-sdk/jenvtest/blob/main/core/src/test/java/io/javaoperatorsdk/jenvtest/sample/JUnitExtensionOnMethodTest.java#L10-L10)
+test [here](https://github.com/java-operator-sdk/jenvtest/blob/main/core/src/test/java/io/javaoperatorsdk/jenvtest/sample/JUnitExtensionSimpleCaseTest.java)
 
 ```java
 
 @EnableKubeAPIServer
-class JUnitExtensionTargetVersionTest {
-    
-    // use @KubeConfig annotation to inject kube config to init any client  
+class JUnitExtensionSimpleCaseTest {
+
+    // Use @KubeConfig annotation to inject kube config yaml to init any client
     @KubeConfig
     static String kubeConfigYaml;
 
     @Test
     void simpleTestWithTargetVersion() {
-        var client =
-                new KubernetesClientBuilder().withConfig(Config.fromKubeconfig(kubeConfigYaml)).build();
+        var client = new KubernetesClientBuilder()
+                .withConfig(Config.fromKubeconfig(kubeConfigYaml))
+                .build();
 
-        simpleTest(client);
+        client.resource(TestUtils.testConfigMap()).create();
+        var cm = client.resource(TestUtils.testConfigMap()).get();
 
-        String kubeVersion = client.getKubernetesVersion().getGitVersion().substring(1);
-        assertThat(kubeVersion).isEqualTo(TestUtils.NON_LATEST_API_SERVER_VERSION);
+        Assertions.assertThat(cm).isNotNull();
     }
 }
 ```
@@ -87,6 +88,36 @@ class KubeApiServerTest {
     }
 }
 ```
+
+
+### Kubernetes Fabric8 Client Support 
+
+There is a dedicated support for [Fabric8 Kubernetes Client](https://github.com/fabric8io/kubernetes-client).
+
+Using dependency:
+
+```xml
+<dependency>
+    <groupId>io.javaoperatorsdk</groupId>
+    <artifactId>jenvtest-fabric8-client</artifactId>
+    <version>[version]</version>
+    <scope>test</scope>
+</dependency>
+```
+
+The client can be directly injected to the test. See sample test [here](/home/csviri/Workspace/jenvtest/fabric8/src/test/java/io/javaoperatorsdk/jenvtest/junit/JUnitFabric8ClientInjectionTest.java).
+
+```java
+
+@EnableKubeAPIServer
+class JUnitFabric8ClientInjectionTest {
+
+    static KubernetesClient client;
+   
+    // emitted code     
+}  
+```
+
 
 ### Testing Mutation and Validation Webhooks
 
