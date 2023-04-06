@@ -1,10 +1,10 @@
 package io.javaoperatorsdk.jenvtest.junit;
 
 import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.extension.*;
@@ -24,6 +24,13 @@ public class KubeAPIServerExtension
   private static final Logger log = LoggerFactory.getLogger(KubeAPIServerExtension.class);
 
   private KubeAPIServer kubeApiServer;
+  private List<ClientInjectionHandler> clientInjectionHandlers;
+
+  public KubeAPIServerExtension() {
+    var loader = ServiceLoader.load(ClientInjectionHandler.class);
+    clientInjectionHandlers =
+        loader.stream().map(ServiceLoader.Provider::get).collect(Collectors.toList());
+  }
 
   @Override
   public void beforeAll(ExtensionContext extensionContext) {
@@ -47,47 +54,13 @@ public class KubeAPIServerExtension
 
 
   private void initialize(ExtensionContext extensionContext, boolean staticContext) {
-    var kubeConfigField = getFieldForKubeConfigInjection(extensionContext, staticContext);
-    startIfAnnotationPresent(extensionContext, kubeConfigField.isEmpty());
-    kubeConfigField.ifPresent(f -> setKubeConfigYamlToField(extensionContext, f));
-  }
-
-  private void setKubeConfigYamlToField(ExtensionContext extensionContext, Field kubeConfigField) {
-    try {
-      var target = extensionContext.getTestInstance()
-          .orElseGet(() -> extensionContext.getTestClass().orElseThrow());
-      kubeConfigField.setAccessible(true);
-      kubeConfigField.set(target,
-          kubeApiServer.getKubeConfigYaml());
-    } catch (IllegalAccessException e) {
-      throw new JenvtestException(e);
-    }
-  }
-
-  private Optional<Field> getFieldForKubeConfigInjection(ExtensionContext extensionContext,
-      boolean findStatic) {
-    Class<?> clazz = extensionContext.getTestClass().orElseThrow();
-    var kubeConfigFields = Arrays.stream(clazz.getDeclaredFields())
-        .filter(f -> f.getAnnotationsByType(KubeConfig.class).length > 0)
+    var targetInjectors = clientInjectionHandlers.stream()
+        .filter(h -> h.isTargetFieldAvailable(extensionContext, staticContext))
         .collect(Collectors.toList());
-    if (kubeConfigFields.isEmpty()) {
-      return Optional.empty();
-    }
-    if (kubeConfigFields.size() > 1) {
-      throw new JenvtestException(
-          "More fields annotation with @" + KubeConfig.class.getSimpleName() + " annotation");
-    }
-    var field = kubeConfigFields.get(0);
-    if (!field.getType().equals(String.class)) {
-      throw new JenvtestException(
-          "Field annotated with @" + KubeConfig.class.getSimpleName() + " is not a String");
-    }
 
-    if (java.lang.reflect.Modifier.isStatic(field.getModifiers()) != findStatic) {
-      return Optional.empty();
-    } else {
-      return Optional.of(field);
-    }
+    startIfAnnotationPresent(extensionContext, targetInjectors.isEmpty());
+
+    targetInjectors.forEach(i -> i.inject(extensionContext, staticContext, kubeApiServer));
   }
 
   private void startIfAnnotationPresent(ExtensionContext extensionContext,
