@@ -100,7 +100,7 @@ public class KubeAPIServerProcess {
 
   public void waitUntilDefaultNamespaceCreated() {
     try {
-      Thread.sleep(5000);
+      Thread.sleep(15000);
     } catch (InterruptedException e) {
       throw new RuntimeException(e);
     }
