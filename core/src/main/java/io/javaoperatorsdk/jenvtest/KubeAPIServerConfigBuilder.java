@@ -6,7 +6,8 @@ import java.util.List;
 
 public final class KubeAPIServerConfigBuilder {
 
-  public static final String JENVTEST_DOWNLOAD_BINARIES = "JENVTEST_DOWNLOAD_BINARIES";
+  // environment variables
+  public static final String JENVTEST_DOWNLOAD_BINARIES = "JENVTEST_OFFLINE_MODE";
   public static final String JENVTEST_DIR_ENV_VAR = "JENVTEST_DIR";
   public static final String JENVTEST_API_SERVER_VERSION_ENV_VAR = "JENVTEST_API_SERVER_VERSION";
 
