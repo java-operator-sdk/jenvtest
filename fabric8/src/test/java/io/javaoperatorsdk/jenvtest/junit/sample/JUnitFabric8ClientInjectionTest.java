@@ -21,11 +21,12 @@ class JUnitFabric8ClientInjectionTest {
 
   @Test
   void testClientInjection() {
-    simpleTest(client);
+    simpleTest(client, "test1");
   }
 
   @Test
   void testKubeConfigInjectionAlsoWorks() {
-    simpleTest(new KubernetesClientBuilder().withConfig(Config.fromKubeconfig(configYaml)).build());
+    simpleTest(new KubernetesClientBuilder().withConfig(Config.fromKubeconfig(configYaml)).build(),
+        "test2");
   }
 }
