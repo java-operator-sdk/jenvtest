@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import io.javaoperatorsdk.jenvtest.JenvtestException;
 import io.javaoperatorsdk.jenvtest.Utils;
+import io.javaoperatorsdk.jenvtest.binary.repo.BinaryRepo;
 
 public class BinaryDownloader {
 

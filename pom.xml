@@ -57,6 +57,8 @@
         <kubernetes.webhooks.framework.version>1.0.0</kubernetes.webhooks.framework.version>
         <nexus-staging-maven-plugin.version>1.6.13</nexus-staging-maven-plugin.version>
         <maven-javadoc-plugin.version>3.5.0</maven-javadoc-plugin.version>
+        <jackson.version>2.14.2</jackson.version>
+
         <sonar.organization>java-operator-sdk</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
@@ -86,92 +88,91 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-compress -->
             <dependency>
-                <groupId>com.google.cloud</groupId>
-                <artifactId>libraries-bom</artifactId>
-                <version>${google.cloud.libraries.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-compress</artifactId>
+                <version>${commons-compress.version}</version>
             </dependency>
-                <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-compress -->
-                <dependency>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-compress</artifactId>
-                    <version>${commons-compress.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>commons-io</groupId>
-                    <artifactId>commons-io</artifactId>
-                    <version>${commons-io.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.awaitility</groupId>
-                    <artifactId>awaitility</artifactId>
-                    <scope>test</scope>
-                    <version>${awaitility.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.junit.jupiter</groupId>
-                    <artifactId>junit-jupiter-api</artifactId>
-                    <version>${junit.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.junit.jupiter</groupId>
-                    <artifactId>junit-jupiter-engine</artifactId>
-                    <version>${junit.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.mockito</groupId>
-                    <artifactId>mockito-core</artifactId>
-                    <version>${mokito.version}</version>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                    <version>${slf4j.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.apache.logging.log4j</groupId>
-                    <artifactId>log4j-slf4j2-impl</artifactId>
-                    <version>${log4j.version}</version>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.apache.logging.log4j</groupId>
-                    <artifactId>log4j-core</artifactId>
-                    <version>${log4j.version}</version>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>io.fabric8</groupId>
-                    <artifactId>kubernetes-client</artifactId>
-                    <version>${fabric8-client.version}</version>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.assertj</groupId>
-                    <artifactId>assertj-core</artifactId>
-                    <version>${assertj.version}</version>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-server</artifactId>
-                    <version>${jetty.version}</version>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.bouncycastle</groupId>
-                    <artifactId>bcpkix-jdk18on</artifactId>
-                    <version>${bouncycastle.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>io.javaoperatorsdk</groupId>
-                    <artifactId>kubernetes-webhooks-framework-core</artifactId>
-                    <version>${kubernetes.webhooks.framework.version}</version>
-                    <scope>test</scope>
-                </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons-io.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.awaitility</groupId>
+                <artifactId>awaitility</artifactId>
+                <scope>test</scope>
+                <version>${awaitility.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-api</artifactId>
+                <version>${junit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-engine</artifactId>
+                <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>${mokito.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-slf4j2-impl</artifactId>
+                <version>${log4j.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-core</artifactId>
+                <version>${log4j.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.fabric8</groupId>
+                <artifactId>kubernetes-client</artifactId>
+                <version>${fabric8-client.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-core</artifactId>
+                <version>${assertj.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-server</artifactId>
+                <version>${jetty.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcpkix-jdk18on</artifactId>
+                <version>${bouncycastle.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.javaoperatorsdk</groupId>
+                <artifactId>kubernetes-webhooks-framework-core</artifactId>
+                <version>${kubernetes.webhooks.framework.version}</version>
+                <scope>test</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
