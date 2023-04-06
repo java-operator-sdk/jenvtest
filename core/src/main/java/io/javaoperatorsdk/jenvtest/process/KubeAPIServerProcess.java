@@ -142,7 +142,7 @@ public class KubeAPIServerProcess {
   private HttpRequest getHttpRequest() {
     try {
       return HttpRequest.newBuilder()
-          .uri(new URI("https://127.0.0.1:" + apiServerPort + "/healthy"))
+          .uri(new URI("https://127.0.0.1:" + apiServerPort + "/healthz"))
           .GET()
           .build();
     } catch (URISyntaxException e) {
