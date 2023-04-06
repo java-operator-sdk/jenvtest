@@ -13,6 +13,7 @@ class JUnitFabric8ClientInjectionTest {
 
   static KubernetesClient client;
 
+  // old approach also works
   @KubeConfig
   static String configYaml;
 
