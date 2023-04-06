@@ -6,7 +6,7 @@ import io.javaoperatorsdk.jenvtest.junit.EnableKubeAPIServer;
 
 import static io.javaoperatorsdk.jenvtest.sample.TestUtils.simpleTest;
 
-@EnableKubeAPIServer
+@EnableKubeAPIServer(updateKubeConfigFile = true)
 class JUnitExtensionKubeConfigUpdateTest {
 
   @Test

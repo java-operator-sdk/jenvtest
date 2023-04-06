@@ -23,4 +23,6 @@ public @interface EnableKubeAPIServer {
   String kubeAPIVersion() default NOT_SET;
 
   String[] apiServerFlags() default {};
+
+  boolean updateKubeConfigFile() default false;
 }
