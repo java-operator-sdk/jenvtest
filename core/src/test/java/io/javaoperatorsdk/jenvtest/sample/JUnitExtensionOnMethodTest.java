@@ -14,13 +14,13 @@ class JUnitExtensionOnMethodTest {
 
   @Test
   @EnableKubeAPIServer
-  void testCommunication() {
-    simpleTest(kubeConfigYaml);
+  void simpleTest1() {
+    TestUtils.simpleTest(kubeConfigYaml);
   }
 
   @Test
   @EnableKubeAPIServer
-  void testCommunication2() {
-    simpleTest(kubeConfigYaml);
+  void simpleTest2() {
+    TestUtils.simpleTest(kubeConfigYaml);
   }
 }
