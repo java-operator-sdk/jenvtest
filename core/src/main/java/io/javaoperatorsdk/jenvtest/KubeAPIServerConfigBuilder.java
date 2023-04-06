@@ -15,7 +15,7 @@ public final class KubeAPIServerConfigBuilder {
   private String jenvtestDir;
   private String apiServerVersion;
   private Boolean offlineMode;
-  private boolean updateKubeConfig = true;
+  private boolean updateKubeConfig = false;
   private final List<String> apiServerFlags = new ArrayList<>(0);
 
   public KubeAPIServerConfigBuilder() {}

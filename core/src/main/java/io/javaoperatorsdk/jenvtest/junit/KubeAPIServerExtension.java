@@ -58,21 +58,30 @@ public class KubeAPIServerExtension
         .filter(h -> h.isTargetFieldAvailable(extensionContext, staticContext))
         .collect(Collectors.toList());
 
-    startIfAnnotationPresent(extensionContext, targetInjectors.isEmpty());
+    startIfAnnotationPresent(extensionContext, !targetInjectors.isEmpty());
 
     targetInjectors.forEach(i -> i.inject(extensionContext, staticContext, kubeApiServer));
   }
 
   private void startIfAnnotationPresent(ExtensionContext extensionContext,
-      boolean updateKubeConfig) {
+      boolean willInjectClient) {
     extensionContext.getElement().ifPresent(ae -> {
       var annotation = getExtensionAnnotationInstance(ae);
-      annotation.ifPresent(a -> startApiServer(a, updateKubeConfig));
+
+      annotation.ifPresent(a -> {
+        if (!willInjectClient && !a.updateKubeConfigFile()) {
+          log.warn(
+              "Neither kube config file will be updated or client info will be injected into the test. "
+                  +
+                  "This is probably a miss configuration since server won't be easily accessible.");
+        }
+        startApiServer(a);
+      });
     });
   }
 
-  private void startApiServer(EnableKubeAPIServer annotation, boolean updateKubeConfig) {
-    kubeApiServer = new KubeAPIServer(annotationToConfig(annotation, updateKubeConfig));
+  private void startApiServer(EnableKubeAPIServer annotation) {
+    kubeApiServer = new KubeAPIServer(annotationToConfig(annotation));
     kubeApiServer.start();
   }
 
@@ -84,8 +93,7 @@ public class KubeAPIServerExtension
     });
   }
 
-  private KubeAPIServerConfig annotationToConfig(EnableKubeAPIServer annotation,
-      boolean updateKubeConfig) {
+  private KubeAPIServerConfig annotationToConfig(EnableKubeAPIServer annotation) {
     var builder = KubeAPIServerConfigBuilder.anAPIServerConfig();
     var version = annotation.kubeAPIVersion();
     if (!NOT_SET.equals(version)) {
@@ -94,7 +102,8 @@ public class KubeAPIServerExtension
     if (annotation.apiServerFlags().length > 0) {
       builder.withApiServerFlags(List.of(annotation.apiServerFlags()));
     }
-    builder.withUpdateKubeConfig(updateKubeConfig);
+
+    builder.withUpdateKubeConfig(annotation.updateKubeConfigFile());
     return builder.build();
   }
 

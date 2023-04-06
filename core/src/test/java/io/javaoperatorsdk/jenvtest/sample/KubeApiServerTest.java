@@ -3,6 +3,7 @@ package io.javaoperatorsdk.jenvtest.sample;
 import org.junit.jupiter.api.Test;
 
 import io.fabric8.kubernetes.client.Config;
+import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import io.javaoperatorsdk.jenvtest.KubeAPIServer;
 import io.javaoperatorsdk.jenvtest.KubeAPIServerConfigBuilder;
@@ -26,13 +27,26 @@ class KubeApiServerTest {
   }
 
   @Test
+  void usingKubeConfigFileToInitClient() {
+    var kubeApi = new KubeAPIServer(KubeAPIServerConfigBuilder.anAPIServerConfig()
+        .withUpdateKubeConfig(true)
+        .build());
+    kubeApi.start();
+
+    var client = new KubernetesClientBuilder().build();
+
+    TestUtils.simpleTest(client);
+  }
+
+
+  @Test
   void usingWildcardVersion() {
     var kubeApi = new KubeAPIServer(KubeAPIServerConfigBuilder.anAPIServerConfig()
         .withApiServerVersion("1.26.*")
         .build());
     kubeApi.start();
 
-    var client = new KubernetesClientBuilder().build();
+    var client = createClient(kubeApi.getKubeConfigYaml());
     TestUtils.simpleTest(client);
     assertThat(client.getKubernetesVersion().getMinor()).isEqualTo("26");
 
@@ -46,9 +60,7 @@ class KubeApiServerTest {
         .build());
     kubeApi.start();
 
-    var client =
-        new KubernetesClientBuilder().withConfig(Config.fromKubeconfig(kubeApi.getKubeConfigYaml()))
-            .build();
+    var client = createClient(kubeApi.getKubeConfigYaml());
     TestUtils.simpleTest(client);
 
     kubeApi.stop();
@@ -56,7 +68,13 @@ class KubeApiServerTest {
 
   void testWithAPIServer(KubeAPIServer kubeApi) {
     kubeApi.start();
-    simpleTest();
+    var client = createClient(kubeApi.getKubeConfigYaml());
+    simpleTest(client);
     kubeApi.stop();
   }
+
+  KubernetesClient createClient(String yaml) {
+    return new KubernetesClientBuilder().withConfig(Config.fromKubeconfig(yaml)).build();
+  }
+
 }

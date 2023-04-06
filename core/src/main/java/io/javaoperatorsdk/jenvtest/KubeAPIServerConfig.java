@@ -33,6 +33,9 @@ public class KubeAPIServerConfig {
    */
   private final List<String> apiServerFlags;
 
+  /**
+   * If kube config (in ~/kube/config ) file should be updated.
+   */
   private final boolean updateKubeConfig;
 
   KubeAPIServerConfig(String jenvtestDir, String apiServerVersion, boolean offlineMode,
