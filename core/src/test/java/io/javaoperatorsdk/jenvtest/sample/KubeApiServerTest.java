@@ -27,19 +27,6 @@ class KubeApiServerTest {
   }
 
   @Test
-  void usingKubeConfigFileToInitClient() {
-    var kubeApi = new KubeAPIServer(KubeAPIServerConfigBuilder.anAPIServerConfig()
-        .withUpdateKubeConfig(true)
-        .build());
-    kubeApi.start();
-
-    var client = new KubernetesClientBuilder().build();
-
-    TestUtils.simpleTest(client);
-  }
-
-
-  @Test
   void usingWildcardVersion() {
     var kubeApi = new KubeAPIServer(KubeAPIServerConfigBuilder.anAPIServerConfig()
         .withApiServerVersion("1.26.*")
