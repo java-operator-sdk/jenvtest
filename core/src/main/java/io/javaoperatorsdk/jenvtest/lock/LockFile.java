@@ -1,4 +1,4 @@
-package io.javaoperatorsdk.jenvtest.binary;
+package io.javaoperatorsdk.jenvtest.lock;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,21 +9,20 @@ import org.slf4j.LoggerFactory;
 
 import io.javaoperatorsdk.jenvtest.JenvtestException;
 
-public class DownloadLock {
+public class LockFile {
 
-  private static final Logger log = LoggerFactory.getLogger(DownloadLock.class);
+  private static final Logger log = LoggerFactory.getLogger(LockFile.class);
 
-  public static final String LOCK_SUFFIX = ".lock";
-  private final String downloadDir;
+  private final String dir;
   private final String lockFileName;
 
-  public DownloadLock(String version, String downloadDir) {
-    this.downloadDir = downloadDir;
-    this.lockFileName = version + LOCK_SUFFIX;
+  public LockFile(String lockFileName, String dir) {
+    this.dir = dir;
+    this.lockFileName = lockFileName;
   }
 
   public boolean tryLock() {
-    File file = new File(downloadDir, lockFileName);
+    File file = new File(dir, lockFileName);
     try {
       return file.createNewFile();
     } catch (IOException e) {
@@ -32,7 +31,7 @@ public class DownloadLock {
   }
 
   public void releaseLock() {
-    File file = new File(downloadDir, lockFileName);
+    File file = new File(dir, lockFileName);
     var deleted = file.delete();
     if (!deleted) {
       throw new JenvtestException("Lock file not deleted: " + file.getPath());
@@ -40,7 +39,7 @@ public class DownloadLock {
   }
 
   public void waitUntilLockDeleted() {
-    var file = new File(downloadDir);
+    var file = new File(dir);
     var path = file.toPath();
 
     try (final WatchService watchService = FileSystems.getDefault().newWatchService()) {

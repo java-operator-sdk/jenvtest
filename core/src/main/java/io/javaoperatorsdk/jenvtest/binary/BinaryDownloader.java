@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import io.javaoperatorsdk.jenvtest.JenvtestException;
 import io.javaoperatorsdk.jenvtest.Utils;
 import io.javaoperatorsdk.jenvtest.binary.repo.BinaryRepo;
+import io.javaoperatorsdk.jenvtest.lock.LockFile;
 
 public class BinaryDownloader {
 
@@ -44,10 +45,13 @@ public class BinaryDownloader {
     log.info("Downloading binaries with version: {}", version);
     var downloadDir = new File(jenvtestDir, BinaryManager.BINARY_LIST_DIR);
     downloadDir.mkdirs();
-    DownloadLock lock =
-        new DownloadLock(version, downloadDir.getPath());
-
+    LockFile lock =
+        new LockFile(version + ".lock", downloadDir.getPath());
+    var dirForVersion = dirForVersion(version);
     if (lock.tryLock()) {
+      if (dirForVersion.exists()) {
+        return dirForVersion;
+      }
       var tempFile = binaryRepo.downloadVersionToTempFile(version);
       File dir = createDirForBinaries(version);
       extractFiles(tempFile, dir);
@@ -61,7 +65,7 @@ public class BinaryDownloader {
       log.debug("Waiting for lock to be deleted for version: {}", version);
       lock.waitUntilLockDeleted();
       log.debug("Lock deleted for version: {}", version);
-      return dirForVersion(version);
+      return dirForVersion;
     }
   }
 
