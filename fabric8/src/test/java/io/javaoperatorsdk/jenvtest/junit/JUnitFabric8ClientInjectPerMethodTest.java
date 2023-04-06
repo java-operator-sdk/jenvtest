@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import io.fabric8.kubernetes.client.KubernetesClient;
 
-class JUnitFabric8ClientInjectPerMethod {
+class JUnitFabric8ClientInjectPerMethodTest {
 
   KubernetesClient client;
 
