@@ -42,8 +42,10 @@ public class BinaryDownloader {
 
   public File download(String version) {
     log.info("Downloading binaries with version: {}", version);
+    var downloadDir = new File(jenvtestDir, BinaryManager.BINARY_LIST_DIR);
+    downloadDir.mkdirs();
     DownloadLock lock =
-        new DownloadLock(version, new File(jenvtestDir, BinaryManager.BINARY_LIST_DIR).getPath());
+        new DownloadLock(version, downloadDir.getPath());
 
     if (lock.tryLock()) {
       var tempFile = binaryRepo.downloadVersionToTempFile(version);
