@@ -12,6 +12,7 @@ import static io.javaoperatorsdk.jenvtest.sample.TestUtils.simpleTest;
 @EnableKubeAPIServer
 class JUnitExtensionSimpleCaseTest {
 
+  // static is required in case the config is shared between test cases
   @KubeConfig
   static String kubeConfigYaml;
 

@@ -1,10 +1,12 @@
-package io.javaoperatorsdk.jenvtest.junit;
+package io.javaoperatorsdk.jenvtest.junit.sample;
 
 import org.junit.jupiter.api.Test;
 
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
+import io.javaoperatorsdk.jenvtest.junit.EnableKubeAPIServer;
+import io.javaoperatorsdk.jenvtest.junit.KubeConfig;
 
 import static io.javaoperatorsdk.jenvtest.junit.TestUtils.simpleTest;
 

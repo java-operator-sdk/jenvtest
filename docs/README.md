@@ -4,6 +4,13 @@ jenvtest is a relatively simple test that support integration testing with Kuber
 The whole concept and implementation is relatively simple, this doc describes some high level concepts
 and provides some more detailed information.
 
+## Samples
+
+Samples are provided in form of unit tests in the [sample package](https://github.com/java-operator-sdk/jenvtest/tree/main/core/src/test/java/io/javaoperatorsdk/jenvtest/sample)
+in core.
+
+For fabric8 client in [this package](https://github.com/java-operator-sdk/jenvtest/tree/main/fabric8/src/test/java/io/javaoperatorsdk/jenvtest/junit/sample)
+
 ## Configuration Options
 
 See available configuration options documented in [KubeAPIServerConfig](https://github.com/java-operator-sdk/jenvtest/blob/main/core/src/main/java/io/javaoperatorsdk/jenvtest/KubeAPIServerConfig.java#L6-L6)

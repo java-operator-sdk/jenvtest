@@ -9,6 +9,10 @@ Linux, Windows, Mac is supported.
 See also [this blog](https://csviri.medium.com/introducing-jenvtest-kubernetes-api-server-tests-made-easy-for-java-4d02a9bb26d4)
 post regarding the motivation and more.
 
+## Docs 
+
+See more documentation in [docs](https://github.com/java-operator-sdk/jenvtest/tree/main/docs) directory.
+
 ## Usage
 
 Include dependency:
