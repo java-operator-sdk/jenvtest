@@ -38,7 +38,7 @@ public class TestUtils {
 
   public static void simpleTest(KubernetesClient client, String testResourceName) {
     client.resource(TestUtils.testConfigMap(testResourceName)).create();
-    var cm = client.resource(TestUtils.testConfigMap()).get();
+    var cm = client.resource(TestUtils.testConfigMap(testResourceName)).get();
 
     Assertions.assertThat(cm).isNotNull();
 
