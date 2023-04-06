@@ -1,19 +1,23 @@
-package io.javaoperatorsdk.jenvtest.binary;
+package io.javaoperatorsdk.jenvtest.binary.repo;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.javaoperatorsdk.jenvtest.JenvtestException;
+import io.javaoperatorsdk.jenvtest.binary.OSInfo;
 
-import com.google.cloud.storage.Storage;
-import com.google.cloud.storage.StorageOptions;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class BinaryRepo {
 
@@ -42,12 +46,28 @@ public class BinaryRepo {
     }
   }
 
-
   public Stream<String> listObjectNames() {
-    Storage storage = StorageOptions.getDefaultInstance().getService();
-    var blobs = storage.get(BUCKET_NAME).list();
-    return StreamSupport.stream(blobs.iterateAll().spliterator(), false)
-        .map(b -> b.asBlobInfo().getName());
+    try {
+      var httpClient = HttpClient.newBuilder()
+          .build();
+
+      HttpRequest request = HttpRequest.newBuilder()
+          .GET()
+          .uri(URI.create("https://storage.googleapis.com/storage/v1/b/kubebuilder-tools/o"))
+          .build();
+
+      var response = httpClient.send(request, HttpResponse.BodyHandlers.ofString()).body();
+      ObjectMapper mapper =
+          new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+      ObjectList objectList = mapper.readValue(response, ObjectList.class);
+      return objectList.getItems().stream().map(ObjectListItem::getName);
+    } catch (IOException e) {
+      throw new JenvtestException(e);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new JenvtestException(e);
+    }
   }
+
 
 }
