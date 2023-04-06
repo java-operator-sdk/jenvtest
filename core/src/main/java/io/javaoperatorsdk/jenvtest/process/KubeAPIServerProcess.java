@@ -146,7 +146,7 @@ public class KubeAPIServerProcess {
           .GET()
           .build();
     } catch (URISyntaxException e) {
-      throw new RuntimeException(e);
+      throw new JenvtestException(e);
     }
   }
 
