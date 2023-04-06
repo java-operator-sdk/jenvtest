@@ -24,12 +24,16 @@ public class KubeAPIServerConfig {
   private final boolean offlineMode;
 
   /**
+   * <p>
    * Flags to pass to Kube API Server on startup. Key and value are two separated items, like
    * specifying min-request-timeout needs to add in order two values: "--min-request-timeout" and
    * "300" for the actual desired value.
-   *
+   * </p>
+   * <p>
    * See Kubernetes docs for possible flags:
-   * https://kubernetes.io/docs/reference/command-line-tools-reference/kube-apiserver/
+   * <a href="https://kubernetes.io/docs/reference/command-line-tools-reference/kube-apiserver/">API
+   * Server Docs</a>
+   * </p>
    */
   private final List<String> apiServerFlags;
 
