@@ -1,11 +1,11 @@
-package io.javaoperatorsdk.jenvtest;
+package io.javaoperatorsdk.jenvtest.sample;
 
 import org.junit.jupiter.api.Test;
 
 import io.javaoperatorsdk.jenvtest.junit.EnableKubeAPIServer;
 import io.javaoperatorsdk.jenvtest.junit.KubeConfig;
 
-import static io.javaoperatorsdk.jenvtest.TestUtils.simpleTest;
+import static io.javaoperatorsdk.jenvtest.sample.TestUtils.simpleTest;
 
 class JUnitExtensionOnMethodTest {
 

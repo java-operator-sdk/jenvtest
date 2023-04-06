@@ -81,7 +81,6 @@
 
     <modules>
         <module>core</module>
-        <module>samples</module>
         <module>fabric8</module>
     </modules>
 
