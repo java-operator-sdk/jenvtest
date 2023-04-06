@@ -14,6 +14,7 @@ public class KubeAPIServer implements UnexpectedProcessStopHandler {
 
   private static final Logger log = LoggerFactory.getLogger(KubeAPIServer.class);
 
+  // todo configurable
   public static final int STARTUP_TIMEOUT = 50_000;
 
   private final KubeAPIServerConfig config;
