@@ -109,7 +109,7 @@ public class KubeAPIServerProcess {
       var startedAt = LocalTime.now();
       while (true) {
         if (ready(client, request)) {
-          //todo wait until default namespace is found? just on windows?
+          // todo wait until default namespace is found? just on windows?
           return;
         }
         if (LocalTime.now().isAfter(startedAt.plus(STARTUP_TIMEOUT, ChronoUnit.MILLIS))) {
