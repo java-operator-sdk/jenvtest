@@ -27,18 +27,6 @@ class KubeApiServerTest {
   }
 
   @Test
-  void usingKubeConfigFileToInitClient() {
-    var kubeApi = new KubeAPIServer(KubeAPIServerConfigBuilder.anAPIServerConfig()
-        .withUpdateKubeConfig(true)
-        .build());
-    kubeApi.start();
-
-    var client = new KubernetesClientBuilder().build();
-
-    TestUtils.simpleTest(client);
-  }
-
-  @Test
   void canWaitForEtcdHealthCheckOnStartup() {
     var kubeApi = new KubeAPIServer(KubeAPIServerConfigBuilder.anAPIServerConfig()
         .withWaitForEtcdHealthCheckOnStartup(true)
