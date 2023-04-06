@@ -13,6 +13,8 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +26,8 @@ import org.slf4j.LoggerFactory;
 import io.javaoperatorsdk.jenvtest.*;
 import io.javaoperatorsdk.jenvtest.binary.BinaryManager;
 import io.javaoperatorsdk.jenvtest.cert.CertManager;
+
+import static io.javaoperatorsdk.jenvtest.KubeAPIServer.STARTUP_TIMEOUT;
 
 public class KubeAPIServerProcess {
 
@@ -100,27 +104,22 @@ public class KubeAPIServerProcess {
 
   public void waitUntilDefaultNamespaceCreated() {
     try {
-      Thread.sleep(15000);
+      var client = getHttpClient();
+      var request = getHttpRequest();
+      var startedAt = LocalTime.now();
+      while (true) {
+        if (ready(client, request)) {
+          return;
+        }
+        if (LocalTime.now().isAfter(startedAt.plus(STARTUP_TIMEOUT, ChronoUnit.MILLIS))) {
+          throw new JenvtestException("API Server did not start properly");
+        }
+        Thread.sleep(POLLING_INTERVAL);
+      }
     } catch (InterruptedException e) {
-      throw new RuntimeException(e);
+      Thread.currentThread().interrupt();
+      throw new JenvtestException(e);
     }
-    // try {
-    // var client = getHttpClient();
-    // var request = getHttpRequest();
-    // var startedAt = LocalTime.now();
-    // while (true) {
-    // if (ready(client, request)) {
-    // return;
-    // }
-    // if (LocalTime.now().isAfter(startedAt.plus(STARTUP_TIMEOUT, ChronoUnit.MILLIS))) {
-    // throw new JenvtestException("API Server did not start properly");
-    // }
-    //
-    // }
-    // } catch (InterruptedException e) {
-    // Thread.currentThread().interrupt();
-    // throw new JenvtestException(e);
-    // }
   }
 
   private boolean ready(HttpClient client, HttpRequest request) {
