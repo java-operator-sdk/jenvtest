@@ -104,7 +104,7 @@ Using dependency:
 </dependency>
 ```
 
-The client can be directly injected to the test. See sample test [here](/home/csviri/Workspace/jenvtest/fabric8/src/test/java/io/javaoperatorsdk/jenvtest/junit/JUnitFabric8ClientInjectionTest.java).
+The client can be directly injected to the test. See sample test [here](https://github.com/java-operator-sdk/jenvtest/blob/d5676ceafd278b323532327584401b93a62440ba/fabric8/src/test/java/io/javaoperatorsdk/jenvtest/junit/JUnitFabric8ClientInjectionTest.java).
 
 ```java
 
