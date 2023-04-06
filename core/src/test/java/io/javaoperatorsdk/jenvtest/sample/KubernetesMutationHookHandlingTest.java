@@ -1,4 +1,4 @@
-package io.javaoperatorsdk.jenvtest;
+package io.javaoperatorsdk.jenvtest.sample;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;

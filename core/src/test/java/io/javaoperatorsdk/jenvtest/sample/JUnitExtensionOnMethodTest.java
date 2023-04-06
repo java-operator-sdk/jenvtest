@@ -1,11 +1,11 @@
-package io.javaoperatorsdk.jenvtest;
+package io.javaoperatorsdk.jenvtest.sample;
 
 import org.junit.jupiter.api.Test;
 
 import io.javaoperatorsdk.jenvtest.junit.EnableKubeAPIServer;
 import io.javaoperatorsdk.jenvtest.junit.KubeConfig;
 
-import static io.javaoperatorsdk.jenvtest.TestUtils.simpleTest;
+import static io.javaoperatorsdk.jenvtest.sample.TestUtils.simpleTest;
 
 class JUnitExtensionOnMethodTest {
 
@@ -14,13 +14,13 @@ class JUnitExtensionOnMethodTest {
 
   @Test
   @EnableKubeAPIServer
-  void testCommunication() {
-    simpleTest(kubeConfigYaml);
+  void simpleTest1() {
+    TestUtils.simpleTest(kubeConfigYaml);
   }
 
   @Test
   @EnableKubeAPIServer
-  void testCommunication2() {
-    simpleTest(kubeConfigYaml);
+  void simpleTest2() {
+    TestUtils.simpleTest(kubeConfigYaml);
   }
 }

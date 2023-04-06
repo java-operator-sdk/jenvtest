@@ -1,12 +1,14 @@
-package io.javaoperatorsdk.jenvtest;
+package io.javaoperatorsdk.jenvtest.sample;
 
 import org.junit.jupiter.api.Test;
 
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
+import io.javaoperatorsdk.jenvtest.KubeAPIServer;
+import io.javaoperatorsdk.jenvtest.KubeAPIServerConfigBuilder;
 
-import static io.javaoperatorsdk.jenvtest.TestUtils.NON_LATEST_API_SERVER_VERSION;
-import static io.javaoperatorsdk.jenvtest.TestUtils.simpleTest;
+import static io.javaoperatorsdk.jenvtest.sample.TestUtils.NON_LATEST_API_SERVER_VERSION;
+import static io.javaoperatorsdk.jenvtest.sample.TestUtils.simpleTest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class KubeApiServerTest {

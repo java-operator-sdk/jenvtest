@@ -25,33 +25,28 @@ Include dependency:
 ### In Unit Tests
 
 See sample unit
-test [here](https://github.com/java-operator-sdk/jenvtest/blob/6fadd8cb07ea0a61410175abf1f6ec495bf6a20f/samples/src/test/java/io/javaoperatorsdk/jenvtest/JUnitExtensionOnClassTest.java)
+test [here](https://github.com/java-operator-sdk/jenvtest/blob/main/core/src/test/java/io/javaoperatorsdk/jenvtest/sample/JUnitExtensionSimpleCaseTest.java)
 
 ```java
 
-@EnableKubeAPIServer // Start/Stop Kube API Server in the background
-class JUnitExtensionTest {
+@EnableKubeAPIServer
+class JUnitExtensionSimpleCaseTest {
+
+    // Use @KubeConfig annotation to inject kube config yaml to init any client
+    @KubeConfig
+    static String kubeConfigYaml;
 
     @Test
-    void testCommunication() {
-        // use a Kubernetes client to communicate with the server
-        var client = new KubernetesClientBuilder().build();
-        client.resource(configMap()).createOrReplace();
-        var cm = client.resource(configMap()).get();
-
-        assertThat(cm).isNotNull();
-    }
-
-    private ConfigMap configMap() {
-        return new ConfigMapBuilder()
-                .withMetadata(new ObjectMetaBuilder()
-                        .withName("test1")
-                        .withNamespace("default")
-                        .build())
-                .withData(Map.of("key", "data"))
+    void simpleTestWithTargetVersion() {
+        var client = new KubernetesClientBuilder()
+                .withConfig(Config.fromKubeconfig(kubeConfigYaml))
                 .build();
-    }
 
+        client.resource(TestUtils.testConfigMap()).create();
+        var cm = client.resource(TestUtils.testConfigMap()).get();
+
+        Assertions.assertThat(cm).isNotNull();
+    }
 }
 ```
 
@@ -92,6 +87,34 @@ class KubeApiServerTest {
         kubeApi.stop();
     }
 }
+```
+
+### Fabric8 Kubernetes Client Support 
+
+There is a dedicated support for [Fabric8 Kubernetes Client](https://github.com/fabric8io/kubernetes-client).
+
+Using dependency:
+
+```xml
+<dependency>
+    <groupId>io.javaoperatorsdk</groupId>
+    <artifactId>jenvtest-fabric8-client</artifactId>
+    <version>[version]</version>
+    <scope>test</scope>
+</dependency>
+```
+
+The client can be directly injected to the test. See sample test [here](/home/csviri/Workspace/jenvtest/fabric8/src/test/java/io/javaoperatorsdk/jenvtest/junit/JUnitFabric8ClientInjectionTest.java).
+
+```java
+
+@EnableKubeAPIServer
+class JUnitFabric8ClientInjectionTest {
+
+    static KubernetesClient client;
+   
+    // emitted code     
+}  
 ```
 
 ### Testing Mutation and Validation Webhooks
