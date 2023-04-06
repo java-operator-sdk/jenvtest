@@ -60,7 +60,7 @@ The underlying API can be used directly.
 See [KubeApiServer](https://github.com/java-operator-sdk/jenvtest/blob/main/core/src/main/java/io/javaoperatorsdk/jenvtest/KubeAPIServer.java)
 
 See
-it's [usage in a test](https://github.com/java-operator-sdk/jenvtest/blob/main/samples/src/test/java/io/javaoperatorsdk/jenvtest/KubeApiServerTest.java#L12-L35).
+it's [usage in a test](https://github.com/java-operator-sdk/jenvtest/blob/main/core/src/test/java/io/javaoperatorsdk/jenvtest/sample/KubeApiServerTest.java).
 
 ```java
 class KubeApiServerTest {
@@ -108,7 +108,7 @@ Using dependency:
 </dependency>
 ```
 
-The client can be directly injected to the test. See sample test [here](https://github.com/java-operator-sdk/jenvtest/blob/main/fabric8/src/test/java/io/javaoperatorsdk/jenvtest/junit/JUnitFabric8ClientInjectionTest.java).
+The client can be directly injected to the test. See sample test [here](https://github.com/java-operator-sdk/jenvtest/blob/main/fabric8/src/test/java/io/javaoperatorsdk/jenvtest/junit/sample/JUnitFabric8ClientInjectionTest.java#L111-L111).
 
 ```java
 
