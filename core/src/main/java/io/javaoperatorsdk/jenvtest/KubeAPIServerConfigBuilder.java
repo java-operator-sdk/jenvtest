@@ -72,7 +72,7 @@ public final class KubeAPIServerConfigBuilder {
         this.waitForEtcdHealthCheckOnStartup =
             Boolean.parseBoolean(waitForEtcdHealthCheckOnStartup);
       } else {
-        this.waitForEtcdHealthCheckOnStartup = false;
+        this.waitForEtcdHealthCheckOnStartup = true;
       }
     }
     return new KubeAPIServerConfig(jenvtestDir, apiServerVersion, offlineMode, apiServerFlags,
