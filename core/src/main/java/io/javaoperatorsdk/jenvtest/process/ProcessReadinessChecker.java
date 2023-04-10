@@ -37,7 +37,8 @@ public class ProcessReadinessChecker {
   private final boolean useTLS;
 
 
-  public ProcessReadinessChecker(int port, String readyCheckPath, String processName, boolean useTLS) {
+  public ProcessReadinessChecker(int port, String readyCheckPath, String processName,
+      boolean useTLS) {
     this.port = port;
     this.readyCheckPath = readyCheckPath;
     this.processName = processName;
