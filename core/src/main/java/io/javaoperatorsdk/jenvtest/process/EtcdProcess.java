@@ -67,10 +67,15 @@ public class EtcdProcess {
         return null;
       });
       log.debug("etcd started on port: {}", port);
+      waitUntilEtcdHealthy(port);
       return port;
     } catch (IOException e) {
       throw new JenvtestException(e);
     }
+  }
+
+  private void waitUntilEtcdHealthy(int port) {
+    new ProcessReadinessChecker(port, "health", "etcd", false).waitUntilReady();
   }
 
   public void cleanEtcdData() {

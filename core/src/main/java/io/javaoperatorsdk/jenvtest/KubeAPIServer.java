@@ -14,8 +14,6 @@ public class KubeAPIServer implements UnexpectedProcessStopHandler {
 
   private static final Logger log = LoggerFactory.getLogger(KubeAPIServer.class);
 
-  public static final int STARTUP_TIMEOUT = 10_000;
-
   private final KubeAPIServerConfig config;
   private final BinaryManager binaryManager;
   private final CertManager certManager;
@@ -46,7 +44,7 @@ public class KubeAPIServer implements UnexpectedProcessStopHandler {
     if (config.isUpdateKubeConfig()) {
       kubeConfig.updateKubeConfig(apiServerPort);
     }
-    kubeApiServerProcess.waitUntilDefaultNamespaceCreated();
+    kubeApiServerProcess.waitUntilReady();
     log.debug("API Server ready to use");
   }
 
