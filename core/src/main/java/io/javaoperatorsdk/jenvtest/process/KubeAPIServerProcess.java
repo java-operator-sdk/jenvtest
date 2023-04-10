@@ -125,7 +125,9 @@ public class KubeAPIServerProcess {
   private boolean ready(HttpClient client, HttpRequest request) {
     try {
       var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-      log.trace("Ready Response message:{} code: {}", response.body(), response.statusCode());
+      log.debug("Ready Response message:{} code: {} Api Server Port: {}", response.body(),
+          response.statusCode(),
+          apiServerPort);
       return response.statusCode() == 200;
     } catch (ConnectException e) {
       // still want to retry
@@ -208,7 +210,12 @@ public class KubeAPIServerProcess {
     }
     stopped = true;
     if (apiServerProcess != null) {
-      apiServerProcess.destroyForcibly();
+      try {
+        apiServerProcess.destroyForcibly();
+        apiServerProcess.waitFor();
+      } catch (InterruptedException e) {
+        throw new JenvtestException(e);
+      }
     }
     log.debug("API Server stopped");
   }
