@@ -28,7 +28,7 @@ import io.javaoperatorsdk.jenvtest.JenvtestException;
 public class ProcessReadinessChecker {
   private static final Logger log = LoggerFactory.getLogger(ProcessReadinessChecker.class);
 
-  public static final int STARTUP_TIMEOUT = 40_000;
+  public static final int STARTUP_TIMEOUT = 120_000;
   public static final int POLLING_INTERVAL = 150;
 
   private final int port;
