@@ -23,13 +23,15 @@ public class EtcdProcess {
   private volatile Process etcdProcess;
   private volatile boolean stopped = false;
   private final UnexpectedProcessStopHandler processStopHandler;
+  private final boolean waitForHealthCheck;
   private File tempWalDir;
   private File tempDataDir;
 
   public EtcdProcess(BinaryManager binaryManager,
-      UnexpectedProcessStopHandler processStopHandler) {
+      UnexpectedProcessStopHandler processStopHandler, boolean waitForHealthCheck) {
     this.binaryManager = binaryManager;
     this.processStopHandler = processStopHandler;
+    this.waitForHealthCheck = waitForHealthCheck;
   }
 
   public int startEtcd() {
@@ -67,7 +69,9 @@ public class EtcdProcess {
         return null;
       });
       log.debug("etcd started on port: {}", port);
-      waitUntilEtcdHealthy(port);
+      if (waitForHealthCheck) {
+        waitUntilEtcdHealthy(port);
+      }
       return port;
     } catch (IOException e) {
       throw new JenvtestException(e);
