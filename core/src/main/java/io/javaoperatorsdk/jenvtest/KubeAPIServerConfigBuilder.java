@@ -67,7 +67,7 @@ public final class KubeAPIServerConfigBuilder {
       }
     }
     if (waitForEtcdHealthCheckOnStartup == null) {
-      var waitForEtcdHealthCheckOnStartup = System.getenv(JENVTEST_API_SERVER_VERSION_ENV_VAR);
+      var waitForEtcdHealthCheckOnStartup = System.getenv(JENVTEST_WAIT_FOR_ETCD_HEALTH_CHECK);
       if (waitForEtcdHealthCheckOnStartup != null) {
         this.waitForEtcdHealthCheckOnStartup =
             Boolean.parseBoolean(waitForEtcdHealthCheckOnStartup);
