@@ -38,6 +38,18 @@ class KubeApiServerTest {
     TestUtils.simpleTest(client);
   }
 
+  @Test
+  void canWaitForEtcdHealthCheckOnStartup() {
+    var kubeApi = new KubeAPIServer(KubeAPIServerConfigBuilder.anAPIServerConfig()
+        .withWaitForEtcdHealthCheckOnStartup(true)
+        .build());
+    kubeApi.start();
+
+    var client = createClient(kubeApi.getKubeConfigYaml());
+    TestUtils.simpleTest(client);
+
+    kubeApi.stop();
+  }
 
   @Test
   void usingWildcardVersion() {

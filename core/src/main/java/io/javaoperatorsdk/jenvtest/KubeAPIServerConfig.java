@@ -42,13 +42,20 @@ public class KubeAPIServerConfig {
    */
   private final boolean updateKubeConfig;
 
+  /**
+   * This is mostly not needed, and increases startup time.
+   */
+  private final boolean waitForEtcdHealthCheckOnStartup;
+
   KubeAPIServerConfig(String jenvtestDir, String apiServerVersion, boolean offlineMode,
-      List<String> apiServerFlags, boolean updateKubeConfig) {
+      List<String> apiServerFlags, boolean updateKubeConfig,
+      boolean waitForEtcdHealthCheckOnStartup) {
     this.jenvtestDir = jenvtestDir;
     this.apiServerVersion = apiServerVersion;
     this.offlineMode = offlineMode;
     this.apiServerFlags = apiServerFlags;
     this.updateKubeConfig = updateKubeConfig;
+    this.waitForEtcdHealthCheckOnStartup = waitForEtcdHealthCheckOnStartup;
   }
 
   public String getJenvtestDir() {
@@ -69,5 +76,9 @@ public class KubeAPIServerConfig {
 
   public boolean isUpdateKubeConfig() {
     return updateKubeConfig;
+  }
+
+  public boolean isWaitForEtcdHealthCheckOnStartup() {
+    return waitForEtcdHealthCheckOnStartup;
   }
 }

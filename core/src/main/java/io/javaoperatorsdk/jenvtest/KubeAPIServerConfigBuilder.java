@@ -10,6 +10,8 @@ public final class KubeAPIServerConfigBuilder {
   public static final String JENVTEST_DOWNLOAD_BINARIES = "JENVTEST_OFFLINE_MODE";
   public static final String JENVTEST_DIR_ENV_VAR = "JENVTEST_DIR";
   public static final String JENVTEST_API_SERVER_VERSION_ENV_VAR = "JENVTEST_API_SERVER_VERSION";
+  public static final String JENVTEST_WAIT_FOR_ETCD_HEALTH_CHECK =
+      "JENVTEST_WAIT_FOR_ETCD_HEALTH_CHECK";
 
   public static final String DIRECTORY_NAME = ".jenvtest";
 
@@ -18,6 +20,7 @@ public final class KubeAPIServerConfigBuilder {
   private Boolean offlineMode;
   private boolean updateKubeConfig = false;
   private final List<String> apiServerFlags = new ArrayList<>(0);
+  private Boolean waitForEtcdHealthCheckOnStartup;
 
   public KubeAPIServerConfigBuilder() {}
 
@@ -63,8 +66,17 @@ public final class KubeAPIServerConfigBuilder {
         this.apiServerVersion = apiServerVersionEnvVar;
       }
     }
+    if (waitForEtcdHealthCheckOnStartup == null) {
+      var waitForEtcdHealthCheckOnStartup = System.getenv(JENVTEST_API_SERVER_VERSION_ENV_VAR);
+      if (waitForEtcdHealthCheckOnStartup != null) {
+        this.waitForEtcdHealthCheckOnStartup =
+            Boolean.parseBoolean(waitForEtcdHealthCheckOnStartup);
+      } else {
+        this.waitForEtcdHealthCheckOnStartup = false;
+      }
+    }
     return new KubeAPIServerConfig(jenvtestDir, apiServerVersion, offlineMode, apiServerFlags,
-        updateKubeConfig);
+        updateKubeConfig, waitForEtcdHealthCheckOnStartup);
   }
 
   public KubeAPIServerConfigBuilder withUpdateKubeConfig(boolean updateKubeConfig) {
@@ -87,6 +99,12 @@ public final class KubeAPIServerConfigBuilder {
   public KubeAPIServerConfigBuilder withApiServerFlag(String key) {
     checkKeyPrefix(key);
     apiServerFlags.add(key);
+    return this;
+  }
+
+  public KubeAPIServerConfigBuilder withWaitForEtcdHealthCheckOnStartup(
+      boolean waitForEtcdHealthCheckOnStartup) {
+    this.waitForEtcdHealthCheckOnStartup = waitForEtcdHealthCheckOnStartup;
     return this;
   }
 
