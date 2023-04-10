@@ -110,6 +110,7 @@ public class KubeAPIServerProcess {
       while (true) {
         if (ready(client, request)) {
           // todo wait until default namespace is found? just on windows?
+          Thread.sleep(1000);
           return;
         }
         if (LocalTime.now().isAfter(startedAt.plus(STARTUP_TIMEOUT, ChronoUnit.MILLIS))) {
