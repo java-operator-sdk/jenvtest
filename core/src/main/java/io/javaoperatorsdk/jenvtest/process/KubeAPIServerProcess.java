@@ -210,7 +210,12 @@ public class KubeAPIServerProcess {
     }
     stopped = true;
     if (apiServerProcess != null) {
-      apiServerProcess.destroyForcibly();
+      try {
+        apiServerProcess.destroyForcibly();
+        apiServerProcess.waitFor();
+      } catch (InterruptedException e) {
+        throw new JenvtestException(e);
+      }
     }
     log.debug("API Server stopped");
   }

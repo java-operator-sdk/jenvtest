@@ -88,7 +88,12 @@ public class EtcdProcess {
     }
     stopped = true;
     if (etcdProcess != null) {
-      etcdProcess.destroyForcibly();
+      try {
+        etcdProcess.destroyForcibly();
+        etcdProcess.waitFor();
+      } catch (InterruptedException e) {
+        throw new JenvtestException(e);
+      }
     }
     log.debug("etcd stopped");
   }
