@@ -82,7 +82,7 @@ public final class KubeAPIServerConfigBuilder {
       if (envStartupTimeout != null) {
         this.startupTimeout = Integer.parseInt(envStartupTimeout);
       } else {
-        this.startupTimeout = 30_000;
+        this.startupTimeout = 60_000;
       }
     }
     return new KubeAPIServerConfig(jenvtestDir, apiServerVersion, offlineMode, apiServerFlags,
