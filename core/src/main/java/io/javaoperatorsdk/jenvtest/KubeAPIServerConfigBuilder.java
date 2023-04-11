@@ -112,6 +112,11 @@ public final class KubeAPIServerConfigBuilder {
     return this;
   }
 
+  public KubeAPIServerConfigBuilder withStartupTimeout(Integer startupTimeout) {
+    this.startupTimeout = startupTimeout;
+    return this;
+  }
+
   public KubeAPIServerConfigBuilder withWaitForEtcdHealthCheckOnStartup(
       boolean waitForEtcdHealthCheckOnStartup) {
     this.waitForEtcdHealthCheckOnStartup = waitForEtcdHealthCheckOnStartup;
