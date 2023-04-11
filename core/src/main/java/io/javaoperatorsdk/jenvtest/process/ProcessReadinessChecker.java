@@ -57,10 +57,10 @@ public class ProcessReadinessChecker {
           "get", "ns", "default").start();
       return process.waitFor() == 0;
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new JenvtestException(e);
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
-      throw new RuntimeException(e);
+      throw new JenvtestException(e);
     }
   }
 

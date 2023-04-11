@@ -32,9 +32,10 @@ public class LockFile {
 
   public void releaseLock() {
     File file = new File(dir, lockFileName);
-    var deleted = file.delete();
-    if (!deleted) {
-      throw new JenvtestException("Lock file not deleted: " + file.getPath());
+    try {
+      Files.deleteIfExists(file.toPath());
+    } catch (IOException e) {
+      throw new JenvtestException(e);
     }
   }
 
