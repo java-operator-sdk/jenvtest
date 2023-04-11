@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import io.javaoperatorsdk.jenvtest.JenvtestException;
 import io.javaoperatorsdk.jenvtest.Utils;
 import io.javaoperatorsdk.jenvtest.binary.repo.BinaryRepo;
+import io.javaoperatorsdk.jenvtest.lock.LockFile;
 
 public class BinaryDownloader {
 
@@ -32,7 +33,6 @@ public class BinaryDownloader {
     this.jenvtestDir = jenvtestDir;
     this.osInfoProvider = osInfoProvider;
     this.binaryRepo = new BinaryRepo(osInfoProvider);
-
   }
 
   BinaryDownloader(String jenvtestDir, BinaryRepo binaryRepo, OSInfo osInfoProvider) {
@@ -43,14 +43,30 @@ public class BinaryDownloader {
 
   public File download(String version) {
     log.info("Downloading binaries with version: {}", version);
-    var tempFile = binaryRepo.downloadVersionToTempFile(version);
-    File dir = createDirForBinaries(version);
-    extractFiles(tempFile, dir);
-    var deleted = tempFile.delete();
-    if (!deleted) {
-      log.warn("Unable to delete temp file: {}", tempFile.getPath());
+    var downloadDir = new File(jenvtestDir, BinaryManager.BINARY_LIST_DIR);
+    downloadDir.mkdirs();
+    LockFile lock =
+        new LockFile(version + ".lock", downloadDir.getPath());
+    var dirForVersion = dirForVersion(version);
+    if (lock.tryLock()) {
+      if (dirForVersion.exists()) {
+        return dirForVersion;
+      }
+      var tempFile = binaryRepo.downloadVersionToTempFile(version);
+      File dir = createDirForBinaries(version);
+      extractFiles(tempFile, dir);
+      var deleted = tempFile.delete();
+      if (!deleted) {
+        log.warn("Unable to delete temp file: {}", tempFile.getPath());
+      }
+      lock.releaseLock();
+      return dir;
+    } else {
+      log.debug("Waiting for lock to be deleted for version: {}", version);
+      lock.waitUntilLockDeleted();
+      log.debug("Lock deleted for version: {}", version);
+      return dirForVersion;
     }
-    return dir;
   }
 
   public File downloadLatest() {
@@ -99,12 +115,16 @@ public class BinaryDownloader {
   }
 
   private File createDirForBinaries(String version) {
-    var dir = new File(jenvtestDir, BinaryManager.BINARY_LIST_DIR + File.separator
-        + version + Utils.platformSuffix(osInfoProvider));
+    var dir = dirForVersion(version);
     if (!dir.mkdirs()) {
       throw new JenvtestException("Cannot created director: " + dir.getPath());
     }
     return dir;
+  }
+
+  private File dirForVersion(String version) {
+    return new File(jenvtestDir, BinaryManager.BINARY_LIST_DIR + File.separator
+        + version + Utils.platformSuffix(osInfoProvider));
   }
 
   public String findLatestVersion() {

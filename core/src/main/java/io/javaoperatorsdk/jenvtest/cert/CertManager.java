@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.javaoperatorsdk.jenvtest.JenvtestException;
+import io.javaoperatorsdk.jenvtest.lock.LockFile;
 
 public class CertManager {
 
@@ -46,16 +47,36 @@ public class CertManager {
   }
 
   public void createCertificatesIfNeeded() {
-    generateAPIServerCertificates();
-    generateUserCertificates();
+    if (certFilesPresent()) {
+      return;
+    }
+    // locking is for parallel execution
+    LockFile lockFile = new LockFile("cert.lock", jenvtestDir);
+    if (lockFile.tryLock()) {
+      if (certFilesPresent()) {
+        return;
+      }
+      try {
+        generateAPIServerCertificates();
+        generateUserCertificates();
+      } finally {
+        lockFile.releaseLock();
+      }
+    } else {
+      lockFile.waitUntilLockDeleted();
+    }
+  }
+
+  private boolean certFilesPresent() {
+    var apiCert = new File(jenvtestDir, API_SERVER_CERT_NAME);
+    var apiKey = new File(jenvtestDir, API_SERVER_KEY_NAME);
+    var clientCert = new File(jenvtestDir, CLIENT_CERT_NAME);
+    var clientKey = new File(jenvtestDir, CLIENT_KEY_NAME);
+
+    return apiCert.exists() && apiKey.exists() && clientCert.exists() && clientKey.exists();
   }
 
   private void generateAPIServerCertificates() {
-    var cert = new File(jenvtestDir, API_SERVER_CERT_NAME);
-    var key = new File(jenvtestDir, API_SERVER_KEY_NAME);
-    if (cert.exists() && key.exists()) {
-      return;
-    }
     log.info("Generating API Server certificates");
     generateKeyAndCertificate("CN=example.org", new File(jenvtestDir, API_SERVER_KEY_NAME),
         new File(jenvtestDir, API_SERVER_CERT_NAME),
@@ -70,11 +91,6 @@ public class CertManager {
   }
 
   private void generateUserCertificates() {
-    var cert = new File(jenvtestDir, CLIENT_CERT_NAME);
-    var key = new File(jenvtestDir, CLIENT_KEY_NAME);
-    if (cert.exists() && key.exists()) {
-      return;
-    }
     log.info("Generating Client certificates");
     generateKeyAndCertificate("O=system:masters,CN=jenvtest",
         new File(jenvtestDir, CLIENT_KEY_NAME),

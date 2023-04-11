@@ -79,7 +79,7 @@ public class EtcdProcess {
   }
 
   private void waitUntilEtcdHealthy(int port) {
-    new ProcessReadinessChecker(port, "health", "etcd", false).waitUntilReady();
+    new ProcessReadinessChecker().waitUntilReady(port, "health", "etcd", false);
   }
 
   public void cleanEtcdData() {

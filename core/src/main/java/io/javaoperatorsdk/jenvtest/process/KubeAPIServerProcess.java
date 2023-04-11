@@ -17,6 +17,7 @@ public class KubeAPIServerProcess {
   private static final Logger log = LoggerFactory.getLogger(KubeAPIServerProcess.class);
   private static final Logger apiLog = LoggerFactory.getLogger(KubeAPIServerProcess.class
       .getName() + ".APIServerProcessLogs");
+  public static final String KUBE_API_SERVER = "Kube API Server";
 
   private final CertManager certManager;
   private final BinaryManager binaryManager;
@@ -85,7 +86,9 @@ public class KubeAPIServerProcess {
   }
 
   public void waitUntilReady() {
-    new ProcessReadinessChecker(apiServerPort, "readyz", "Kube API Server", true).waitUntilReady();
+    var readinessChecker = new ProcessReadinessChecker();
+    readinessChecker.waitUntilReady(apiServerPort, "readyz", KUBE_API_SERVER, true);
+    readinessChecker.waitUntilDefaultNamespaceAvailable(apiServerPort, binaryManager, certManager);
   }
 
   public void stopApiServer() {

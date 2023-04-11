@@ -14,6 +14,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
+import java.util.function.BooleanSupplier;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
@@ -24,34 +25,57 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.javaoperatorsdk.jenvtest.JenvtestException;
+import io.javaoperatorsdk.jenvtest.binary.BinaryManager;
+import io.javaoperatorsdk.jenvtest.cert.CertManager;
+
+import static io.javaoperatorsdk.jenvtest.process.KubeAPIServerProcess.KUBE_API_SERVER;
 
 public class ProcessReadinessChecker {
+
   private static final Logger log = LoggerFactory.getLogger(ProcessReadinessChecker.class);
 
-  public static final int STARTUP_TIMEOUT = 10_000;
-  public static final int POLLING_INTERVAL = 150;
-
-  private final int port;
-  private final String readyCheckPath;
-  private final String processName;
-  private final boolean useTLS;
+  public static final int STARTUP_TIMEOUT = 60_000;
+  public static final int POLLING_INTERVAL = 200;
 
 
-  public ProcessReadinessChecker(int port, String readyCheckPath, String processName,
-      boolean useTLS) {
-    this.port = port;
-    this.readyCheckPath = readyCheckPath;
-    this.processName = processName;
-    this.useTLS = useTLS;
+  public void waitUntilDefaultNamespaceAvailable(int apiServerPort,
+      BinaryManager binaryManager,
+      CertManager certManager) {
+    pollWithTimeout(() -> defaultNamespaceExists(apiServerPort, binaryManager, certManager),
+        KUBE_API_SERVER);
   }
 
-  public void waitUntilReady() {
+  private boolean defaultNamespaceExists(int apiServerPort, BinaryManager binaryManager,
+      CertManager certManager) {
     try {
-      var client = getHttpClient();
-      var request = getHttpRequest();
+      Process process = new ProcessBuilder(binaryManager.binaries().getKubectl().getPath(),
+          "--client-certificate=" + certManager.getClientCertPath(),
+          "--client-key=" + certManager.getClientKeyPath(),
+          "--certificate-authority=" + certManager.getAPIServerCertPath(),
+          "--server=https://127.0.0.1:" + apiServerPort,
+          "--request-timeout=5s",
+          "get", "ns", "default").start();
+      return process.waitFor() == 0;
+    } catch (IOException e) {
+      throw new JenvtestException(e);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new JenvtestException(e);
+    }
+  }
+
+  public void waitUntilReady(int port, String readyCheckPath, String processName,
+      boolean useTLS) {
+    var client = getHttpClient();
+    var request = getHttpRequest(useTLS, readyCheckPath, port);
+    pollWithTimeout(() -> ready(client, request, processName, port), processName);
+  }
+
+  private static void pollWithTimeout(BooleanSupplier predicate, String processName) {
+    try {
       var startedAt = LocalTime.now();
       while (true) {
-        if (ready(client, request)) {
+        if (predicate.getAsBoolean()) {
           return;
         }
         if (LocalTime.now().isAfter(startedAt.plus(STARTUP_TIMEOUT, ChronoUnit.MILLIS))) {
@@ -65,7 +89,7 @@ public class ProcessReadinessChecker {
     }
   }
 
-  private boolean ready(HttpClient client, HttpRequest request) {
+  private boolean ready(HttpClient client, HttpRequest request, String processName, int port) {
     try {
       var response = client.send(request, HttpResponse.BodyHandlers.ofString());
       log.debug("Ready Response message:{} code: {} for {} on Port: {}", response.body(),
@@ -84,7 +108,7 @@ public class ProcessReadinessChecker {
     }
   }
 
-  private HttpRequest getHttpRequest() {
+  private HttpRequest getHttpRequest(boolean useTLS, String readyCheckPath, int port) {
     try {
       return HttpRequest.newBuilder()
           .uri(new URI((useTLS ? "https" : "http") + "://127.0.0.1:" + port + "/" + readyCheckPath))
@@ -128,7 +152,7 @@ public class ProcessReadinessChecker {
 
                 @Override
                 public void checkClientTrusted(X509Certificate[] chain, String authType,
-                    SSLEngine engine) throws CertificateException {
+                    SSLEngine engine) {
 
                 }
 

@@ -12,10 +12,16 @@ import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 
 public class TestUtils {
 
+  public static final String TEST_1 = "test1";
+
   public static ConfigMap testConfigMap() {
+    return testConfigMap(TEST_1);
+  }
+
+  public static ConfigMap testConfigMap(String name) {
     return new ConfigMapBuilder()
         .withMetadata(new ObjectMetaBuilder()
-            .withName("test1")
+            .withName(name)
             .withNamespace("default")
             .build())
         .withData(Map.of("key", "data"))
@@ -23,12 +29,16 @@ public class TestUtils {
   }
 
   public static void simpleTest() {
-    simpleTest(new KubernetesClientBuilder().build());
+    simpleTest(new KubernetesClientBuilder().build(), "test1");
   }
 
   public static void simpleTest(KubernetesClient client) {
-    client.resource(TestUtils.testConfigMap()).create();
-    var cm = client.resource(TestUtils.testConfigMap()).get();
+    simpleTest(client, TEST_1);
+  }
+
+  public static void simpleTest(KubernetesClient client, String testResourceName) {
+    client.resource(TestUtils.testConfigMap(testResourceName)).create();
+    var cm = client.resource(TestUtils.testConfigMap(testResourceName)).get();
 
     Assertions.assertThat(cm).isNotNull();
 
