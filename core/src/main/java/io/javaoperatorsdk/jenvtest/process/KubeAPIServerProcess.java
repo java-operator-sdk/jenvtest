@@ -85,7 +85,9 @@ public class KubeAPIServerProcess {
   }
 
   public void waitUntilReady() {
-    new ProcessReadinessChecker(apiServerPort, "readyz", "Kube API Server", true).waitUntilReady();
+    var readinessChecker = new ProcessReadinessChecker();
+    readinessChecker.waitUntilReady(apiServerPort, "readyz", "Kube API Server", true);
+    readinessChecker.waitUntilDefaultNamespaceAvailable(apiServerPort, binaryManager, certManager);
   }
 
   public void stopApiServer() {
