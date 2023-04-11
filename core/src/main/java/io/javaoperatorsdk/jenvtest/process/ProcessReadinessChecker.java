@@ -28,6 +28,8 @@ import io.javaoperatorsdk.jenvtest.JenvtestException;
 import io.javaoperatorsdk.jenvtest.binary.BinaryManager;
 import io.javaoperatorsdk.jenvtest.cert.CertManager;
 
+import static io.javaoperatorsdk.jenvtest.process.KubeAPIServerProcess.KUBE_API_SERVER;
+
 public class ProcessReadinessChecker {
 
   private static final Logger log = LoggerFactory.getLogger(ProcessReadinessChecker.class);
@@ -39,45 +41,41 @@ public class ProcessReadinessChecker {
   public void waitUntilDefaultNamespaceAvailable(int apiServerPort,
       BinaryManager binaryManager,
       CertManager certManager) {
-    try {
-      var startedAt = LocalTime.now();
-      while (true) {
-        if (defaultNamespaceExists(apiServerPort, binaryManager, certManager)) {
-          return;
-        }
-        if (LocalTime.now().isAfter(startedAt.plus(STARTUP_TIMEOUT, ChronoUnit.MILLIS))) {
-          throw new JenvtestException("Cannot find default namespace in api server");
-        }
-        Thread.sleep(POLLING_INTERVAL);
-      }
-    } catch (IOException e) {
-      throw new JenvtestException(e);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-      throw new JenvtestException(e);
-    }
-
+    pollWithTimeout(() -> defaultNamespaceExists(apiServerPort, binaryManager, certManager),
+        KUBE_API_SERVER);
   }
 
   private boolean defaultNamespaceExists(int apiServerPort, BinaryManager binaryManager,
-      CertManager certManager) throws IOException, InterruptedException {
-    var process = new ProcessBuilder(binaryManager.binaries().getKubectl().getPath(),
-        "--client-certificate=" + certManager.getClientCertPath(),
-        "--client-key=" + certManager.getClientKeyPath(),
-        "--certificate-authority=" + certManager.getAPIServerCertPath(),
-        "--server=https://127.0.0.1:" + apiServerPort,
-        "get", "ns", "default").start();
-    return process.waitFor() == 0;
+      CertManager certManager) {
+    try {
+      Process process = new ProcessBuilder(binaryManager.binaries().getKubectl().getPath(),
+          "--client-certificate=" + certManager.getClientCertPath(),
+          "--client-key=" + certManager.getClientKeyPath(),
+          "--certificate-authority=" + certManager.getAPIServerCertPath(),
+          "--server=https://127.0.0.1:" + apiServerPort,
+          "--request-timeout=5s",
+          "get", "ns", "default").start();
+      return process.waitFor() == 0;
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new RuntimeException(e);
+    }
   }
 
   public void waitUntilReady(int port, String readyCheckPath, String processName,
       boolean useTLS) {
+    var client = getHttpClient();
+    var request = getHttpRequest(useTLS, readyCheckPath, port);
+    pollWithTimeout(() -> ready(client, request, processName, port), processName);
+  }
+
+  private static void pollWithTimeout(BooleanSupplier predicate, String processName) {
     try {
-      var client = getHttpClient();
-      var request = getHttpRequest(useTLS, readyCheckPath, port);
       var startedAt = LocalTime.now();
       while (true) {
-        if (ready(client, request, processName, port)) {
+        if (predicate.getAsBoolean()) {
           return;
         }
         if (LocalTime.now().isAfter(startedAt.plus(STARTUP_TIMEOUT, ChronoUnit.MILLIS))) {
@@ -89,10 +87,6 @@ public class ProcessReadinessChecker {
       Thread.currentThread().interrupt();
       throw new JenvtestException(e);
     }
-  }
-
-  private static void waitUntilWithTimeout(BooleanSupplier predicate) {
-
   }
 
   private boolean ready(HttpClient client, HttpRequest request, String processName, int port) {
