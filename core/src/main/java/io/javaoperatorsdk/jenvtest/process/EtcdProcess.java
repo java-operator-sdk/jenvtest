@@ -24,14 +24,17 @@ public class EtcdProcess {
   private volatile boolean stopped = false;
   private final UnexpectedProcessStopHandler processStopHandler;
   private final boolean waitForHealthCheck;
+  private final int startupTimeout;
   private File tempWalDir;
   private File tempDataDir;
 
   public EtcdProcess(BinaryManager binaryManager,
-      UnexpectedProcessStopHandler processStopHandler, boolean waitForHealthCheck) {
+      UnexpectedProcessStopHandler processStopHandler, boolean waitForHealthCheck,
+      int startupTimeout) {
     this.binaryManager = binaryManager;
     this.processStopHandler = processStopHandler;
     this.waitForHealthCheck = waitForHealthCheck;
+    this.startupTimeout = startupTimeout;
   }
 
   public int startEtcd() {
@@ -79,7 +82,7 @@ public class EtcdProcess {
   }
 
   private void waitUntilEtcdHealthy(int port) {
-    new ProcessReadinessChecker().waitUntilReady(port, "health", "etcd", false);
+    new ProcessReadinessChecker().waitUntilReady(port, "health", "etcd", false, startupTimeout);
   }
 
   public void cleanEtcdData() {

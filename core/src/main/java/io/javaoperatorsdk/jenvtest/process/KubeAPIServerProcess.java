@@ -87,8 +87,12 @@ public class KubeAPIServerProcess {
 
   public void waitUntilReady() {
     var readinessChecker = new ProcessReadinessChecker();
-    readinessChecker.waitUntilReady(apiServerPort, "readyz", KUBE_API_SERVER, true);
-    readinessChecker.waitUntilDefaultNamespaceAvailable(apiServerPort, binaryManager, certManager);
+    var timeout = config.getStartupTimeout();
+    var startTime = System.currentTimeMillis();
+    readinessChecker.waitUntilReady(apiServerPort, "readyz", KUBE_API_SERVER, true, timeout);
+    int newTimout = (int) (timeout - (System.currentTimeMillis() - startTime));
+    readinessChecker.waitUntilDefaultNamespaceAvailable(apiServerPort, binaryManager, certManager,
+        newTimout);
   }
 
   public void stopApiServer() {

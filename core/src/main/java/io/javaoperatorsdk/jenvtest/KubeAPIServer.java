@@ -31,7 +31,7 @@ public class KubeAPIServer implements UnexpectedProcessStopHandler {
     this.certManager = new CertManager(config.getJenvtestDir());
     this.kubeConfig = new KubeConfig(certManager, binaryManager);
     this.etcdProcess = new EtcdProcess(binaryManager, this,
-        config.isWaitForEtcdHealthCheckOnStartup());
+        config.isWaitForEtcdHealthCheckOnStartup(), config.getStartupTimeout());
     this.kubeApiServerProcess =
         new KubeAPIServerProcess(certManager, binaryManager, this, config);
   }

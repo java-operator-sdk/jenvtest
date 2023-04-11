@@ -12,6 +12,7 @@ public final class KubeAPIServerConfigBuilder {
   public static final String JENVTEST_API_SERVER_VERSION_ENV_VAR = "JENVTEST_API_SERVER_VERSION";
   public static final String JENVTEST_WAIT_FOR_ETCD_HEALTH_CHECK =
       "JENVTEST_WAIT_FOR_ETCD_HEALTH_CHECK";
+  public static final String JENVTEST_STARTUP_TIMEOUT = "JENVTEST_STARTUP_TIMEOUT";
 
   public static final String DIRECTORY_NAME = ".jenvtest";
 
@@ -21,6 +22,7 @@ public final class KubeAPIServerConfigBuilder {
   private boolean updateKubeConfig = false;
   private final List<String> apiServerFlags = new ArrayList<>(0);
   private Boolean waitForEtcdHealthCheckOnStartup;
+  private Integer startupTimeout;
 
   public KubeAPIServerConfigBuilder() {}
 
@@ -75,8 +77,16 @@ public final class KubeAPIServerConfigBuilder {
         this.waitForEtcdHealthCheckOnStartup = false;
       }
     }
+    if (startupTimeout == null) {
+      var envStartupTimeout = System.getenv(JENVTEST_STARTUP_TIMEOUT);
+      if (envStartupTimeout != null) {
+        this.startupTimeout = Integer.parseInt(envStartupTimeout);
+      } else {
+        this.startupTimeout = 30_000;
+      }
+    }
     return new KubeAPIServerConfig(jenvtestDir, apiServerVersion, offlineMode, apiServerFlags,
-        updateKubeConfig, waitForEtcdHealthCheckOnStartup);
+        updateKubeConfig, waitForEtcdHealthCheckOnStartup, startupTimeout);
   }
 
   public KubeAPIServerConfigBuilder withUpdateKubeConfig(boolean updateKubeConfig) {
