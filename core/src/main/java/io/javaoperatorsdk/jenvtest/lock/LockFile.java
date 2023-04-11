@@ -59,7 +59,10 @@ public class LockFile {
           log.warn("Watch key no longer valid");
         }
       }
-    } catch (IOException | InterruptedException e) {
+    } catch (IOException e) {
+      throw new JenvtestException(e);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       throw new JenvtestException(e);
     }
   }

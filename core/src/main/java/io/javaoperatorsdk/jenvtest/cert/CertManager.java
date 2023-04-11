@@ -53,6 +53,9 @@ public class CertManager {
     // locking is for parallel execution
     LockFile lockFile = new LockFile("cert.lock", jenvtestDir);
     if (lockFile.tryLock()) {
+      if (certFilesPresent()) {
+        return;
+      }
       try {
         generateAPIServerCertificates();
         generateUserCertificates();
