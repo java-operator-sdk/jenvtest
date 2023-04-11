@@ -86,11 +86,6 @@ public class KubeAPIServerProcess {
 
   public void waitUntilReady() {
     new ProcessReadinessChecker(apiServerPort, "readyz", "Kube API Server", true).waitUntilReady();
-    try {
-      Thread.sleep(10000);
-    } catch (InterruptedException e) {
-      throw new RuntimeException(e);
-    }
   }
 
   public void stopApiServer() {
