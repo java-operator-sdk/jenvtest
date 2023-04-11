@@ -5,12 +5,14 @@ import org.junit.jupiter.api.Test;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
+import io.javaoperatorsdk.jenvtest.JenvtestException;
 import io.javaoperatorsdk.jenvtest.KubeAPIServer;
 import io.javaoperatorsdk.jenvtest.KubeAPIServerConfigBuilder;
 
 import static io.javaoperatorsdk.jenvtest.sample.TestUtils.NON_LATEST_API_SERVER_VERSION;
 import static io.javaoperatorsdk.jenvtest.sample.TestUtils.simpleTest;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class KubeApiServerTest {
 
@@ -64,6 +66,14 @@ class KubeApiServerTest {
     TestUtils.simpleTest(client);
 
     kubeApi.stop();
+  }
+
+  @Test
+  void canSetStartupTimeout() {
+    var kubeApi = new KubeAPIServer(KubeAPIServerConfigBuilder.anAPIServerConfig()
+        .withStartupTimeout(500)
+        .build());
+    assertThrows(JenvtestException.class, kubeApi::start);
   }
 
   void testWithAPIServer(KubeAPIServer kubeApi) {

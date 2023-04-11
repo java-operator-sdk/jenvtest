@@ -43,19 +43,27 @@ public class KubeAPIServerConfig {
   private final boolean updateKubeConfig;
 
   /**
-   * This is mostly not needed, and increases startup time.
+   * This is mostly not needed, and increases startup time. Might be removed in the future.
    */
   private final boolean waitForEtcdHealthCheckOnStartup;
 
+  /**
+   * Startup timeout of Kube API Server (and ETCD if enabled - might adds up in this case), the
+   * default value is quite high, to support parallel tests. Tuning is possible based on the actual
+   * setup.
+   */
+  private final int startupTimeout;
+
   KubeAPIServerConfig(String jenvtestDir, String apiServerVersion, boolean offlineMode,
       List<String> apiServerFlags, boolean updateKubeConfig,
-      boolean waitForEtcdHealthCheckOnStartup) {
+      boolean waitForEtcdHealthCheckOnStartup, int startupTimeout) {
     this.jenvtestDir = jenvtestDir;
     this.apiServerVersion = apiServerVersion;
     this.offlineMode = offlineMode;
     this.apiServerFlags = apiServerFlags;
     this.updateKubeConfig = updateKubeConfig;
     this.waitForEtcdHealthCheckOnStartup = waitForEtcdHealthCheckOnStartup;
+    this.startupTimeout = startupTimeout;
   }
 
   public String getJenvtestDir() {
@@ -80,5 +88,9 @@ public class KubeAPIServerConfig {
 
   public boolean isWaitForEtcdHealthCheckOnStartup() {
     return waitForEtcdHealthCheckOnStartup;
+  }
+
+  public int getStartupTimeout() {
+    return startupTimeout;
   }
 }

@@ -34,15 +34,13 @@ public class ProcessReadinessChecker {
 
   private static final Logger log = LoggerFactory.getLogger(ProcessReadinessChecker.class);
 
-  public static final int STARTUP_TIMEOUT = 60_000;
   public static final int POLLING_INTERVAL = 200;
-
 
   public void waitUntilDefaultNamespaceAvailable(int apiServerPort,
       BinaryManager binaryManager,
-      CertManager certManager) {
+      CertManager certManager, int timeoutMillis) {
     pollWithTimeout(() -> defaultNamespaceExists(apiServerPort, binaryManager, certManager),
-        KUBE_API_SERVER);
+        KUBE_API_SERVER, timeoutMillis);
   }
 
   private boolean defaultNamespaceExists(int apiServerPort, BinaryManager binaryManager,
@@ -65,20 +63,21 @@ public class ProcessReadinessChecker {
   }
 
   public void waitUntilReady(int port, String readyCheckPath, String processName,
-      boolean useTLS) {
+      boolean useTLS, int timeoutMillis) {
     var client = getHttpClient();
     var request = getHttpRequest(useTLS, readyCheckPath, port);
-    pollWithTimeout(() -> ready(client, request, processName, port), processName);
+    pollWithTimeout(() -> ready(client, request, processName, port), processName, timeoutMillis);
   }
 
-  private static void pollWithTimeout(BooleanSupplier predicate, String processName) {
+  private static void pollWithTimeout(BooleanSupplier predicate, String processName,
+      int timeoutMillis) {
     try {
       var startedAt = LocalTime.now();
       while (true) {
         if (predicate.getAsBoolean()) {
           return;
         }
-        if (LocalTime.now().isAfter(startedAt.plus(STARTUP_TIMEOUT, ChronoUnit.MILLIS))) {
+        if (LocalTime.now().isAfter(startedAt.plus(timeoutMillis, ChronoUnit.MILLIS))) {
           throw new JenvtestException(processName + " did not start properly");
         }
         Thread.sleep(POLLING_INTERVAL);
