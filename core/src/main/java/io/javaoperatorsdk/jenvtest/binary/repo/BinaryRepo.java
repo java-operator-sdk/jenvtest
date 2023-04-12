@@ -7,6 +7,9 @@ import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
@@ -23,14 +26,13 @@ public class BinaryRepo {
 
   private static final Logger log = LoggerFactory.getLogger(BinaryRepo.class);
 
-  private static final String BUCKET_NAME = "kubebuilder-tools";
-
   private final OSInfo osInfo;
+  private static List<String> objectNames;
+  private static final ReentrantLock downloadLock = new ReentrantLock();
 
   public BinaryRepo(OSInfo osInfo) {
     this.osInfo = osInfo;
   }
-
 
   public File downloadVersionToTempFile(String version) {
     try {
@@ -47,25 +49,33 @@ public class BinaryRepo {
   }
 
   public Stream<String> listObjectNames() {
+    downloadLock.lock();
     try {
-      var httpClient = HttpClient.newBuilder()
-          .build();
+      if (objectNames == null) {
+        log.debug("Listing objects from storage");
+        var httpClient = HttpClient.newBuilder()
+            .build();
 
-      HttpRequest request = HttpRequest.newBuilder()
-          .GET()
-          .uri(URI.create("https://storage.googleapis.com/storage/v1/b/kubebuilder-tools/o"))
-          .build();
+        HttpRequest request = HttpRequest.newBuilder()
+            .GET()
+            .uri(URI.create("https://storage.googleapis.com/storage/v1/b/kubebuilder-tools/o"))
+            .build();
 
-      var response = httpClient.send(request, HttpResponse.BodyHandlers.ofString()).body();
-      ObjectMapper mapper =
-          new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-      ObjectList objectList = mapper.readValue(response, ObjectList.class);
-      return objectList.getItems().stream().map(ObjectListItem::getName);
+        var response = httpClient.send(request, HttpResponse.BodyHandlers.ofString()).body();
+        ObjectMapper mapper =
+            new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        ObjectList objectList = mapper.readValue(response, ObjectList.class);
+        objectNames = objectList.getItems().stream().map(ObjectListItem::getName)
+            .collect(Collectors.toList());
+      }
+      return objectNames.stream();
     } catch (IOException e) {
       throw new JenvtestException(e);
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
       throw new JenvtestException(e);
+    } finally {
+      downloadLock.unlock();
     }
   }
 

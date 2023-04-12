@@ -5,6 +5,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -17,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import io.javaoperatorsdk.jenvtest.JenvtestException;
 import io.javaoperatorsdk.jenvtest.Utils;
 import io.javaoperatorsdk.jenvtest.binary.repo.BinaryRepo;
-import io.javaoperatorsdk.jenvtest.lock.LockFile;
 
 public class BinaryDownloader {
 
@@ -28,6 +30,7 @@ public class BinaryDownloader {
   private final String jenvtestDir;
   private final BinaryRepo binaryRepo;
   private final OSInfo osInfoProvider;
+  private static final Map<String, ReentrantLock> versionLocks = new ConcurrentHashMap<>();
 
   public BinaryDownloader(String jenvtestDir, OSInfo osInfoProvider) {
     this.jenvtestDir = jenvtestDir;
@@ -42,31 +45,27 @@ public class BinaryDownloader {
   }
 
   public File download(String version) {
-    log.info("Downloading binaries with version: {}", version);
-    var downloadDir = new File(jenvtestDir, BinaryManager.BINARY_LIST_DIR);
-    downloadDir.mkdirs();
-    LockFile lock =
-        new LockFile(version + ".lock", downloadDir.getPath());
+    var lock = versionLocks.computeIfAbsent(version, v -> new ReentrantLock());
     var dirForVersion = dirForVersion(version);
-    if (lock.tryLock()) {
+    lock.lock();
+    try {
       if (dirForVersion.exists()) {
         return dirForVersion;
       }
+      new File(jenvtestDir, BinaryManager.BINARY_LIST_DIR).mkdirs();
+      log.info("Downloading binaries with version: {}", version);
       var tempFile = binaryRepo.downloadVersionToTempFile(version);
       File dir = createDirForBinaries(version);
       extractFiles(tempFile, dir);
+      log.debug("Binary downloaded and extracted");
       var deleted = tempFile.delete();
       if (!deleted) {
         log.warn("Unable to delete temp file: {}", tempFile.getPath());
       }
-      lock.releaseLock();
-      return dir;
-    } else {
-      log.debug("Waiting for lock to be deleted for version: {}", version);
-      lock.waitUntilLockDeleted();
-      log.debug("Lock deleted for version: {}", version);
-      return dirForVersion;
+    } finally {
+      lock.unlock();
     }
+    return dirForVersion;
   }
 
   public File downloadLatest() {
