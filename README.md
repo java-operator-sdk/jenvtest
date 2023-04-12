@@ -64,30 +64,19 @@ it's [usage in a test](https://github.com/java-operator-sdk/jenvtest/blob/main/c
 
 ```java
 class KubeApiServerTest {
-
+    
     @Test
-    void trivialCase() {
-        testWithAPIServer(new KubeAPIServer());
-    }
-
-    @Test
-    void apiServerWithSpecificVersion() {
-        testWithAPIServer(new KubeAPIServer(
-                KubeAPIServerConfigBuilder.anAPIServerConfig()
-                        .withApiServerVersion("1.26.0")
-                        .build()));
-    }
-
-
-    void testWithAPIServer(KubeAPIServer kubeApi) {
+    void apiServerTest() {
+        var kubeApi = new KubeAPIServer();
         kubeApi.start();
 
-        var client = new KubernetesClientBuilder().build();
+        var client = createClient(kubeApi.getKubeConfigYaml());
+        
         client.resource(TestUtils.testConfigMap()).create();
+        
         var cm = client.resource(TestUtils.testConfigMap()).get();
-
         Assertions.assertThat(cm).isNotNull();
-
+        
         kubeApi.stop();
     }
 }
