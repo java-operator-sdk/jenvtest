@@ -84,7 +84,7 @@ class KubeApiServerTest {
 
 ### Fabric8 Kubernetes Client Support 
 
-There is a dedicated support for [Fabric8 Kubernetes Client](https://github.com/fabric8io/kubernetes-client).
+There is dedicated support for [Fabric8 Kubernetes Client](https://github.com/fabric8io/kubernetes-client).
 
 Using dependency:
 
@@ -109,6 +109,12 @@ class JUnitFabric8ClientInjectionTest {
     // emitted code     
 }  
 ```
+
+### Support for Parallel Execution in Junit5
+
+Parallel test execution is explicitly supported for JUnit5, in fact the project tests are running parallel. 
+Running a new instance for each test case. This speeds up the tests (in our case >75%) in a way that test cases are also
+fully isolated from each other. See the [surefire plugin config](https://github.com/csviri/jenvtest/blob/6bb0510208d33cc64938b7a4518ecd0c21de8b26/pom.xml#L222-L237). 
 
 ### Testing Mutation and Validation Webhooks
 
