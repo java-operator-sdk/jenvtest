@@ -12,6 +12,7 @@ import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
@@ -28,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.javaoperatorsdk.jenvtest.JenvtestException;
-import io.javaoperatorsdk.jenvtest.lock.LockFile;
 
 public class CertManager {
 
@@ -40,6 +40,8 @@ public class CertManager {
   public static final String CLIENT_KEY_NAME = "client.key";
   public static final String CLIENT_CERT_NAME = "client.crt";
 
+  private static final ReentrantLock generatorLock = new ReentrantLock();
+
   private String jenvtestDir;
 
   public CertManager(String jenvtestDir) {
@@ -50,20 +52,15 @@ public class CertManager {
     if (certFilesPresent()) {
       return;
     }
-    // locking is for parallel execution
-    LockFile lockFile = new LockFile("cert.lock", jenvtestDir);
-    if (lockFile.tryLock()) {
+    generatorLock.lock();
+    try {
       if (certFilesPresent()) {
         return;
       }
-      try {
-        generateAPIServerCertificates();
-        generateUserCertificates();
-      } finally {
-        lockFile.releaseLock();
-      }
-    } else {
-      lockFile.waitUntilLockDeleted();
+      generateAPIServerCertificates();
+      generateUserCertificates();
+    } finally {
+      generatorLock.unlock();
     }
   }
 
