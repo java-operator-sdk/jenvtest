@@ -70,7 +70,9 @@ class KubeApiServerTest {
         var kubeApi = new KubeAPIServer();
         kubeApi.start();
 
-        var client = createClient(kubeApi.getKubeConfigYaml());
+        var client =  new KubernetesClientBuilder()
+                .withConfig(Config.fromKubeconfig(kubeApi.getKubeConfigYaml()))
+                .build();
         
         client.resource(TestUtils.testConfigMap()).create();
         
