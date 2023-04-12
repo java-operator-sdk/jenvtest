@@ -7,20 +7,21 @@ import java.util.List;
 public final class KubeAPIServerConfigBuilder {
 
   // environment variables
-  public static final String JENVTEST_DOWNLOAD_BINARIES = "JENVTEST_OFFLINE_MODE";
-  public static final String JENVTEST_DIR_ENV_VAR = "JENVTEST_DIR";
-  public static final String JENVTEST_API_SERVER_VERSION_ENV_VAR = "JENVTEST_API_SERVER_VERSION";
+  public static final String JENVTEST_OFFLINE_MODE = "JENVTEST_OFFLINE_MODE";
+  public static final String JENVTEST_DIR = "JENVTEST_DIR";
+  public static final String JENVTEST_KUBE_API_SERVER_VERSION = "JENVTEST_KUBE_API_SERVER_VERSION";
   public static final String JENVTEST_WAIT_FOR_ETCD_HEALTH_CHECK =
       "JENVTEST_WAIT_FOR_ETCD_HEALTH_CHECK";
   public static final String JENVTEST_STARTUP_TIMEOUT = "JENVTEST_STARTUP_TIMEOUT";
 
   public static final String DIRECTORY_NAME = ".jenvtest";
 
+  private final List<String> apiServerFlags = new ArrayList<>(0);
+  private boolean updateKubeConfig = false;
+
   private String jenvtestDir;
   private String apiServerVersion;
   private Boolean offlineMode;
-  private boolean updateKubeConfig = false;
-  private final List<String> apiServerFlags = new ArrayList<>(0);
   private Boolean waitForEtcdHealthCheckOnStartup;
   private Integer startupTimeout;
 
@@ -46,47 +47,42 @@ public final class KubeAPIServerConfigBuilder {
   }
 
   public KubeAPIServerConfig build() {
-    if (jenvtestDir == null) {
-      var jenvtestDirFromEnvVar = System.getenv(JENVTEST_DIR_ENV_VAR);
-      if (jenvtestDirFromEnvVar != null) {
-        this.jenvtestDir = jenvtestDirFromEnvVar;
-      } else {
-        this.jenvtestDir = new File(System.getProperty("user.home"), DIRECTORY_NAME).getPath();
-      }
-    }
-    if (offlineMode == null) {
-      var downloadBinariesEnvVal = System.getenv(JENVTEST_DOWNLOAD_BINARIES);
-      if (downloadBinariesEnvVal != null) {
-        this.offlineMode = Boolean.parseBoolean(downloadBinariesEnvVal);
-      } else {
-        this.offlineMode = false;
-      }
-    }
-    if (apiServerVersion == null) {
-      var apiServerVersionEnvVar = System.getenv(JENVTEST_API_SERVER_VERSION_ENV_VAR);
-      if (apiServerVersionEnvVar != null) {
-        this.apiServerVersion = apiServerVersionEnvVar;
-      }
-    }
-    if (waitForEtcdHealthCheckOnStartup == null) {
-      var waitForEtcdHealthCheckOnStartup = System.getenv(JENVTEST_WAIT_FOR_ETCD_HEALTH_CHECK);
-      if (waitForEtcdHealthCheckOnStartup != null) {
-        this.waitForEtcdHealthCheckOnStartup =
-            Boolean.parseBoolean(waitForEtcdHealthCheckOnStartup);
-      } else {
-        this.waitForEtcdHealthCheckOnStartup = false;
-      }
-    }
-    if (startupTimeout == null) {
-      var envStartupTimeout = System.getenv(JENVTEST_STARTUP_TIMEOUT);
-      if (envStartupTimeout != null) {
-        this.startupTimeout = Integer.parseInt(envStartupTimeout);
-      } else {
-        this.startupTimeout = 60_000;
-      }
-    }
+    this.jenvtestDir = finalConfigValue(this.jenvtestDir, JENVTEST_DIR,
+        new File(System.getProperty("user.home"), DIRECTORY_NAME).getPath());
+    this.offlineMode = finalConfigValue(this.offlineMode, JENVTEST_OFFLINE_MODE, false);
+    this.apiServerVersion =
+        finalConfigValue(this.apiServerVersion, JENVTEST_KUBE_API_SERVER_VERSION, null);
+    this.waitForEtcdHealthCheckOnStartup = finalConfigValue(this.waitForEtcdHealthCheckOnStartup,
+        JENVTEST_WAIT_FOR_ETCD_HEALTH_CHECK, false);
+    this.startupTimeout = finalConfigValue(this.startupTimeout, JENVTEST_STARTUP_TIMEOUT, 60_000);
+
     return new KubeAPIServerConfig(jenvtestDir, apiServerVersion, offlineMode, apiServerFlags,
         updateKubeConfig, waitForEtcdHealthCheckOnStartup, startupTimeout);
+  }
+
+  private String finalConfigValue(String currentValue, String envVariable, String defaultValue) {
+    return finalConfigValue(String.class, currentValue, envVariable, defaultValue);
+  }
+
+  private Boolean finalConfigValue(Boolean currentValue, String envVariable, Boolean defaultValue) {
+    return finalConfigValue(Boolean.class, currentValue, envVariable, defaultValue);
+  }
+
+  private Integer finalConfigValue(Integer currentValue, String envVariable, Integer defaultValue) {
+    return finalConfigValue(Integer.class, currentValue, envVariable, defaultValue);
+  }
+
+  private <T> T finalConfigValue(Class<T> type, T currentValue, String envVariable,
+      T defaultValue) {
+    if (currentValue != null) {
+      return currentValue;
+    }
+    var envValue = System.getenv(envVariable);
+    if (envValue != null) {
+      return type.cast(envValue);
+    } else {
+      return defaultValue;
+    }
   }
 
   public KubeAPIServerConfigBuilder withUpdateKubeConfig(boolean updateKubeConfig) {
