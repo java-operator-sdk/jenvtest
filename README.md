@@ -93,7 +93,7 @@ Using dependency:
 ```xml
 <dependency>
     <groupId>io.javaoperatorsdk</groupId>
-    <artifactId>jenvtest-fabric8-client</artifactId>
+    <artifactId>jenvtest-fabric8-client-support</artifactId>
     <version>[version]</version>
     <scope>test</scope>
 </dependency>
