@@ -9,7 +9,7 @@
         <version>0.8.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>jenvtest-fabric8-client</artifactId>
+    <artifactId>jenvtest-fabric8-client-support</artifactId>
     <packaging>jar</packaging>
     <name>JEnvTest Fabric8 Client Support</name>
 
