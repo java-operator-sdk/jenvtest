@@ -58,7 +58,6 @@
         <nexus-staging-maven-plugin.version>1.6.13</nexus-staging-maven-plugin.version>
         <maven-javadoc-plugin.version>3.5.0</maven-javadoc-plugin.version>
         <jackson.version>2.14.2</jackson.version>
-
         <sonar.organization>java-operator-sdk</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
@@ -84,6 +83,7 @@
     <modules>
         <module>core</module>
         <module>fabric8</module>
+        <module>quarkus</module>
     </modules>
 
     <dependencyManagement>
