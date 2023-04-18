@@ -10,6 +10,7 @@ import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import io.javaoperatorsdk.jenvtest.KubeAPIServer;
 import io.javaoperatorsdk.jenvtest.KubeAPIServerConfig;
 import io.javaoperatorsdk.jenvtest.KubeAPIServerConfigBuilder;
+import io.quarkus.arc.DefaultBean;
 
 public class QuarkusTestConfiguration {
 
@@ -24,6 +25,7 @@ public class QuarkusTestConfiguration {
 
   @Produces
   @Singleton
+  @DefaultBean
   public KubeAPIServerConfig kubeAPIServerConfig() {
     return new KubeAPIServerConfigBuilder().build();
   }

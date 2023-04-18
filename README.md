@@ -112,6 +112,37 @@ class JUnitFabric8ClientInjectionTest {
 }  
 ```
 
+### Quarkus Support
+
+Quarkus is explicitly supporter, although it is kinda limited for now. By including the following dependency:
+
+```xml
+<dependency>
+    <groupId>io.javaoperatorsdk</groupId>
+    <artifactId>jenvtest-quarkus-support</artifactId>
+    <version>[version]</version>
+    <scope>test</scope>
+</dependency>
+```
+
+Injecting a Kubernetes client is supported from in the tests, that will spin up a KubeApiServer instance in the 
+background:
+
+```java
+
+@QuarkusTest
+class QuarkusSupportTest {
+
+  @Inject
+  KubernetesClient client;
+
+  @Test
+  void setsUpJenvtestServerAndClient() {
+    assertThat(client.getKubernetesVersion().getGitVersion()).startsWith("v1.26");
+  }
+}
+```
+
 ### Support for Parallel Execution in Junit5
 
 Parallel test execution is explicitly supported for JUnit5, in fact the project tests are running parallel. 
