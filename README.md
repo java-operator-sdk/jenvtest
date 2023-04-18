@@ -137,8 +137,8 @@ class QuarkusSupportTest {
   KubernetesClient client;
 
   @Test
-  void setsUpJenvtestServerAndClient() {
-    assertThat(client.getKubernetesVersion().getGitVersion()).startsWith("v1.26");
+  void testAgainstAPIServer() {
+    // test code using the client
   }
 }
 ```
