@@ -2,7 +2,6 @@ package io.javaoperatorsdk.jenvtest.quarkus;
 
 import javax.enterprise.inject.Disposes;
 import javax.enterprise.inject.Produces;
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 import io.fabric8.kubernetes.client.Config;
@@ -13,8 +12,6 @@ import io.javaoperatorsdk.jenvtest.KubeAPIServerConfig;
 import io.javaoperatorsdk.jenvtest.KubeAPIServerConfigBuilder;
 
 public class QuarkusTestConfiguration {
-
-  public static final String JENVTEST_CLIENT = "jenvtestClient";
 
   @Produces
   @Singleton
@@ -35,8 +32,6 @@ public class QuarkusTestConfiguration {
     kubeAPIServer.stop();
   }
 
-  @Named(JENVTEST_CLIENT)
-  @JenvtestClient
   @Produces
   @Singleton
   public KubernetesClient kubeApiServerClient(KubeAPIServer kubeAPIServer) {
@@ -45,7 +40,7 @@ public class QuarkusTestConfiguration {
         .build();
   }
 
-  public void closeClient(@Named(JENVTEST_CLIENT) @Disposes KubernetesClient kubernetesClient) {
+  public void closeClient(@Disposes KubernetesClient kubernetesClient) {
     kubernetesClient.close();
   }
 
