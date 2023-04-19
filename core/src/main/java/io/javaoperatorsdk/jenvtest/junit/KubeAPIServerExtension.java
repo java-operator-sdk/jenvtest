@@ -89,7 +89,10 @@ public class KubeAPIServerExtension
   private void stopIfAnnotationPresent(ExtensionContext extensionContext) {
     extensionContext.getElement().ifPresent(ae -> {
       var annotation = getExtensionAnnotationInstance(ae);
-      annotation.ifPresent(a -> kubeApiServer.stop());
+      annotation.ifPresent(a -> {
+        clientInjectionHandlers.forEach(ih -> ih.cleanup(extensionContext));
+        kubeApiServer.stop();
+      });
     });
   }
 
