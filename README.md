@@ -114,7 +114,7 @@ class JUnitFabric8ClientInjectionTest {
 
 ### Quarkus Support
 
-Quarkus is explicitly supporter, although it is kinda limited for now. By including the following dependency:
+Quarkus is explicitly supported although it is currently limited. To use JEnvTest from Quarkus, include the following dependency:
 
 ```xml
 <dependency>
