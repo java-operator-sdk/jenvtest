@@ -23,10 +23,10 @@ public class Fabric8ClientInjectionHandler implements ClientInjectionHandler {
   public void inject(ExtensionContext extensionContext,
       boolean staticField, KubeAPIServer kubeApiServer) {
     var field = getFieldForKubeConfigInjection(extensionContext, staticField).orElseThrow();
-    setKubeConfigYamlToField(extensionContext, field, kubeApiServer);
+    setKubernetesClientToField(extensionContext, field, kubeApiServer);
   }
 
-  private void setKubeConfigYamlToField(ExtensionContext extensionContext,
+  private void setKubernetesClientToField(ExtensionContext extensionContext,
       Field kubeConfigField, KubeAPIServer kubeApiServer) {
     try {
       var target = extensionContext.getTestInstance()
