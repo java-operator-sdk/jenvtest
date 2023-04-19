@@ -15,11 +15,14 @@ import io.javaoperatorsdk.jenvtest.KubeAPIServer;
 
 public class Fabric8ClientInjectionHandler implements ClientInjectionHandler {
 
+  private KubernetesClient client;
+
   public boolean isTargetFieldAvailable(ExtensionContext extensionContext,
       boolean staticField) {
     return getFieldForKubeConfigInjection(extensionContext, staticField).isPresent();
   }
 
+  @Override
   public void inject(ExtensionContext extensionContext,
       boolean staticField, KubeAPIServer kubeApiServer) {
     var field = getFieldForKubeConfigInjection(extensionContext, staticField).orElseThrow();
@@ -31,13 +34,18 @@ public class Fabric8ClientInjectionHandler implements ClientInjectionHandler {
     try {
       var target = extensionContext.getTestInstance()
           .orElseGet(() -> extensionContext.getTestClass().orElseThrow());
+      client = new KubernetesClientBuilder()
+          .withConfig(Config.fromKubeconfig(kubeApiServer.getKubeConfigYaml())).build();
       kubeConfigField.setAccessible(true);
-      kubeConfigField.set(target, new KubernetesClientBuilder()
-          .withConfig(Config.fromKubeconfig(kubeApiServer.getKubeConfigYaml()))
-          .build());
+      kubeConfigField.set(target, client);
     } catch (IllegalAccessException e) {
       throw new JenvtestException(e);
     }
+  }
+
+  @Override
+  public void cleanup(ExtensionContext extensionContext) {
+    client.close();
   }
 
   @SuppressWarnings("rawtypes")

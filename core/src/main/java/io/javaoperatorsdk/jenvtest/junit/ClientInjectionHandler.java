@@ -11,4 +11,6 @@ public interface ClientInjectionHandler {
 
   void inject(ExtensionContext extensionContext,
       boolean staticField, KubeAPIServer kubeApiServer);
+
+  default void cleanup(ExtensionContext extensionContext) {}
 }
