@@ -125,7 +125,7 @@ Quarkus is explicitly supported although it is currently limited. To use JEnvTes
 </dependency>
 ```
 
-Injecting a Kubernetes client is supported from in the tests, that will spin up a KubeApiServer instance in the 
+JEnvTest works by injecting a specific Kubernetes client in your tests that is configured to access an automatically started Kubernetes API server instance in the 
 background:
 
 ```java
