@@ -19,25 +19,25 @@ public class Fabric8ClientInjectionHandler implements ClientInjectionHandler {
 
   public boolean isTargetFieldAvailable(ExtensionContext extensionContext,
       boolean staticField) {
-    return getFieldForKubeConfigInjection(extensionContext, staticField).isPresent();
+    return getFieldForKubeClientInjection(extensionContext, staticField).isPresent();
   }
 
   @Override
   public void inject(ExtensionContext extensionContext,
       boolean staticField, KubeAPIServer kubeApiServer) {
-    var field = getFieldForKubeConfigInjection(extensionContext, staticField).orElseThrow();
+    var field = getFieldForKubeClientInjection(extensionContext, staticField).orElseThrow();
     setKubernetesClientToField(extensionContext, field, kubeApiServer);
   }
 
   private void setKubernetesClientToField(ExtensionContext extensionContext,
-      Field kubeConfigField, KubeAPIServer kubeApiServer) {
+      Field kubeClientField, KubeAPIServer kubeApiServer) {
     try {
       var target = extensionContext.getTestInstance()
           .orElseGet(() -> extensionContext.getTestClass().orElseThrow());
       client = new KubernetesClientBuilder()
           .withConfig(Config.fromKubeconfig(kubeApiServer.getKubeConfigYaml())).build();
-      kubeConfigField.setAccessible(true);
-      kubeConfigField.set(target, client);
+      kubeClientField.setAccessible(true);
+      kubeClientField.set(target, client);
     } catch (IllegalAccessException e) {
       throw new JenvtestException(e);
     }
@@ -48,8 +48,7 @@ public class Fabric8ClientInjectionHandler implements ClientInjectionHandler {
     client.close();
   }
 
-  @SuppressWarnings("rawtypes")
-  public static Optional<Field> getFieldForKubeConfigInjection(ExtensionContext extensionContext,
+  public static Optional<Field> getFieldForKubeClientInjection(ExtensionContext extensionContext,
       boolean staticField) {
     Class<?> clazz = extensionContext.getTestClass().orElseThrow();
     var kubeConfigFields = Arrays.stream(clazz.getDeclaredFields())
