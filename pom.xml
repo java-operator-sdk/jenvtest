@@ -35,7 +35,7 @@
     <properties>
         <junit.version>5.9.2</junit.version>
         <slf4j.version>2.0.9</slf4j.version>
-        <log4j.version>2.20.0</log4j.version>
+        <log4j.version>2.21.1</log4j.version>
         <awaitility.version>4.2.0</awaitility.version>
         <fabric8-client.version>6.5.1</fabric8-client.version>
         <assertj.version>3.24.2</assertj.version>
@@ -45,18 +45,18 @@
         <google.cloud.libraries.version>26.12.0</google.cloud.libraries.version>
         <commons-io.version>2.13.0</commons-io.version>
         <bouncycastle.version>1.75</bouncycastle.version>
-        <mokito.version>5.5.0</mokito.version>
+        <mokito.version>5.7.0</mokito.version>
         <maven.compiler.target>11</maven.compiler.target>
         <maven.compiler.source>11</maven.compiler.source>
         <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
-        <maven-surefire-plugin.version>3.1.0</maven-surefire-plugin.version>
+        <maven-surefire-plugin.version>3.2.2</maven-surefire-plugin.version>
         <impsort-maven-plugin.version>1.9.0</impsort-maven-plugin.version>
         <formatter-maven-plugin.version>2.22.0</formatter-maven-plugin.version>
         <directory-maven-plugin.version>1.0</directory-maven-plugin.version>
         <jetty.version>12.0.3</jetty.version>
         <kubernetes.webhooks.framework.version>1.0.0</kubernetes.webhooks.framework.version>
         <nexus-staging-maven-plugin.version>1.6.13</nexus-staging-maven-plugin.version>
-        <maven-javadoc-plugin.version>3.5.0</maven-javadoc-plugin.version>
+        <maven-javadoc-plugin.version>3.6.2</maven-javadoc-plugin.version>
         <jackson.version>2.14.2</jackson.version>
 
         <sonar.organization>java-operator-sdk</sonar.organization>
@@ -226,11 +226,12 @@
                 <configuration>
                     <properties>
                         <configurationParameters>
-                            junit.jupiter.execution.parallel.enabled = true
-                            junit.jupiter.execution.parallel.mode.default = concurrent
-                            junit.jupiter.execution.parallel.mode.classes.default = concurrent
-                            junit.jupiter.execution.parallel.config.strategy = fixed
-                            junit.jupiter.execution.parallel.config.fixed.parallelism = 5
+<!--                            Uncomment for parallel build -->
+<!--                            junit.jupiter.execution.parallel.enabled = true-->
+<!--                            junit.jupiter.execution.parallel.mode.default = concurrent-->
+<!--                            junit.jupiter.execution.parallel.mode.classes.default = concurrent-->
+<!--                            junit.jupiter.execution.parallel.config.strategy = fixed-->
+<!--                            junit.jupiter.execution.parallel.config.fixed.parallelism = 5-->
                         </configurationParameters>
                     </properties>
                 </configuration>
