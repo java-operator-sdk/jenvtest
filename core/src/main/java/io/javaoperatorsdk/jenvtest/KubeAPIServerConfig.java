@@ -18,7 +18,7 @@ public class KubeAPIServerConfig {
   private final String apiServerVersion;
 
   /**
-   * If true, tries to download binaries. If the apiServerVersion is not set and some local binaries
+   * If true, does not download binaries. If the apiServerVersion is not set and some local binaries
    * found won't try to download them again.
    */
   private final boolean offlineMode;
