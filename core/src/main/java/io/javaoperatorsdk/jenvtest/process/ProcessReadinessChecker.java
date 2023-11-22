@@ -14,6 +14,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Map;
 import java.util.function.BooleanSupplier;
 
 import javax.net.ssl.SSLContext;
@@ -25,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.javaoperatorsdk.jenvtest.JenvtestException;
+import io.javaoperatorsdk.jenvtest.KubeAPIServerConfig;
 import io.javaoperatorsdk.jenvtest.binary.BinaryManager;
 import io.javaoperatorsdk.jenvtest.cert.CertManager;
 
@@ -36,23 +38,36 @@ public class ProcessReadinessChecker {
 
   public static final int POLLING_INTERVAL = 200;
 
-  public void waitUntilDefaultNamespaceAvailable(int apiServerPort,
-      BinaryManager binaryManager,
-      CertManager certManager, int timeoutMillis) {
-    pollWithTimeout(() -> defaultNamespaceExists(apiServerPort, binaryManager, certManager),
+  public void waitUntilDefaultNamespaceAvailable(int apiServerPort, BinaryManager binaryManager,
+      CertManager certManager, KubeAPIServerConfig config, int timeoutMillis) {
+    pollWithTimeout(() -> defaultNamespaceExists(apiServerPort, binaryManager, certManager, config),
         KUBE_API_SERVER, timeoutMillis);
   }
 
   private boolean defaultNamespaceExists(int apiServerPort, BinaryManager binaryManager,
-      CertManager certManager) {
+      CertManager certManager, KubeAPIServerConfig config) {
     try {
-      Process process = new ProcessBuilder(binaryManager.binaries().getKubectl().getPath(),
-          "--client-certificate=" + certManager.getClientCertPath(),
-          "--client-key=" + certManager.getClientKeyPath(),
-          "--certificate-authority=" + certManager.getAPIServerCertPath(),
-          "--server=https://127.0.0.1:" + apiServerPort,
-          "--request-timeout=5s",
-          "get", "ns", "default").start();
+      ProcessBuilder processBuilder =
+          new ProcessBuilder(binaryManager.binaries().getKubectl().getPath(),
+              "--client-certificate=" + certManager.getClientCertPath(),
+              "--client-key=" + certManager.getClientKeyPath(),
+              "--certificate-authority=" + certManager.getAPIServerCertPath(),
+              "--server=https://127.0.0.1:" + apiServerPort,
+              "--request-timeout=5s",
+              "get", "ns", "default");
+
+      if (!config.isUpdateKubeConfig()) {
+        // When the default kubeconfig file contains default context using client-certificate-data
+        // or client-key-data, kubectl will fail because it will not know which one to use and the
+        // readiness check will never pass. To avoid that, we set the KUBECONFIG environment
+        // variable to an non-existent kubeconfig file. This cannot be done using the --kubeconfig
+        // option to kubectl, because kubectl will complain if such file does not exist, but when
+        // set through KUBECONFIG env. variable, it does not complain.
+        Map<String, String> env = processBuilder.environment();
+        env.put("KUBECONFIG", config.getJenvtestDir() + "/.kubeconfig");
+      }
+
+      Process process = processBuilder.start();
       return process.waitFor() == 0;
     } catch (IOException e) {
       throw new JenvtestException(e);
