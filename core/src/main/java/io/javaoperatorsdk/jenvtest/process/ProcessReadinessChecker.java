@@ -112,7 +112,7 @@ public class ProcessReadinessChecker {
       return response.statusCode() == 200;
     } catch (ConnectException e) {
       // still want to retry
-      log.warn("Cannot connect to the server", e);
+      log.debug("Cannot connect to the server", e);
       return false;
     } catch (IOException e) {
       throw new JenvtestException(e);
