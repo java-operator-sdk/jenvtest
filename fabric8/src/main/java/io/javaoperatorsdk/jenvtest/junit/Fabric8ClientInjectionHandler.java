@@ -45,7 +45,9 @@ public class Fabric8ClientInjectionHandler implements ClientInjectionHandler {
 
   @Override
   public void cleanup(ExtensionContext extensionContext) {
-    client.close();
+    if (client != null) {
+      client.close();
+    }
   }
 
   public static Optional<Field> getFieldForKubeClientInjection(ExtensionContext extensionContext,
