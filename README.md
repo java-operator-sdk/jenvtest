@@ -112,6 +112,37 @@ class JUnitFabric8ClientInjectionTest {
 }  
 ```
 
+### Quarkus Support
+
+Quarkus is explicitly supported although it is currently limited. To use JEnvTest from Quarkus, include the following dependency:
+
+```xml
+<dependency>
+    <groupId>io.javaoperatorsdk</groupId>
+    <artifactId>jenvtest-quarkus-support</artifactId>
+    <version>[version]</version>
+    <scope>test</scope>
+</dependency>
+```
+
+JEnvTest works by injecting a specific Kubernetes client in your tests that is configured to access an automatically started Kubernetes API server instance in the 
+background:
+
+```java
+
+@QuarkusTest
+class QuarkusSupportTest {
+
+  @Inject
+  KubernetesClient client;
+
+  @Test
+  void testAgainstAPIServer() {
+    // test code using the client
+  }
+}
+```
+
 ### Support for Parallel Execution in Junit5
 
 Parallel test execution is explicitly supported for JUnit5, in fact the project tests are running parallel. 
