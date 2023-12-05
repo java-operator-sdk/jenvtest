@@ -57,7 +57,7 @@
         <kubernetes.webhooks.framework.version>1.0.0</kubernetes.webhooks.framework.version>
         <nexus-staging-maven-plugin.version>1.6.13</nexus-staging-maven-plugin.version>
         <maven-javadoc-plugin.version>3.6.3</maven-javadoc-plugin.version>
-        <jackson.version>2.14.2</jackson.version>
+        <jackson.version>2.16.0</jackson.version>
 
         <sonar.organization>java-operator-sdk</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
