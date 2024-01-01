@@ -38,7 +38,7 @@
         <log4j.version>2.22.0</log4j.version>
         <awaitility.version>4.2.0</awaitility.version>
         <fabric8-client.version>6.9.2</fabric8-client.version>
-        <assertj.version>3.24.2</assertj.version>
+        <assertj.version>3.25.0</assertj.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <commons-compress.version>1.25.0</commons-compress.version>
