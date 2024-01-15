@@ -45,7 +45,7 @@
         <google.cloud.libraries.version>26.12.0</google.cloud.libraries.version>
         <commons-io.version>2.15.0</commons-io.version>
         <bouncycastle.version>1.77</bouncycastle.version>
-        <mokito.version>5.8.0</mokito.version>
+        <mokito.version>5.9.0</mokito.version>
         <maven.compiler.target>11</maven.compiler.target>
         <maven.compiler.source>11</maven.compiler.source>
         <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
