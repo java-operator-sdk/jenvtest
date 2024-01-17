@@ -17,7 +17,7 @@ class JUnitExtensionOnMethodTest {
   String kubeConfigYaml;
 
   @Test
-  @EnableKubeAPIServer
+  @EnableKubeAPIServer(kubeAPIVersion = "1.28.*")
   void simpleTest1() {
     TestUtils.simpleTest(kubeConfigYaml);
   }
