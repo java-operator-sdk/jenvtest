@@ -179,6 +179,7 @@ public class ProcessReadinessChecker {
           null);
       return HttpClient.newBuilder()
           .sslContext(sslContext)
+          .version(HttpClient.Version.HTTP_1_1)
           .build();
     } catch (NoSuchAlgorithmException | KeyManagementException e) {
       throw new JenvtestException(e);
