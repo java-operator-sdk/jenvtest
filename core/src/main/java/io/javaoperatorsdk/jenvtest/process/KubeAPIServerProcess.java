@@ -89,7 +89,9 @@ public class KubeAPIServerProcess {
     var readinessChecker = new ProcessReadinessChecker();
     var timeout = config.getStartupTimeout();
     var startTime = System.currentTimeMillis();
-    readinessChecker.waitUntilReady(apiServerPort, "readyz", KUBE_API_SERVER, true, timeout);
+    // the 1.29.0 binary has issue with this. Will temporarily comment out and further investigate.
+    // But with this now all the executions are failing
+    // readinessChecker.waitUntilReady(apiServerPort, "readyz", KUBE_API_SERVER, true, timeout);
     int newTimout = (int) (timeout - (System.currentTimeMillis() - startTime));
     readinessChecker.waitUntilDefaultNamespaceAvailable(apiServerPort, binaryManager, certManager,
         config, newTimout);
