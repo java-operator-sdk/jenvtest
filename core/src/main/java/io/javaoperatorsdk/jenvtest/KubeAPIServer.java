@@ -37,11 +37,6 @@ public class KubeAPIServer implements UnexpectedProcessStopHandler {
   }
 
   public void start() {
-    startAsync();
-    waitUntilReady();
-  }
-
-  public void startAsync() {
     log.debug("Stating API Server. Using jenvtest dir: {}", config.getJenvtestDir());
     binaryManager.initAndDownloadIfRequired();
     certManager.createCertificatesIfNeeded();
@@ -50,9 +45,6 @@ public class KubeAPIServer implements UnexpectedProcessStopHandler {
     if (config.isUpdateKubeConfig()) {
       kubeConfig.updateKubeConfig(apiServerPort);
     }
-  }
-
-  public void waitUntilReady() {
     kubeApiServerProcess.waitUntilReady();
     log.debug("API Server ready to use");
   }
