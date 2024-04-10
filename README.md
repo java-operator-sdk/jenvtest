@@ -1,3 +1,5 @@
+> **_MOVED_**  Jenvtest was renamed to kube-api-test and moved to be part of [Fabric8 Kubernetes Client](https://github.com/fabric8io/kubernetes-client/blob/main/doc/kube-api-test.md)
+
 # jenvtest
 
 jenvtest makes it easy to implement integration tests with Kubernetes API Server in Java.
